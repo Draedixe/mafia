@@ -24,7 +24,7 @@ abstract class Roles_Enum {
     const CONDUCTEUR_DE_BUS = 6;
     const MEDECIN_LEGISTE = 7;
     const DETECTIVE = 8;
-    const ESCORTEUR = 9;
+    const MARSHALL = 9;
     const MACON = 10;
     const MACON_CHEF = 11;
     const GARDIEN_DE_PRISON = 12;
