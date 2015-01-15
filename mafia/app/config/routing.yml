@@ -1,3 +1,7 @@
+mafia_user:
+    resource: "@MafiaUserBundle/Resources/config/routing.yml"
+    prefix:   /
+
 mafia_roles:
     resource: "@MafiaRolesBundle/Resources/config/routing.yml"
     prefix:   /
@@ -5,3 +9,6 @@ mafia_roles:
 app:
     resource: @AppBundle/Controller/
     type:     annotation
+
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
