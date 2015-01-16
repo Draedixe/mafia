@@ -19,7 +19,7 @@ class CrimeController extends Controller{
         $crime = new Crime();
         $formBuilder = $this->createFormBuilder($crime);
         $formBuilder
-            ->add('nomCrime', 'text',array('label'=>'Nom de la categorie : '));
+            ->add('nomCrime', 'text',array('label'=>'Nom du crime : '));
         $form = $formBuilder->getForm();
         $request = $this->get('request');
 
@@ -38,7 +38,7 @@ class CrimeController extends Controller{
         ));
     }
 
-    public function affichageListeCrimeAction()
+    public function affichageListeCrimesAction()
     {
         $repository = $this->getDoctrine()
             ->getManager()

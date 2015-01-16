@@ -1,18 +1,18 @@
-{% extends "base.html.twig" %}
+{% extends "FOSUserBundle::layout.html.twig" %}
 
 
 {% block title %}Mafia - Crimes{% endblock %}
 
-{% block body %}
+{% block fos_user_content %}
 
     <h3>Liste des crimes</h3>
 
     <ul>
         {% for crime in crimes %}
 
-        <li>crime.nomCrime</li>
+        <li>{{ crime.nomCrime }}</li>
 
-        [% endfor %}
+        {% endfor %}
     </ul>
 
 {% endblock %}

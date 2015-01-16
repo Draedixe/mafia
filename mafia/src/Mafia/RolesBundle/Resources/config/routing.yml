@@ -1,3 +1,15 @@
-mafia_roles_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: MafiaRolesBundle:Default:index }
+creation_crime:
+    path: /crime/creation
+    defaults: { _controller: MafiaRolesBundle:Crime:creationCrime }
+
+liste_crimes:
+    path: /crime/liste
+    defaults: { _controller: MafiaRolesBundle:Crime:affichageListeCrimes }
+
+creation_categorie:
+    path: /categorie/creation
+    defaults: { _controller: MafiaRolesBundle:Categorie:creationCategorie }
+
+liste_categories:
+    path: /categorie/liste
+    defaults: { _controller: MafiaRolesBundle:Categorie:affichageListeCategories }

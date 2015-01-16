@@ -1,0 +1,18 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Categories{% endblock %}
+
+{% block fos_user_content %}
+
+    <h3>Liste des catégories</h3>
+
+    <ul>
+        {% for categorie in categories %}
+
+            <li>{{ categorie.nomCategorie }}</li>
+
+        {% endfor %}
+    </ul>
+
+{% endblock %}
