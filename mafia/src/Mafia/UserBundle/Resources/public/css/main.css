@@ -1,0 +1,23 @@
+body{
+    width: 1000px;
+    margin: 0 auto 0 auto;
+
+    background-color: lightblue;
+}
+
+section{
+    background-color: #ffffff;
+    padding: 50px 10px 50px 10px;
+
+}
+
+nav{
+    border: solid #000000 1px;
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+nav a{
+    margin-right: 10px;
+}

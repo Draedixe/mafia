@@ -25,7 +25,7 @@ class User extends BaseUser
     public function __construct()
     {
         parent::__construct();
-        $points = 0;
+        $this->points = 0;
     }
 
     /**
@@ -36,7 +36,7 @@ class User extends BaseUser
     private $points;
 
 
-    /**
+    /**a
      * Get id
      *
      * @return integer 
