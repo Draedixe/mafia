@@ -12,11 +12,11 @@ abstract class Options_Roles {
 
     private static $options = array(
         Roles_Enum::SHERIFF =>  array(
-                    Options_Roles_Enum::SHERIFF_DETECT_MAFIA_TRIADE => 1,
-                    Options_Roles_Enum::SHERIFF_DETECT_TUEUR_EN_SERIE => 1,
-                    Options_Roles_Enum::SHERIFF_DETECT_PYROMANE => 1,
-                    Options_Roles_Enum::SHERIFF_DETECT_CULTE => 1,
-                    Options_Roles_Enum::SHERIFF_DETECT_TUEUR_DE_MASSE => 1
+            Options_Roles_Enum::SHERIFF_DETECT_MAFIA_TRIADE => 1,
+            Options_Roles_Enum::SHERIFF_DETECT_TUEUR_EN_SERIE => 1,
+            Options_Roles_Enum::SHERIFF_DETECT_PYROMANE => 1,
+            Options_Roles_Enum::SHERIFF_DETECT_CULTE => 1,
+            Options_Roles_Enum::SHERIFF_DETECT_TUEUR_DE_MASSE => 1
         ),
         Roles_Enum::CITOYEN => array(
             Options_Roles_Enum::CITOYEN_GILET_PARE_BALLE => 1,
@@ -36,7 +36,6 @@ abstract class Options_Roles {
             Options_Roles_Enum::CONDUCTEUR_PEUT_SE_CIBLER => 0
         ),
         Roles_Enum::CRIEUR => array(
-            Options_Roles_Enum::CRIEUR_EXCLU_ALEATOIRE => 0
         ),
         Roles_Enum::GARDE_DU_CORPS => array(
             Options_Roles_Enum::GARDE_IGNORE_INVULNERABLE => 1,
@@ -54,7 +53,6 @@ abstract class Options_Roles {
             Options_Roles_Enum::ESCORT_DETECTE_INSENSIBLE_BLOCAGE => 0
         ),
         Roles_Enum::ESPION => array(
-            Options_Roles_Enum::ESPION_EXCLU_ALEATOIRE => 0,
             Options_Roles_Enum::ESPION_VOIT_CIBLE_MAFIA_TRIADE => 0,
             Options_Roles_Enum::ESPION_VOIT_MEURTRE_MAFIA_TRIADE => 1
         ),
@@ -66,7 +64,6 @@ abstract class Options_Roles {
             Options_Roles_Enum::VEILLEUR_PEUT_SE_CIBLER => 0
         ),
         Roles_Enum::VETERAN => array(
-            Options_Roles_Enum::VETERAN_EXCLU_ALEATOIRE => 0,
             Options_Roles_Enum::VETERAN_LIMITE_A_X_NUITS => 2,
             Options_Roles_Enum::VETERAN_IGNORE_INVULNERABLE => 0
         ),
@@ -87,16 +84,63 @@ abstract class Options_Roles {
             Options_Roles_Enum::MACON_DEVIENT_CHEF_QUAND_SEUl => 0
         ),
         Roles_Enum::MACON_CHEF => array(
-            Options_Roles_Enum::CHEF_MACON_EXCLU_ROLE_ALEATOIRE => 1,
             Options_Roles_Enum::CHEF_MACON_NOMBRE_RECRUTEMENT => 2
+        ),
+        Roles_Enum::AGENT => array(
+            Options_Roles_Enum::AGENT_DEVIENT_MAFIOSO_QUAND_SEUL => 1,
+            Options_Roles_Enum::AGENT_NOMBRE_NUITS_ENTRE_PISTAGE => 1
+        ),
+        Roles_Enum::PILLEUR => array(
+            Options_Roles_Enum::PILLEUR_DEVIENT_MAFIOSO_QUAND_SEUL => 1,
+            Options_Roles_Enum::PILLEUR_PEUT_SE_CACHER_X_FOIS => 2,
+            Options_Roles_Enum::PILLEUR_CIBLE_ALERTEE => 0,
+            Options_Roles_Enum::PILLEUR_PEUT_SE_CACHER_CHEZ_MAFIEUX => 0
+        ),
+        Roles_Enum::MAITRE_CHANTEUR => array(
+            Options_Roles_Enum::MAITRE_CHANTEUR_DEVIENT_MAFIOSO_QUAND_SEUL => 1,
+            Options_Roles_Enum::MAITRE_CHANTEUR_VICTIME_PEUT_PARLER_DURANT_JUGEMENT => 0
+        ),
+        Roles_Enum::CONSEILLER => array(
+            Options_Roles_Enum::CONSEILLER_REMPLACE_PARRAIN => 0,
+            Options_Roles_Enum::CONSEILLER_DETECTE_ROLE_EXACT => 0,
+            Options_Roles_Enum::CONSEILLER_DEVIENT_MAFIOSO_QUAND_SEUL => 1
+        ),
+        Roles_Enum::PROSTITUEE => array(
+            Options_Roles_Enum::PROSTITUEE_DEVIENT_MAFIOSO_QUAND_SEULE => 1,
+            Options_Roles_Enum::PROSTITUEE_IMBLOCABLE => 0,
+            Options_Roles_Enum::PROSTITUEE_DETECTE_CIBLE_IMBLOCABLE => 0
+        ),
+        Roles_Enum::MAITRE_DU_DEGUISEMENT => array(
+            Options_Roles_Enum::MAITRE_DEGUISEMENT_DEVIENT_MAFIOSO_QUAND_SEUL => 1,
+            Options_Roles_Enum::MAITRE_DEGUISEMENT_MASQUE_ROLE_VICTIME =>0
+        ),
+        Roles_Enum::CONTREFACTEUR => array(
+            Options_Roles_Enum::CONTREFACTEUR_DEVIENT_MAFIOSO_QUAND_SEUL => 1,
+            Options_Roles_Enum::CONTREFACTEUR_IMMUNISE_DETECTION => 0
+        ),
+        Roles_Enum::PARRAIN => array(
+            Options_Roles_Enum::PARRAIN_INVULNERABLE_LA_NUIT => 1,
+            Options_Roles_Enum::PARRAIN_IMMUNISE_CONTRE_DETECTIONS => 1,
+            Options_Roles_Enum::PARRAIN_IMMUNISE_CONTRE_BLOCAGE => 0,
+            Options_Roles_Enum::PARRAIN_PEUT_TUER_MAFIOSO => 1
+        ),
+        Roles_Enum::CONCIERGE => array(
+            Options_Roles_Enum::CONCIERGE_DEVIENT_MAFIOSO_QUAND_SEUL => 1,
+            Options_Roles_Enum::CONCIERGE_NOMBRE_MASQUAGES => 2
+        ),
+        Roles_Enum::KIDNAPPER => array(
+            Options_Roles_Enum::KIDNAPPER_DEVIENT_MAFIOSO_QUAND_SEUL => 1,
+            Options_Roles_Enum::KIDNAPPER_PEUT_EMPRISONNER_MEMBRE_MAFIA => 0
         )
 
 
 
 
 
-    );
 
+
+
+    );
 
 
     public static function getOptions($role)
