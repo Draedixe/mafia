@@ -13,3 +13,11 @@ creation_categorie:
 liste_categories:
     path: /categorie/liste
     defaults: { _controller: MafiaRolesBundle:Categorie:affichageListeCategories }
+
+creation_role:
+    path: /role/creation
+    defaults: { _controller: MafiaRolesBundle:Role:creationRole }
+
+vue_role:
+    path: /role/afficher/{id}
+    defaults: { _controller: MafiaRolesBundle:Role:affichageRole, id:1 }

@@ -61,4 +61,9 @@ class Crime
     {
         return $this->nomCrime;
     }
+
+    public function __toString()
+    {
+        return $this->nomCrime;
+    }
 }

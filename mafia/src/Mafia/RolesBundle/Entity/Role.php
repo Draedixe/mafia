@@ -2,6 +2,9 @@
 
 namespace Mafia\RolesBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Mafia\RolesBundle\Entity\Crime;
+use Mafia\RolesBundle\Entity\Categorie;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -24,9 +27,9 @@ class Role
     /**
      * @var string
      *
-     * @ORM\Column(name="nom", type="string", length=100)
+     * @ORM\Column(name="nomRole", type="string", length=100)
      */
-    private $nom;
+    private $nomRole;
 
     /**
      * @var string
@@ -35,6 +38,46 @@ class Role
      */
     private $description;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="enum_role", type="integer")
+     */
+    private $enum_role;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="enum_faction", type="integer")
+     */
+    private $enum_faction;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="roleUnique", type="boolean")
+     */
+    private $roleUnique;
+
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\Categorie", cascade={"persist"})
+     * @ORM\JoinTable(name="categories_role")
+     */
+    private $categoriesRole;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\Crime", cascade={"persist"})
+     * @ORM\JoinTable(name="crimes_role")
+     */
+    private $crimesRole;
+
+
+    public function __construct()
+    {
+        $this->categoriesRole = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->crimesRole = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * Get id
@@ -47,26 +90,26 @@ class Role
     }
 
     /**
-     * Set nom
+     * Set nomRole
      *
      * @param string $nom
      * @return Role
      */
-    public function setNom($nom)
+    public function setNomRole($nom)
     {
-        $this->nom = $nom;
+        $this->nomRole = $nom;
 
         return $this;
     }
 
     /**
-     * Get nom
+     * Get nomRole
      *
      * @return string 
      */
-    public function getNom()
+    public function getNomRole()
     {
-        return $this->nom;
+        return $this->nomRole;
     }
 
     /**
@@ -90,5 +133,117 @@ class Role
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Get enum_faction
+     *
+     * @return int
+     */
+    public function getEnumFaction()
+    {
+        return $this->enum_faction;
+    }
+
+    /**
+     * Set enum_faction
+     *
+     * @param int $enum_faction
+     */
+    public function setEnumFaction($enum_faction)
+    {
+        $this->enum_faction = $enum_faction;
+    }
+
+    /**
+     * Get enum_role
+     *
+     * @return int
+     */
+    public function getEnumRole()
+    {
+        return $this->enum_role;
+    }
+
+    /**
+     * Set enum_role
+     *
+     * @param int $enum_role
+     */
+    public function setEnumRole($enum_role)
+    {
+        $this->enum_role = $enum_role;
+    }
+
+    /**
+     * Get roleUnique
+     *
+     * @return boolean
+     */
+    public function isUnique()
+    {
+        return $this->roleUnique;
+    }
+
+    /**
+     * Set roleUnique
+     *
+     * @param boolean $unique
+     */
+    public function setUnique($unique)
+    {
+        $this->roleUnique = $unique;
+    }
+
+    /**
+     * @param Categorie $categorie
+     */
+    public function addCategorieRole(Categorie $categorie)
+    {
+        $this->categoriesRole[] = $categorie;
+    }
+
+    /**
+     * @param Categorie $categorie
+     */
+    public function removeCategorieRole(Categorie $categorie)
+    {
+        $this->categoriesRole->removeElement($categorie);
+    }
+
+    /**
+     * Get categoriesRole
+     *
+     * @return ArrayCollection
+     */
+    public function getCategoriesRole()
+    {
+        return $this->categoriesRole;
+    }
+
+    /**
+     * @param Crime $crime
+     */
+    public function addCrimeRole(Crime $crime)
+    {
+        $this->crimesRole[] = $crime;
+    }
+
+    /**
+     * @param Crime $crime
+     */
+    public function removeCrimeRole(Crime $crime)
+    {
+        $this->crimesRole->removeElement($crime);
+    }
+
+    /**
+     * Get crimesRole
+     *
+     * @return ArrayCollection
+     */
+    public function getCrimesRole()
+    {
+        return $this->crimesRole;
     }
 }

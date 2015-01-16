@@ -1,0 +1,33 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - role.nomRole{% endblock %}
+
+{% block fos_user_content %}
+
+    <h3>{{ role.nomRole }}</h3>
+
+    <h4>Description :</h4>
+    <p>
+        {{ role.description }}
+    </p>
+
+    <h4>Catégories du rôle :</h4>
+    <ul>
+        {% for categorie in role.categoriesRole %}
+            <li>{{ categorie.nomCategorie }}</li>
+        {% endfor %}
+    </ul>
+
+    <h4>Crimes du rôle :</h4>
+    <ul>
+        {% for crime in role.crimesRole %}
+            <li>{{ crime.nomCrime }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if role.unique %}
+        <h4>Ce rôle est unique dans une composition</h4>
+    {% endif %}
+
+{% endblock %}
