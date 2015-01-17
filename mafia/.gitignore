@@ -9,3 +9,8 @@
 /vendor/
 /bin/
 /composer.phar
+/app/check.php
+composer.lock
+/web/config.php
+/app/SymfonyRequirements.php
+/../idea/
