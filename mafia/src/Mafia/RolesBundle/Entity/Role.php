@@ -140,7 +140,7 @@ class Role
      *
      * @return int
      */
-    public function getEnumFaction()
+    public function getEnum_faction()
     {
         return $this->enum_faction;
     }
@@ -150,7 +150,7 @@ class Role
      *
      * @param int $enum_faction
      */
-    public function setEnumFaction($enum_faction)
+    public function setEnum_faction($enum_faction)
     {
         $this->enum_faction = $enum_faction;
     }
@@ -160,7 +160,7 @@ class Role
      *
      * @return int
      */
-    public function getEnumRole()
+    public function getEnum_role()
     {
         return $this->enum_role;
     }
@@ -170,7 +170,7 @@ class Role
      *
      * @param int $enum_role
      */
-    public function setEnumRole($enum_role)
+    public function setEnum_role($enum_role)
     {
         $this->enum_role = $enum_role;
     }

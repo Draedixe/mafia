@@ -1,0 +1,31 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Roles{% endblock %}
+
+{% block fos_user_content %}
+
+    <h3>Liste des rôles</h3>
+    <a href="{{ path('creation_role') }}">+ Créer un rôle</a>
+    <a href="{{ path('creation_crime') }}">+ Créer un crime</a>
+    <a href="{{ path('creation_categorie') }}">+ Créer une catégorie</a>
+    <h4>Rôles de la ville</h4>
+    <ul>
+        {% for role in roles if role.enum_faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
+            <li><a href="{{ path('vue_role',{'id' : role.id}) }}">{{ role.nomRole }}</a></li>
+        {% endfor %}
+    </ul>
+    <h4>Rôles de la mafia</h4>
+    <ul>
+        {% for role in roles if role.enum_faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
+            <li><a href="{{ path('vue_role',{'id' : role.id}) }}">{{ role.nomRole }}</a></li>
+        {% endfor %}
+    </ul>
+    <h4>Rôles neutres</h4>
+    <ul>
+        {% for role in roles if role.enum_faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
+            <li><a href="{{ path('vue_role',{'id' : role.id}) }}">{{ role.nomRole }}</a></li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

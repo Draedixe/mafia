@@ -21,3 +21,7 @@ creation_role:
 vue_role:
     path: /role/afficher/{id}
     defaults: { _controller: MafiaRolesBundle:Role:affichageRole, id:1 }
+
+liste_roles:
+    path: /role/liste
+    defaults: { _controller: MafiaRolesBundle:Role:affichageListeRoles }

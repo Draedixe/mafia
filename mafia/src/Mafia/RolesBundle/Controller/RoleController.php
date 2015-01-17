@@ -59,4 +59,16 @@ class RoleController extends Controller
             'role' => $role
         ));
     }
+
+    public function affichageListeRolesAction()
+    {
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Role');
+
+        $roles = $repository->findAll();
+        return $this->render('MafiaRolesBundle:Affichages:liste_roles.html.twig', array(
+            'roles' => $roles
+        ));
+    }
 } 
