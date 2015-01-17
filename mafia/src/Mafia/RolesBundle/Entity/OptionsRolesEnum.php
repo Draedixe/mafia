@@ -9,7 +9,7 @@
 namespace Mafia\RolesBundle\Entity;
 
 
-abstract class Options_Roles_Enum {
+abstract class OptionsRolesEnum {
 
 
     //-- VILLE --\\
