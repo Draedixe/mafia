@@ -41,16 +41,16 @@ class Role
     /**
      * @var integer
      *
-     * @ORM\Column(name="enum_role", type="integer")
+     * @ORM\Column(name="enumRole", type="integer")
      */
-    private $enum_role;
+    private $enumRole;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="enum_faction", type="integer")
+     * @ORM\Column(name="enumFaction", type="integer")
      */
-    private $enum_faction;
+    private $enumFaction;
 
     /**
      * @var boolean
@@ -136,43 +136,43 @@ class Role
     }
 
     /**
-     * Get enum_faction
+     * Get enumFaction
      *
      * @return int
      */
-    public function getEnum_faction()
+    public function getEnumFaction()
     {
-        return $this->enum_faction;
+        return $this->enumFaction;
     }
 
     /**
-     * Set enum_faction
+     * Set enumFaction
      *
      * @param int $enum_faction
      */
-    public function setEnum_faction($enum_faction)
+    public function setEnumFaction($enum_faction)
     {
-        $this->enum_faction = $enum_faction;
+        $this->enumFaction = $enum_faction;
     }
 
     /**
-     * Get enum_role
+     * Get enumRole
      *
      * @return int
      */
-    public function getEnum_role()
+    public function getEnumRole()
     {
-        return $this->enum_role;
+        return $this->enumRole;
     }
 
     /**
-     * Set enum_role
+     * Set enumRole
      *
      * @param int $enum_role
      */
-    public function setEnum_role($enum_role)
+    public function setEnumRole($enum_role)
     {
-        $this->enum_role = $enum_role;
+        $this->enumRole = $enum_role;
     }
 
     /**
@@ -180,7 +180,7 @@ class Role
      *
      * @return boolean
      */
-    public function isUnique()
+    public function isRoleUnique()
     {
         return $this->roleUnique;
     }
@@ -190,7 +190,7 @@ class Role
      *
      * @param boolean $unique
      */
-    public function setUnique($unique)
+    public function setRoleUnique($unique)
     {
         $this->roleUnique = $unique;
     }
