@@ -1,0 +1,74 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block title %}Mafia - Composition{% endblock %}
+
+{% block fos_user_content %}
+
+    <script>
+
+        function ajoutCompo(id, nom, unique)
+        {
+            if(unique){
+                if(document.getElementsByClassName("elem" + id).length <= 0) {
+                    var li = document.createElement("li");
+                    li.appendChild(document.createTextNode(nom));
+                    li.className = "elem" + id;
+                    var button = document.createElement("button");
+                    button.textContent = "<";
+                    button.onclick = function () {
+                        $(this).parent().remove();
+                    };
+                    li.appendChild(button);
+                    $('#tableauCompo').append(li);
+                }
+                else{
+                    alert("Cet élément est unique dans une composition !")
+                }
+
+            }
+            else{
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(nom));
+                li.className = "elem" + id;
+                var button = document.createElement("button");
+                button.textContent = "<";
+                button.onclick = function () {
+                    $(this).parent().remove();
+                };
+                li.appendChild(button);
+                $('#tableauCompo').append(li);
+            }
+
+
+
+        }
+    </script>
+    <h3>Création d'une composition</h3>
+
+    <h4>Ville</h4>
+    <ul>
+        {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
+            <li>{{ role.nomRole }}  <button onclick="ajoutCompo({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">></button></li>
+        {% endfor %}
+    </ul>
+
+    <h4>Mafia</h4>
+    <ul>
+        {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
+            <li>{{ role.nomRole }}  <button onclick="ajoutCompo({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">></button></li>
+        {% endfor %}
+    </ul>
+
+    <h4>Neutre</h4>
+    <ul>
+        {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
+            <li>{{ role.nomRole }}  <button onclick="ajoutCompo({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">></button></li>
+        {% endfor %}
+    </ul>
+
+
+    <h3>Composition</h3>
+    <ul id="tableauCompo">
+
+    </ul>
+{% endblock %}

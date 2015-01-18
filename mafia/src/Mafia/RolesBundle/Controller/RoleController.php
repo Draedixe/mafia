@@ -25,7 +25,7 @@ class RoleController extends Controller
             ->add('description', 'textarea', array('label' => 'Description du role : '))
             ->add('enum_role','choice',array('label' => 'Pouvoir du role : ','choices' => array_flip(RolesEnum::getNomsPouvoirs())))
             ->add('enum_faction','choice',array('label' => 'Faction du role : ','choices' => array_flip(FactionEnum::getNomsFactions())))
-            ->add('unique', 'choice', array('choices'=>array(true => 'Oui',false => 'Non'),'label' => 'Role unique : '))
+            ->add('roleUnique', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Role unique : '))
             ->add('categoriesRole', 'entity', array('label' => 'Categories du role : ', 'class' => 'MafiaRolesBundle:Categorie'
                                                     , 'multiple' => 'true', 'expanded' => 'true'))
             ->add('crimesRole', 'entity', array('label' => 'Crimes du role : ', 'class' => 'MafiaRolesBundle:Crime'

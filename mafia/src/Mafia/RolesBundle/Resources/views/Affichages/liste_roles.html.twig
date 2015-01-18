@@ -11,19 +11,19 @@
     <a href="{{ path('creation_categorie') }}">+ Créer une catégorie</a>
     <h4>Rôles de la ville</h4>
     <ul>
-        {% for role in roles if role.enum_faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
+        {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
             <li><a href="{{ path('vue_role',{'id' : role.id}) }}">{{ role.nomRole }}</a></li>
         {% endfor %}
     </ul>
     <h4>Rôles de la mafia</h4>
     <ul>
-        {% for role in roles if role.enum_faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
+        {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
             <li><a href="{{ path('vue_role',{'id' : role.id}) }}">{{ role.nomRole }}</a></li>
         {% endfor %}
     </ul>
     <h4>Rôles neutres</h4>
     <ul>
-        {% for role in roles if role.enum_faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
+        {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
             <li><a href="{{ path('vue_role',{'id' : role.id}) }}">{{ role.nomRole }}</a></li>
         {% endfor %}
     </ul>

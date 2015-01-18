@@ -25,3 +25,7 @@ vue_role:
 liste_roles:
     path: /role/liste
     defaults: { _controller: MafiaRolesBundle:Role:affichageListeRoles }
+
+creation_composition:
+    path: /composition/creation
+    defaults: { _controller: MafiaRolesBundle:Composition:creationComposition }

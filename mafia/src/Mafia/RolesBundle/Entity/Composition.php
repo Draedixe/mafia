@@ -35,6 +35,17 @@ class Composition
      */
     private $officielle;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\Role", cascade={"persist"})
+     * @ORM\JoinTable(name="roles_compo")
+     */
+    private $rolesCompo;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\OptionRole", cascade={"persist"})
+     * @ORM\JoinTable(name="options_roles_compo")
+     */
+    private $optionsRoles;
 
     /**
      * Get id
@@ -90,5 +101,63 @@ class Composition
     public function getOfficielle()
     {
         return $this->officielle;
+    }
+
+    /**
+     * @param Role $role
+     */
+    public function addRoleCompo(Role $role)
+    {
+        $this->rolesCompo[] = $role;
+    }
+
+    /**
+     * @param Role $role
+     */
+    public function removeRoleCompo(Role $role)
+    {
+        $this->rolesCompo->removeElement($role);
+    }
+
+    /**
+     * Get rolesCompo
+     *
+     * @return ArrayCollection
+     */
+    public function getRolesCompo()
+    {
+        return $this->rolesCompo;
+    }
+
+    public function __construct()
+    {
+        $this->rolesCompo = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->optionsRoles = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * @param OptionRole $option
+     */
+    public function addOptionRole(OptionRole $option)
+    {
+        $this->optionsRoles[] = $option;
+    }
+
+    /**
+     * @param OptionRole $option
+     */
+    public function removeOptionRole(OptionRole $option)
+    {
+        $this->optionsRoles->removeElement($option);
+    }
+
+    /**
+     * Get optionsRoles
+     *
+     * @return ArrayCollection
+     */
+    public function getOptionsRoles()
+    {
+        return $this->optionsRoles;
     }
 }
