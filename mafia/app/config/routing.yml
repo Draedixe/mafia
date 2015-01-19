@@ -1,3 +1,7 @@
+mafia_partie:
+    resource: "@MafiaPartieBundle/Resources/config/routing.yml"
+    prefix:   /
+
 mafia_user:
     resource: "@MafiaUserBundle/Resources/config/routing.yml"
     prefix:   /

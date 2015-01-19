@@ -20,6 +20,7 @@ class AppKernel extends Kernel
             new FOS\UserBundle\FOSUserBundle(),
             new Mafia\UserBundle\MafiaUserBundle(),
             new Mafia\RolesBundle\MafiaRolesBundle(),
+            new Mafia\PartieBundle\MafiaPartieBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

@@ -1,0 +1,4 @@
+creation_parametres:
+    path:     /parametres/creation
+    defaults: { _controller: MafiaPartieBundle:Default:creationParametres }
+
