@@ -5,21 +5,28 @@
 {% block fos_user_content %}
 
     <script>
-
+        var composition = [];
+        var idSelectionnee;
+        var nomSelectionne;
+        var uniqueSelectionne;
+        var ancienSelect;
+        var nombreElem = 0;
         function ajoutCompo(id, nom, unique)
         {
+
+            var li;
             if(unique){
                 if(document.getElementsByClassName("elem" + id).length <= 0) {
-                    var li = document.createElement("li");
+                    li = document.createElement("li");
                     li.appendChild(document.createTextNode(nom));
+                    li.id = "elem" + nombreElem + id;
                     li.className = "elem" + id;
-                    var button = document.createElement("button");
-                    button.textContent = "<";
-                    button.onclick = function () {
-                        $(this).parent().remove();
+                    nombreElem ++ ;
+                    li.onclick = function () {
+                        boutonEnleve(li.id,id);
                     };
-                    li.appendChild(button);
                     $('#tableauCompo').append(li);
+                    composition.push(id);
                 }
                 else{
                     alert("Cet élément est unique dans une composition !")
@@ -27,20 +34,44 @@
 
             }
             else{
-                var li = document.createElement("li");
+                li = document.createElement("li");
                 li.appendChild(document.createTextNode(nom));
+                li.id = "elem" + nombreElem + id;
                 li.className = "elem" + id;
-                var button = document.createElement("button");
-                button.textContent = "<";
-                button.onclick = function () {
-                    $(this).parent().remove();
+                nombreElem ++ ;
+                li.onclick = function () {
+                    boutonEnleve(li.id,id);
                 };
-                li.appendChild(button);
                 $('#tableauCompo').append(li);
+                composition.push(id);
             }
+        }
 
+        function boutonEnleve(identifiantElem, id)
+        {
+            $("#"+identifiantElem).remove();
+            composition.splice($.inArray(id, composition),1);
+            for(var i in composition)
+            {
+                alert(composition[i]);
+            }
+        }
 
+        function boutonAjout(id,nom,unique)
+        {
+            idSelectionnee = id;
+            nomSelectionne = nom;
+            uniqueSelectionne = unique;
+            $(ancienSelect).css('background-color','');
+            ancienSelect = "#role" + id;
+            $("#role" + id).css('background-color','#00CCFF');
+        }
 
+        function validerCompo()
+        {
+            $.post('{{ path('ajout_compo')}}', { composition: composition},function(data) {
+                document.location.href="{{ path('vue_role', {'id':1}) }}";
+            });
         }
     </script>
     <h3>Création d'une composition</h3>
@@ -48,27 +79,32 @@
     <h4>Ville</h4>
     <ul>
         {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
-            <li>{{ role.nomRole }}  <button onclick="ajoutCompo({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">></button></li>
+            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">{{ role.nomRole }}  </li>
         {% endfor %}
     </ul>
 
     <h4>Mafia</h4>
     <ul>
         {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
-            <li>{{ role.nomRole }}  <button onclick="ajoutCompo({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">></button></li>
+            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">{{ role.nomRole }} </li>
         {% endfor %}
     </ul>
 
     <h4>Neutre</h4>
     <ul>
         {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
-            <li>{{ role.nomRole }}  <button onclick="ajoutCompo({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">></button></li>
+            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">{{ role.nomRole }}  </li>
         {% endfor %}
     </ul>
 
+    <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne);"  >></button>
 
     <h3>Composition</h3>
     <ul id="tableauCompo">
 
     </ul>
+
+    <button onclick="validerCompo();">
+        Valider
+    </button>
 {% endblock %}

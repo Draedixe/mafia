@@ -29,3 +29,9 @@ liste_roles:
 creation_composition:
     path: /composition/creation
     defaults: { _controller: MafiaRolesBundle:Composition:creationComposition }
+
+ajout_compo:
+    path: /composition/ajout
+    defaults: { _controller: MafiaRolesBundle:Composition:ajoutComposition }
+    requirements:
+      _method: POST
