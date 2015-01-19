@@ -1,0 +1,18 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Parametres{% endblock %}
+
+{% block fos_user_content %}
+
+    <h3>Liste des paramètres</h3>
+    <a href="{{ path('creation_parametres') }}">+ Créer des paramètres</a>
+
+
+    <ul>
+        {% for parametre in parametres %}
+            <li><a href="{{ path('vue_parametres',{'id' : parametre.id}) }}">{{ parametre.nomParametres }}</a></li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

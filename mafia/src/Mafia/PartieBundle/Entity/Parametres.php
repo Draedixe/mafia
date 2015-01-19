@@ -23,6 +23,13 @@ class Parametres
     private $id;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=100))
+     */
+    private $nomParametres;
+
+    /**
      * @var float
      *
      * @ORM\Column(type="float")
@@ -377,4 +384,25 @@ class Parametres
     {
         return $this->choisirNom;
     }
+
+    /**
+     * @return string
+     */
+    public function getNomParametres()
+    {
+        return $this->nomParametres;
+    }
+
+    /**
+     * @param string $nomParametres
+     * @return Parametres
+     */
+    public function setNomParametres($nomParametres)
+    {
+        $this->nomParametres = $nomParametres;
+
+        return $this;
+    }
+
+
 }

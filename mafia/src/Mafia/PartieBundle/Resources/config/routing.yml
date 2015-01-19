@@ -2,3 +2,10 @@ creation_parametres:
     path:     /parametres/creation
     defaults: { _controller: MafiaPartieBundle:Default:creationParametres }
 
+vue_parametres:
+    path: /parametres/afficher/{id}
+    defaults: { _controller: MafiaPartieBundle:Default:affichageParametres, id:1 }
+
+liste_parametres:
+    path:     /parametres/liste
+    defaults: { _controller: MafiaPartieBundle:Default:affichageListeParametres }

@@ -15,6 +15,7 @@ class DefaultController extends Controller
         $parametres = new Parametres();
         $formBuilder = $this->createFormBuilder($parametres);
         $formBuilder
+            ->add('nomParametres', 'text', array('label' => 'Nom des paramètres : '))
             ->add('dureeDuJour', 'number', array('label' => 'Durée du jour: '))
             ->add('enumTypeDeJugement', 'choice',array('label' => 'Type de jugement : ','choices' => array_flip(TypeJugementEnum::getTypeJugement())))
             ->add('dureeDeLaNuit', 'number', array('label' => 'Durée de la nuit: '))
@@ -40,6 +41,31 @@ class DefaultController extends Controller
         }
         return $this->render('MafiaPartieBundle:Formulaires:creer_parametres.html.twig', array(
             'form' => $form->createView(),
+        ));
+    }
+
+
+    public function affichageParametresAction($id)
+    {
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Parametres');
+
+        $parametres = $repository->find($id);
+        return $this->render('MafiaPartieBundle:Affichages:vue_parametres.html.twig', array(
+            'parametres' => $parametres
+        ));
+    }
+
+    public function affichageListeParametresAction()
+    {
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Parametres');
+
+        $parametres = $repository->findAll();
+        return $this->render('MafiaPartieBundle:Affichages:liste_parametres.html.twig', array(
+            'parametres' => $parametres
         ));
     }
 }
