@@ -22,6 +22,10 @@ vue_role:
     path: /role/afficher/{id}
     defaults: { _controller: MafiaRolesBundle:Role:affichageRole, id:1 }
 
+vue_composition:
+    path: /composition/afficher/{id}
+    defaults: { _controller: MafiaRolesBundle:Composition:affichageComposition, id:1 }
+
 liste_roles:
     path: /role/liste
     defaults: { _controller: MafiaRolesBundle:Role:affichageListeRoles }

@@ -1,0 +1,23 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - {{ composition.nomComposition }}{% endblock %}
+
+{% block fos_user_content %}
+
+    <h3>{{ composition.nomCompo }}</h3>
+
+    <h4>Rôles</h4>
+    <ul>
+        {% for role in roles %}
+            <li>{{ role.role.nomRole }} x {{ role.quantite }}</li>
+        {% endfor %}
+    </ul>
+
+    <h4>Options changées</h4>
+    <ul>
+        {% for option in composition.optionsRoles %}
+            <li>{{ options[option.enumOption]  }} => {{ option.valeur }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
