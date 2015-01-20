@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Role
  *
- * @ORM\Table()
  * @ORM\Entity(repositoryClass="Mafia\RolesBundle\Entity\RoleRepository")
  */
 class Role

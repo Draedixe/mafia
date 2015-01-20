@@ -1,0 +1,19 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% form_theme form 'form_table_layout.html.twig' %}
+
+{% block title %}Mafia - Paramètres{% endblock %}
+
+{% block fos_user_content %}
+
+    <a href="{{ path('liste_parametres') }}">Retour à la liste des paramètres</a>
+
+    <h3>Création des paramètres</h3>
+
+    <div class="well">
+        <form method="post" {{ form_enctype(form) }}>
+            {{ form_widget(form) }}
+            <input type="submit" class="btn btn-primary" />
+        </form>
+    </div>
+{% endblock %}
