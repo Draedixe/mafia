@@ -56,7 +56,7 @@
 
         function boutonAjout(id,nom,unique,role)
         {
-            recupererOptions(role);
+            recupererOptions(role,id);
             idSelectionnee = id;
             nomSelectionne = nom;
             uniqueSelectionne = unique;
@@ -68,12 +68,12 @@
 
         function validerCompo()
         {
-            $.post('{{ path('ajout_compo')}}', { composition: composition},function(data) {
+            $.post('{{ path('ajout_compo')}}', { composition: composition,options : options},function(data) {
                 document.location.href="{{ path('vue_role', {'id':1}) }}";
             });
         }
 
-        function recupererOptions(role)
+        function recupererOptions(role,id)
         {
             $('.options').empty();
             $.ajax({
@@ -90,19 +90,19 @@
                         p.appendChild(document.createTextNode(data[i]));
                         p.id = "option" + i;
                         p.className = "options";
-                        ajouterOptionsEtValeurs(i,role);
+                        ajouterOptionsEtValeurs(i,role,id);
                         $('#optionsRole').append(p);
                     }
                 }
             });
         }
 
-        function ajouterOptionsEtValeurs(i,role)
+        function ajouterOptionsEtValeurs(option,role,id)
         {
             $.ajax({
                 type: "POST",
                 url : "{{ path('recuperer_valeurs_options')}}",
-                data: {role: role, option: i},
+                data: {role: role, option: option},
                 dataType : "json",
                 success : function(data)
                 {
@@ -114,23 +114,63 @@
                     for(var j = min; j < max+1 ; j ++)
                     {
                         label = document.createElement("label");
-                        label.setAttribute('for','option' + i + 'val' + j);
+                        label.setAttribute('for','option' + option + 'val' + j);
                         label.appendChild(document.createTextNode(j));
                         radio = document.createElement("input");
-                        radio.setAttribute('id','option' + i + 'val' + j);
+                        radio.setAttribute('onchange','changementValeurOption(' + id + ',' + option + ',' + j + ')');
+                        radio.setAttribute('id','option' + option + 'val' + j);
                         radio.setAttribute('type', 'radio');
-                        radio.setAttribute('name', 'option' + i);
+                        radio.setAttribute('name', 'option' + option);
                         radio.setAttribute('value', j);
-                        if(j == defaut)
+                        var valeurPoss = valeurOption(id,option);
+                        if(valeurPoss > -1)
                         {
-                            radio.setAttribute('checked', true);
+                            if(j == valeurPoss)
+                            {
+                                radio.setAttribute('checked', 'true');
+                            }
                         }
-                        $('#option'+i).append(radio).append(label);
+                        else if(j == defaut)
+                        {
+                            radio.setAttribute('checked', 'true');
+                        }
+                        $('#option'+option).append(radio).append(label);
 
                     }
                 }
             });
         }
+
+        function valeurOption(role,option)
+        {
+            for(var i in options)
+            {
+                if(options[i]['role'] == role && options[i]['option'] == option)
+                {
+                    return options[i]['valeur'];
+                }
+            }
+            return -1;
+        }
+
+        function changementValeurOption(role,option,valeur)
+        {
+            if(valeurOption(role,option) > -1)
+            {
+                for(var i in options)
+                {
+                    if(options[i]['role'] == role && options[i]['option'] == option)
+                    {
+                        options[i]['valeur'] = valeur;
+                    }
+                }
+            }
+            else
+            {
+                options.push({role:role,option:option,valeur:valeur});
+            }
+        }
+
     </script>
     <h3>Création d'une composition</h3>
 

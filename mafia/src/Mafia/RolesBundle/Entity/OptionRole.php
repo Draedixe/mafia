@@ -24,9 +24,15 @@ class OptionRole
     /**
      * @var integer
      *
-     * @ORM\Column(name="enum_option", type="integer")
+     * @ORM\Column(name="enumOption", type="integer")
      */
     private $enumOption;
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="idRole", type="integer")
+     */
+    private $idRole;
 
     /**
      * @var integer
@@ -91,4 +97,24 @@ class OptionRole
     {
         return $this->valeur;
     }
+
+    /**
+     * get idRole
+     * @return int
+     */
+    public function getIdRole()
+    {
+        return $this->idRole;
+    }
+
+    /**
+     * set idRole
+     * @param int $idRole
+     */
+    public function setIdRole($idRole)
+    {
+        $this->idRole = $idRole;
+    }
+
+
 }

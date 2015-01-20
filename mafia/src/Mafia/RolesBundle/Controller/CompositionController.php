@@ -10,6 +10,7 @@ namespace Mafia\RolesBundle\Controller;
 
 
 use Mafia\RolesBundle\Entity\Composition;
+use Mafia\RolesBundle\Entity\OptionRole;
 use Mafia\RolesBundle\Entity\OptionsRoles;
 use Mafia\RolesBundle\Entity\OptionsRolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -36,7 +37,18 @@ class CompositionController extends Controller{
         $newComposition = new Composition();
         $request = $this->get('request');
         $composition = $request->get("composition");
+        $options = $request->get("options");
 
+        $em = $this->getDoctrine()->getManager();
+        foreach($options as $option)
+        {
+            $newOption = new OptionRole();
+            $newOption->setIdRole($option['role']);
+            $newOption->setEnumOption($option['option']);
+            $newOption->setValeur($option['valeur']);
+            $em->persist($newOption);
+            $newComposition->addOptionRole($newOption);
+        }
         $repository = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaRolesBundle:Role');
@@ -47,11 +59,10 @@ class CompositionController extends Controller{
             $role = $repository->find($idRole);
             $newComposition->addRoleCompo($role);
         }
-        $em = $this->getDoctrine()->getManager();
         $em->persist($newComposition);
         $em->flush();
 
-        return false;
+        return new Response("SUCCESS");
 
     }
 
