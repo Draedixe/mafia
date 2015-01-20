@@ -35,3 +35,15 @@ ajout_compo:
     defaults: { _controller: MafiaRolesBundle:Composition:ajoutComposition }
     requirements:
       _method: POST
+
+recuperer_noms_options:
+    path: /options/noms
+    defaults: { _controller: MafiaRolesBundle:Composition:recupererNomOptions }
+    requirements:
+      _method: POST
+
+recuperer_valeurs_options:
+    path: /options/valeurs
+    defaults: { _controller: MafiaRolesBundle:Composition:recupererValeursOptions }
+    requirements:
+      _method: POST

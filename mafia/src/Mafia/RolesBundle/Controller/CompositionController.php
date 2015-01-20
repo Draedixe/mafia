@@ -10,7 +10,10 @@ namespace Mafia\RolesBundle\Controller;
 
 
 use Mafia\RolesBundle\Entity\Composition;
+use Mafia\RolesBundle\Entity\OptionsRoles;
+use Mafia\RolesBundle\Entity\OptionsRolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 class CompositionController extends Controller{
 
@@ -47,7 +50,30 @@ class CompositionController extends Controller{
         $em = $this->getDoctrine()->getManager();
         $em->persist($newComposition);
         $em->flush();
-        return $this->redirect($this->generateUrl('vue_role', array('id'=>1)));
 
+        return false;
+
+    }
+
+    public function recupererNomOptionsAction()
+    {
+        $request = $this->get('request');
+        $role = $request->get("role");
+
+        $resultat = OptionsRoles::getName($role);
+        $data = json_encode($resultat);
+        return new Response($data);
+    }
+
+    public function recupererValeursOptionsAction()
+    {
+        $request = $this->get('request');
+        $role = $request->get("role");
+        $option = $request->get("option");
+
+        $resultat = OptionsRoles::getValeursPossibles($role,$option);
+        $min = $resultat["min"];
+        $max = $resultat["max"];
+        return new Response(json_encode(array("min"=>$min,"max"=>$max)));
     }
 } 

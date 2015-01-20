@@ -11,6 +11,7 @@
         var uniqueSelectionne;
         var ancienSelect;
         var nombreElem = 0;
+        var options = [];
         function ajoutCompo(id, nom, unique)
         {
 
@@ -51,20 +52,18 @@
         {
             $("#"+identifiantElem).remove();
             composition.splice($.inArray(id, composition),1);
-            for(var i in composition)
-            {
-                alert(composition[i]);
-            }
         }
 
-        function boutonAjout(id,nom,unique)
+        function boutonAjout(id,nom,unique,role)
         {
+            recupererOptions(role);
             idSelectionnee = id;
             nomSelectionne = nom;
             uniqueSelectionne = unique;
             $(ancienSelect).css('background-color','');
             ancienSelect = "#role" + id;
             $("#role" + id).css('background-color','#00CCFF');
+
         }
 
         function validerCompo()
@@ -73,32 +72,84 @@
                 document.location.href="{{ path('vue_role', {'id':1}) }}";
             });
         }
+
+        function recupererOptions(role)
+        {
+            $('.options').empty();
+            $.ajax({
+                type: "POST",
+                url : "{{ path('recuperer_noms_options')}}",
+                data: {role: role},
+                dataType : "json",
+                success : function(data)
+                {
+                    for(var i in data)
+                    {
+                        var p;
+                        p = document.createElement("p");
+                        p.appendChild(document.createTextNode(data[i]));
+                        p.id = "option" + i;
+                        p.className = "options";
+                        ajouterOptionsEtValeurs(i,role);
+                        $('#optionsRole').append(p);
+                    }
+                }
+            });
+        }
+
+        function ajouterOptionsEtValeurs(i,role)
+        {
+            $.ajax({
+                type: "POST",
+                url : "{{ path('recuperer_valeurs_options')}}",
+                data: {role: role, option: i},
+                dataType : "json",
+                success : function(data)
+                {
+                    var min = data['min'];
+                    var max = data['max'];
+                    var radio;
+                    for(var j = min; j < max+1 ; j ++)
+                    {
+                        radio = document.createElement("input");
+                        radio.setAttribute('type', 'radio');
+                        radio.setAttribute('name', 'option' + i);
+                        $('#option'+i).append(radio);
+
+                    }
+                }
+            });
+        }
     </script>
     <h3>Création d'une composition</h3>
 
     <h4>Ville</h4>
     <ul>
         {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
-            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">{{ role.nomRole }}  </li>
+            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }},{{ role.enumRole }});">{{ role.nomRole }}  </li>
         {% endfor %}
     </ul>
 
     <h4>Mafia</h4>
     <ul>
         {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
-            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">{{ role.nomRole }} </li>
+            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }},{{ role.enumRole }});">{{ role.nomRole }} </li>
         {% endfor %}
     </ul>
 
     <h4>Neutre</h4>
-    <ul>
-        {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
-            <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }});">{{ role.nomRole }}  </li>
-        {% endfor %}
-    </ul>
-
+        <ul>
+            {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
+                <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }},{{ role.enumRole }});">{{ role.nomRole }}  </li>
+            {% endfor %}
+        </ul>
     <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne);"  >></button>
 
+    <fieldset id="optionsRole">
+        <legend>Options</legend>
+
+
+    </fieldset>
     <h3>Composition</h3>
     <ul id="tableauCompo">
 
