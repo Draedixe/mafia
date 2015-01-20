@@ -322,7 +322,7 @@ abstract class OptionsRoles {
 
     public static function getValeursPossibles($role,$option)
     {
-        $resultat = array("min"=>false,"max"=>true);
+        $resultat = array("min"=>0,"max"=>1);
         switch($role)
         {
             case RolesEnum::MARSHALL :

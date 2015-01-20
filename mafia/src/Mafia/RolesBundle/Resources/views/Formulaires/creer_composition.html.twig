@@ -108,13 +108,24 @@
                 {
                     var min = data['min'];
                     var max = data['max'];
+                    var defaut = data['defaut'];
                     var radio;
+                    var label;
                     for(var j = min; j < max+1 ; j ++)
                     {
+                        label = document.createElement("label");
+                        label.setAttribute('for','option' + i + 'val' + j);
+                        label.appendChild(document.createTextNode(j));
                         radio = document.createElement("input");
+                        radio.setAttribute('id','option' + i + 'val' + j);
                         radio.setAttribute('type', 'radio');
                         radio.setAttribute('name', 'option' + i);
-                        $('#option'+i).append(radio);
+                        radio.setAttribute('value', j);
+                        if(j == defaut)
+                        {
+                            radio.setAttribute('checked', true);
+                        }
+                        $('#option'+i).append(radio).append(label);
 
                     }
                 }

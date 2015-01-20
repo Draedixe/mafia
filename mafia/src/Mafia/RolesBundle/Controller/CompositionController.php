@@ -74,6 +74,8 @@ class CompositionController extends Controller{
         $resultat = OptionsRoles::getValeursPossibles($role,$option);
         $min = $resultat["min"];
         $max = $resultat["max"];
-        return new Response(json_encode(array("min"=>$min,"max"=>$max)));
+        $defaut = OptionsRoles::getOptionsDefaut($role,$option);
+        return new Response(json_encode(array("min"=>$min,"max"=>$max,"defaut"=>$defaut)));
     }
+
 } 
