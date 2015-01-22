@@ -21,3 +21,19 @@ nav{
 nav a{
     margin-right: 10px;
 }
+
+.valeur{
+    border: solid 1px #000000;
+    vertical-align: middle;
+    width: 150px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.table{
+    display: table;
+}
+.table-cell{
+    display: table-cell;
+
+}

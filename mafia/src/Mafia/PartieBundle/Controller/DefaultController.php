@@ -7,6 +7,7 @@ use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\TypeJugementEnum;
 use Mafia\PartieBundle\Entity\TypeNuitEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Mafia\PartieBundle\Form\Type\RangeType;
 
 class DefaultController extends Controller
 {
@@ -15,18 +16,19 @@ class DefaultController extends Controller
         $parametres = new Parametres();
         $formBuilder = $this->createFormBuilder($parametres);
         $formBuilder
-            ->add('nomParametres', 'text', array('label' => 'Nom des paramètres : '))
-            ->add('dureeDuJour', 'number', array('label' => 'Durée du jour: '))
-            ->add('enumTypeDeJugement', 'choice',array('label' => 'Type de jugement : ','choices' => array_flip(TypeJugementEnum::getTypeJugement())))
-            ->add('dureeDeLaNuit', 'number', array('label' => 'Durée de la nuit: '))
-            ->add('dernieresVolontes', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Dernières volontés : '))
-            ->add('tempsDeDiscussion', 'number', array('label' => 'Temps de discussion: '))
-            ->add('debutDuJeu', 'choice',array('label' => 'Début du jeu : ','choices' => array_flip(DebutPartieEnum::getDebutPartie())))
-            ->add('typeDeNuit', 'choice',array('label' => 'Type de nuit : ','choices' => array_flip(TypeNuitEnum::getTypeNuit())))
-            ->add('messagePrives', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Messages privés : '))
-            ->add('phaseDiscussion', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Phase de discussion : '))
-            ->add('choisirNom', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Choisir le nom : '))
-            ->add('officiel', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Officiel : '));
+            ->add('nomParametres', 'text', array('label' => 'Nom des paramètres'))
+            ->add('dureeDuJour', new RangeType(), array('label' => 'Durée du jour'))
+            ->add('enumTypeDeJugement', 'choice',array('label' => 'Type de jugement','choices' => array_flip(TypeJugementEnum::getTypeJugement())))
+            ->add('dureeDeLaNuit', new RangeType(), array('label' => 'Durée de la nuit'))
+            ->add('dernieresVolontes', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Dernières volontés'))
+            ->add('tempsDeDiscussion', new RangeType(), array('label' => 'Temps de discussion: '))
+            ->add('debutDuJeu', 'choice',array('label' => 'Début du jeu','choices' => array_flip(DebutPartieEnum::getDebutPartie())))
+            ->add('typeDeNuit', 'choice',array('label' => 'Type de nuit','choices' => array_flip(TypeNuitEnum::getTypeNuit())))
+            ->add('messagePrives', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Messages privés'))
+            ->add('phaseDiscussion', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Phase de discussion'))
+            ->add('choisirNom', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Choisir le nom'))
+            ->add('officiel', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Officiel'))
+            ->add('Confirmer', 'submit');
         $form = $formBuilder->getForm();
         $request = $this->get('request');
 
