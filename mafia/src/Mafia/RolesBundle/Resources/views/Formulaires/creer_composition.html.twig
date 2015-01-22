@@ -13,6 +13,7 @@
         var ancienSelect;
         var nombreElem = 0;
         var options = [];
+        var actionEnCours = false;
         function ajoutCompo(id, nom, unique, role)
         {
 
@@ -66,16 +67,26 @@
 
         function boutonEnleve(identifiantElem, id, role)
         {
-            recupererOptions(role,id);
-            idSelectionnee = id;
-            roleSelectionne = role;
-            $(ancienSelect).css('background-color','');
-            ancienSelect = "#"+identifiantElem;
-            $(ancienSelect).css('background-color','#00CCFF');
+            if(!actionEnCours)
+            {
+                recupererOptions(role,id);
+                idSelectionnee = id;
+                roleSelectionne = role;
+                $(ancienSelect).css('background-color','');
+                ancienSelect = "#"+identifiantElem;
+                $(ancienSelect).css('background-color','#00CCFF');
+
+            }
+            else
+            {
+                alert("Un chargement est encore en cours");
+            }
         }
 
         function boutonAjout(id,nom,unique,role)
         {
+            if(!actionEnCours)
+            {
             recupererOptions(role,id);
             idSelectionnee = id;
             nomSelectionne = nom;
@@ -85,82 +96,107 @@
             ancienSelect = "#role" + id;
             $("#role" + id).css('background-color','#00CCFF');
 
+            }
+            else
+            {
+                alert("Un chargement est encore en cours");
+            }
         }
 
         function validerCompo()
         {
-            $.post('{{ path('ajout_compo')}}', { composition: composition,options : options, nom: $('#nomComposition').val()},function(data) {
-                document.location.href=data;
-            });
+            if(!actionEnCours) {
+                actionEnCours=true;
+                $.post('{{ path('ajout_compo')}}', {
+                    composition: composition,
+                    options: options,
+                    nom: $('#nomComposition').val()
+                }, function (data) {
+                    actionEnCours = false;
+                    document.location.href = data;
+                });
+            }
+            else
+            {
+                alert("Un chargement est encore en cours");
+            }
         }
 
         function recupererOptions(role,id)
         {
+            actionEnCours = true;
             $('.options').remove();
             $.ajax({
                 type: "POST",
                 url : "{{ path('recuperer_noms_options')}}",
                 data: {role: role},
                 dataType : "json",
+                error: function()
+                {
+                    actionEnCours = false;
+
+                },
                 success : function(data)
                 {
-                    for(var i in data)
+                    if(!data)
                     {
+                        actionEnCours = false;
+                    }
+                    else
+                    {
+
+                        var min;
+                        var max;
+                        var defaut;
                         var p;
-                        p = document.createElement("p");
-                        p.appendChild(document.createTextNode(data[i]));
-                        p.id = "option" + i;
-                        p.className = "options";
-                        ajouterOptionsEtValeurs(i,role,id);
-                        $('#optionsRole').append(p);
-                    }
-                }
-            });
-        }
-
-        function ajouterOptionsEtValeurs(option,role,id)
-        {
-            $.ajax({
-                type: "POST",
-                url : "{{ path('recuperer_valeurs_options')}}",
-                data: {role: role, option: option},
-                dataType : "json",
-                success : function(data)
-                {
-                    var min = data['min'];
-                    var max = data['max'];
-                    var defaut = data['defaut'];
-                    var radio;
-                    var label;
-                    for(var j = min; j < max+1 ; j ++)
-                    {
-                        label = document.createElement("label");
-                        label.setAttribute('for','option' + option + 'val' + j);
-                        label.appendChild(document.createTextNode(j));
-                        radio = document.createElement("input");
-                        radio.setAttribute('onchange','changementValeurOption(' + id + ',' + option + ',' + j + ')');
-                        radio.setAttribute('id','option' + option + 'val' + j);
-                        radio.setAttribute('type', 'radio');
-                        radio.setAttribute('name', 'option' + option);
-                        radio.setAttribute('value', j);
-                        var valeurPoss = valeurOption(id,option);
-                        if(valeurPoss > -1)
+                        var valeurPoss;
+                        var radio, label;
+                        for(var option in data)
                         {
-                            if(j == valeurPoss)
+
+                            min = data[option]["min"];
+                            max = data[option]['max'];
+                            defaut = data[option]['defaut'];
+                            p = document.createElement("p");
+                            p.appendChild(document.createTextNode(data[option]["nom"]));
+                            p.id = "option" + option;
+                            p.className = "options";
+                            for(var j = min; j < max+1 ; j ++)
                             {
-                                radio.setAttribute('checked', 'true');
-                            }
-                        }
-                        else if(j == defaut)
-                        {
-                            radio.setAttribute('checked', 'true');
-                        }
-                        $('#option'+option).append(radio).append(label);
+                                label = document.createElement("label");
+                                label.setAttribute('for','option' + option + 'val' + j);
+                                label.appendChild(document.createTextNode(j));
+                                radio = document.createElement("input");
+                                radio.setAttribute('onchange','changementValeurOption(' + id + ',' + option + ',' + j + ')');
+                                radio.setAttribute('id','option' + option + 'val' + j);
+                                radio.setAttribute('type', 'radio');
+                                radio.setAttribute('name', 'option' + option);
+                                radio.setAttribute('value', j);
+                                valeurPoss = valeurOption(id,option);
+                                if(valeurPoss > -1)
+                                {
+                                    if(j == valeurPoss)
+                                    {
+                                        radio.setAttribute('checked', 'true');
+                                    }
+                                }
+                                else if(j == defaut)
+                                {
+                                    radio.setAttribute('checked', 'true');
+                                }
+                                p.appendChild(radio);
+                                p.appendChild(label);
 
+                            }
+                            $('#optionsRole').append(p);
+                            actionEnCours = false;
+                        }
                     }
                 }
             });
         }
+
+
 
         function valeurOption(role,option)
         {

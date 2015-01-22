@@ -22,7 +22,7 @@ class CompositionController extends Controller{
 
     function nombreOccurences($array, $idRole)
     {
-        $res = 1;
+        $res = 0;
         foreach($array as $valeur)
         {
             if ($valeur == $idRole) {
@@ -136,21 +136,33 @@ class CompositionController extends Controller{
         $role = $request->get("role");
 
         $resultat = OptionsRoles::getName($role);
-        $data = json_encode($resultat);
-        return new Response($data);
+        if(count($resultat) > 0)
+        {
+            $arrFinal = array();
+            foreach($resultat as $enumOption => $nom)
+            {
+                $arrValeur = OptionsRoles::getValeursPossibles($role,$enumOption);
+                $arrFinal[$enumOption] = array('nom' => $nom, 'min'=> $arrValeur["min"], 'max' => $arrValeur["max"], 'defaut' => OptionsRoles::getOptionsDefaut($role,$enumOption));
+            }
+            $data = json_encode($arrFinal);
+            return new Response($data);
+
+        }
+        else return new Response(null);
     }
 
-    public function recupererValeursOptionsAction()
+    public function affichageListeCompositionsAction()
     {
-        $request = $this->get('request');
-        $role = $request->get("role");
-        $option = $request->get("option");
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Composition');
+        $compositions = $repository->findAll();
 
-        $resultat = OptionsRoles::getValeursPossibles($role,$option);
-        $min = $resultat["min"];
-        $max = $resultat["max"];
-        $defaut = OptionsRoles::getOptionsDefaut($role,$option);
-        return new Response(json_encode(array("min"=>$min,"max"=>$max,"defaut"=>$defaut)));
+
+
+        return $this->render('MafiaRolesBundle:Affichages:liste_compositions.html.twig', array(
+            'compositions' => $compositions
+        ));
+
     }
-
 } 

@@ -1,0 +1,18 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Compositions{% endblock %}
+
+{% block fos_user_content %}
+
+    <h3>Liste des compositions</h3>
+    <a href="{{ path('creation_composition') }}">+ Créer une composition</a>
+    <ul>
+        {% for compo in compositions %}
+
+            <li><a href="{{ path('vue_composition',{id: compo.id}) }}">{{ compo.nomCompo }} </a></li>
+
+        {% endfor %}
+    </ul>
+
+{% endblock %}

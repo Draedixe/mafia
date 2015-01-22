@@ -46,8 +46,6 @@ recuperer_noms_options:
     requirements:
       _method: POST
 
-recuperer_valeurs_options:
-    path: /options/valeurs
-    defaults: { _controller: MafiaRolesBundle:Composition:recupererValeursOptions }
-    requirements:
-      _method: POST
+liste_compositions:
+    path: /composition/liste
+    defaults: { _controller: MafiaRolesBundle:Composition:affichageListeCompositions }
