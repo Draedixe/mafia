@@ -1,6 +1,7 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 
-{% form_theme form 'form_table_layout.html.twig' %}
+
+{% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
 
 {% block title %}Mafia - Paramètres{% endblock %}
 
@@ -11,9 +12,9 @@
     <h3>Création des paramètres</h3>
 
     <div class="well">
-        <form method="post" {{ form_enctype(form) }}>
-            {{ form_widget(form) }}
-            <input type="submit" class="btn btn-primary" />
-        </form>
+
+            {{ form(form) }}
+
+
     </div>
 {% endblock %}

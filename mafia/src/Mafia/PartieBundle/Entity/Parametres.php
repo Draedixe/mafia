@@ -3,7 +3,10 @@
 namespace Mafia\PartieBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
+use Mafia\PartieBundle\Entity\TypeNuitEnum;
+use Mafia\PartieBundle\Entity\TypeJugementEnum;
+use Mafia\PartieBundle\Entity\DebutPartieEnum;
 /**
  * Parametres
  *
@@ -32,6 +35,7 @@ class Parametres
     /**
      * @var float
      *
+     * @Assert\Range(min=0.5,max=10.0)
      * @ORM\Column(type="float")
      */
     private $dureeDuJour;
@@ -46,6 +50,7 @@ class Parametres
     /**
      * @var float
      *
+     * @Assert\Range(min=0.5,max=10.0)
      * @ORM\Column(type="float")
      */
     private $dureeDeLaNuit;
@@ -60,6 +65,7 @@ class Parametres
     /**
      * @var float
      *
+     * @Assert\Range(min=0.5,max=10.0)
      * @ORM\Column(type="float")
      */
     private $tempsDeDiscussion;
@@ -106,25 +112,25 @@ class Parametres
      */
     private $officiel;
 
+
     /*
-     *
-     * Paramètres par défaut
-     *
-        function __construct($id)
-        {
-            $this->dureeDuJour = 1.8;
-            $this->id = $id;
-            $this->enumTypeDeJugement = Type_Jugement_Enum::MAJORITE;
-            $this->dureeDeLaNuit = 0.7;
-            $this->dernieresVolontes = true;
-            $this->debutDuJeu = Debut_Partie_Enum::NUIT;
-            $this->tempsDeDiscussion = 0.8;
-            $this->typeDeNuit = Type_Nuit_Enum::DESCRIPTION_MORTS;
-            $this->messagePrives = true;
-            $this->choisirNom = true;
-            $this->phaseDiscussion = true;
-        }
+    * Paramètres par défaut
     */
+    function __construct()
+    {
+        $this->dureeDuJour = 1.8;
+        $this->enumTypeDeJugement = TypeJugementEnum::MAJORITE;
+        $this->dureeDeLaNuit = 0.7;
+        $this->dernieresVolontes = true;
+        $this->debutDuJeu = DebutPartieEnum::NUIT;
+        $this->tempsDeDiscussion = 0.8;
+        $this->typeDeNuit = TypeNuitEnum::DESCRIPTION_MORTS;
+        $this->messagePrives = true;
+        $this->choisirNom = true;
+        $this->phaseDiscussion = true;
+        $this->officiel = false;
+    }
+
 
     /**
      * Get id
