@@ -1,17 +1,15 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 
 
-{% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
-
 {% block title %}Mafia - Paramètres{% endblock %}
 
 {% block fos_user_content %}
 
-    <a href="{{ path('liste_parametres') }}">Retour à la liste des paramètres</a>
 
-    <h3>Création des paramètres</h3>
+    <a href="{{ path('liste_parametres') }}">Retour à la liste des paramètres</a>
 
     <div class="well">
         {{ form(form) }}
     </div>
+
 {% endblock %}

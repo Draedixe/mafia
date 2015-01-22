@@ -35,7 +35,7 @@ class Parametres
     /**
      * @var float
      *
-     * @Assert\Range(min=0.5,max=10.0)
+     * @Assert\Range(min=0.5,max=5.0)
      * @ORM\Column(type="float")
      */
     private $dureeDuJour;
@@ -43,6 +43,7 @@ class Parametres
     /**
      * @var integer
      *
+     * @Assert\Range(min=0,max=3)
      * @ORM\Column(type="integer")
      */
     private $enumTypeDeJugement;
@@ -50,7 +51,7 @@ class Parametres
     /**
      * @var float
      *
-     * @Assert\Range(min=0.5,max=10.0)
+     * @Assert\Range(min=0.5,max=5.0)
      * @ORM\Column(type="float")
      */
     private $dureeDeLaNuit;
@@ -65,7 +66,7 @@ class Parametres
     /**
      * @var float
      *
-     * @Assert\Range(min=0.5,max=10.0)
+     * @Assert\Range(min=0.5,max=5.0)
      * @ORM\Column(type="float")
      */
     private $tempsDeDiscussion;
@@ -73,6 +74,7 @@ class Parametres
     /**
      * @var integer
      *
+     * @Assert\Range(min=0,max=2)
      * @ORM\Column(type="integer")
      */
     private $debutDuJeu;
@@ -80,6 +82,7 @@ class Parametres
     /**
      * @var integer
      *
+     * @Assert\Range(min=0,max=2)
      * @ORM\Column(type="integer")
      */
     private $typeDeNuit;
@@ -122,7 +125,7 @@ class Parametres
         $this->enumTypeDeJugement = TypeJugementEnum::MAJORITE;
         $this->dureeDeLaNuit = 0.7;
         $this->dernieresVolontes = true;
-        $this->debutDuJeu = DebutPartieEnum::NUIT;
+        $this->debutDuJeu = DebutPartieEnum::JOUR_SANS_LYNCHAGE;
         $this->tempsDeDiscussion = 0.8;
         $this->typeDeNuit = TypeNuitEnum::DESCRIPTION_MORTS;
         $this->messagePrives = true;

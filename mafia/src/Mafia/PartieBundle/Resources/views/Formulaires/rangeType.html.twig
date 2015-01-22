@@ -1,7 +1,7 @@
 {% block range_widget %}
     {% spaceless %}
         <div class="table" >
-            <span class="range">{{ form_widget(form, {'type' : 'range', 'attr' : {'min' : "0.5", 'max' : "10.0", "step" : "0.1", 'value' : '5.0' } }) }} </span><span class="valeur table-cell">{{ value }} minutes </span>
+            <span class="range table-cell">{{ form_widget(form, {'type' : 'range', 'attr' : {'min' : "0.5", 'max' : "5.0", "step" : "0.1", 'value' : value|replace({',': '.'}) } }) }} </span><span class="valeur table-cell">{{ value }} minutes </span>
         </div>
         {# This script allows you use range with unsupported browsers #}
         <script type="text/javascript" src="{{ asset('/path/to/html5slider.js') }}"></script>

@@ -9,3 +9,7 @@ vue_parametres:
 liste_parametres:
     path:     /parametres/liste
     defaults: { _controller: MafiaPartieBundle:Default:affichageListeParametres }
+
+supprimer_parametres:
+    path:     /parametres/supprimer/{id}
+    defaults: { _controller: MafiaPartieBundle:Default:supprimerParametres, id:1 }
