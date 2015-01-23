@@ -13,7 +13,9 @@
         var ancienSelect;
         var nombreElem = 0;
         var options = [];
+        var importances = [];
         var actionEnCours = false;
+
         function ajoutCompo(id, nom, unique, role)
         {
 
@@ -69,6 +71,29 @@
         {
             if(!actionEnCours)
             {
+                $("#importanceTD").empty();
+                var label, range, div;
+                label = document.createElement("label");
+                label.setAttribute('for','importanceRange');
+                label.appendChild(document.createTextNode('Importance du rôle : '));
+                range = document.createElement("input");
+                range.setAttribute('onchange','changementValeurImportance(' + id + ')');
+                range.setAttribute('id','importanceRange');
+                range.setAttribute('type', 'range');
+                range.setAttribute('step', '1');
+                range.setAttribute('min', '0');
+                range.setAttribute('max', '200');
+                var valeur = valeurImportance(id);
+                if(valeur > -1){
+                    range.setAttribute('value',valeur );
+                }
+                else{
+                    range.setAttribute('value', '100');
+                }
+                div = document.createElement("div");
+                div.setAttribute('id','importanceValeur');
+                div.appendChild(document.createTextNode(range.value));
+                $("#importanceTD").append(label).append(range).append(div);
                 recupererOptions(role,id);
                 idSelectionnee = id;
                 roleSelectionne = role;
@@ -87,14 +112,36 @@
         {
             if(!actionEnCours)
             {
-            recupererOptions(role,id);
-            idSelectionnee = id;
-            nomSelectionne = nom;
-            uniqueSelectionne = unique;
-            roleSelectionne = role;
-            $(ancienSelect).css('background-color','');
-            ancienSelect = "#role" + id;
-            $("#role" + id).css('background-color','#00CCFF');
+                $("#importanceTD").empty();
+                var label, range, div;
+                label = document.createElement("label");
+                label.setAttribute('for','importanceRange');
+                label.appendChild(document.createTextNode('Importance du rôle : '));
+                range = document.createElement("input");
+                range.setAttribute('onchange','changementValeurImportance(' + id + ')');
+                range.setAttribute('id','importanceRange');
+                range.setAttribute('type', 'range');
+                range.setAttribute('min', '0');
+                range.setAttribute('max', '200');
+                var valeur = valeurImportance(id);
+                if(valeur > -1){
+                    range.setAttribute('value',valeur );
+                }
+                else{
+                    range.setAttribute('value', '100');
+                }
+                div = document.createElement("div");
+                div.setAttribute('id','importanceValeur');
+                div.appendChild(document.createTextNode(range.value));
+                $("#importanceTD").append(label).append(range).append(div);
+                recupererOptions(role,id);
+                idSelectionnee = id;
+                nomSelectionne = nom;
+                uniqueSelectionne = unique;
+                roleSelectionne = role;
+                $(ancienSelect).css('background-color','');
+                ancienSelect = "#role" + id;
+                $("#role" + id).css('background-color','#00CCFF');
 
             }
             else
@@ -110,7 +157,8 @@
                 $.post('{{ path('ajout_compo')}}', {
                     composition: composition,
                     options: options,
-                    nom: $('#nomComposition').val()
+                    nom: $('#nomComposition').val(),
+                    importances: importances
                 }, function (data) {
                     actionEnCours = false;
                     document.location.href = data;
@@ -210,6 +258,38 @@
             return -1;
         }
 
+        function valeurImportance(role)
+        {
+            for(var i in importances)
+            {
+                if(importances[i]['role'] == role)
+                {
+                    return importances[i]['valeur'];
+                }
+            }
+            return -1;
+        }
+
+        function changementValeurImportance(role)
+        {
+            var valeur = $('#importanceRange').val();
+            if(valeurImportance(role) > -1)
+            {
+                for(var i in importances)
+                {
+                    if(importances[i]['role'] == role)
+                    {
+                        importances[i]['valeur'] = valeur;
+                    }
+                }
+            }
+            else
+            {
+                importances.push({role:role,valeur: valeur});
+            }
+            $("#importanceValeur").text(valeur);
+        }
+
         function changementValeurOption(role,option,valeur)
         {
             if(valeurOption(role,option) > -1)
@@ -256,8 +336,8 @@
                     {% endfor %}
                 </ul>
             </td>
-            <td>
-                <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne, roleSelectionne);"  >></button>
+            <td id="importanceTD">
+
             </td>
             <td rowspan="3">
                 <ul id="tableauCompo">
@@ -274,6 +354,7 @@
                 </ul>
             </td>
             <td>
+                <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne, roleSelectionne);"  >></button>
                 <button id="boutonEnleve" onclick="enleveCompo(idSelectionnee,nomSelectionne,uniqueSelectionne,roleSelectionne);"  ><</button>
             </td>
         </tr>

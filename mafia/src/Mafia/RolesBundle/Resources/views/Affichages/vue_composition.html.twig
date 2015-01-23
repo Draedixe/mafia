@@ -10,7 +10,7 @@
     <h4>Rôles</h4>
     <ul>
         {% for role in roles %}
-            <li>{{ role.role.nomRole }} x {{ role.quantite }}</li>
+            <li>{{ role.role.nomRole }} x {{ role.quantite }} => {{ importances[role.role.id] }}</li>
         {% endfor %}
     </ul>
 

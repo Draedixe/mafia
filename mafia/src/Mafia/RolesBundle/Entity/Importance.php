@@ -13,13 +13,16 @@ use Doctrine\ORM\Mapping as ORM;
 class Importance
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\ManyToOne(targetEntity="Mafia\RolesBundle\Entity\Role")
      */
-    private $id;
+    private $role;
+
+    /**
+     * @ORM\Id
+     * @ORM\ManyToOne(targetEntity="Mafia\RolesBundle\Entity\Composition")
+     */
+    private $composition;
 
     /**
      * @var integer
@@ -28,6 +31,37 @@ class Importance
      */
     private $valeur;
 
+    /**
+     * @return Composition
+     */
+    public function getComposition()
+    {
+        return $this->composition;
+    }
+
+    /**
+     * @param Composition $composition
+     */
+    public function setComposition($composition)
+    {
+        $this->composition = $composition;
+    }
+
+    /**
+     * @return Role
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param Role $role
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+    }
 
     /**
      * Get id

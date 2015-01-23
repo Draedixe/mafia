@@ -10,6 +10,7 @@ namespace Mafia\RolesBundle\Controller;
 
 
 use Mafia\RolesBundle\Entity\Composition;
+use Mafia\RolesBundle\Entity\Importance;
 use Mafia\RolesBundle\Entity\OptionRole;
 use Mafia\RolesBundle\Entity\OptionsRoles;
 use Mafia\RolesBundle\Entity\OptionsRolesEnum;
@@ -68,10 +69,22 @@ class CompositionController extends Controller{
             ->getRepository('MafiaRolesBundle:RolesCompos');
         $roles = $repository->findBy(array('composition' => $compo));
 
+        $repository = $this->getDoctrine()
+        ->getManager()
+        ->getRepository('MafiaRolesBundle:Importance');
+        $importances = $repository->findBy(array('composition' => $compo));
+
+        $importancesArr = array();
+        foreach($importances as $importance)
+        {
+            $importancesArr[$importance->getRole()->getId()] = $importance->getValeur();
+        }
+
         return $this->render('MafiaRolesBundle:Affichages:vue_composition.html.twig', array(
             'composition' => $compo,
             'options' => $optionsRes,
-            'roles' => $roles
+            'roles' => $roles,
+            'importances' => $importancesArr
         ));
 
     }
@@ -82,6 +95,7 @@ class CompositionController extends Controller{
         $request = $this->get('request');
         $composition = $request->get("composition");
         $options = $request->get("options");
+        $importances = $request->get("importances");
 
         $em = $this->getDoctrine()->getManager();
         if($options){
@@ -124,6 +138,17 @@ class CompositionController extends Controller{
             $roleCompo->setQuantite($quantite);
             $em->persist($roleCompo);
         }
+        if($importances){
+            foreach($importances as $importance)
+            {
+                $newImportance = new Importance();
+                $role = $repository->find($importance['role']);
+                $newImportance->setRole($role);
+                $newImportance->setComposition($newComposition);
+                $newImportance->setValeur($importance['valeur']);
+                $em->persist($newImportance);
+            }
+        }
         $em->flush();
 
         return new Response($this->generateUrl('vue_composition', array('id'=>$newComposition->getId())));
@@ -165,4 +190,4 @@ class CompositionController extends Controller{
         ));
 
     }
-} 
+}
