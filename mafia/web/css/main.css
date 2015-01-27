@@ -35,5 +35,34 @@ nav a{
 }
 .table-cell{
     display: table-cell;
+}
 
+.jouer_chat{
+    display: table-cell;
+    border: solid green 1px;
+    border-radius: 5px;
+    width: 600px;
+    padding: 5px;
+    height: 300px;
+}
+
+.jouer_user_connectes{
+    display: table-cell;
+    border: solid blue 1px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.jouer_choix_compo{
+    display: table-cell;
+    border: solid violet 1px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.jouer_choix_param{
+    display: table-cell;
+    border: solid red 1px;
+    border-radius: 5px;
+    padding: 5px;
 }

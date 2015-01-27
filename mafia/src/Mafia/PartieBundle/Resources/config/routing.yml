@@ -13,3 +13,11 @@ liste_parametres:
 supprimer_parametres:
     path:     /parametres/supprimer/{id}
     defaults: { _controller: MafiaPartieBundle:Default:supprimerParametres, id:1 }
+
+choix_type_partie:
+    path: /jouer
+    defaults: { _controller: MafiaPartieBundle:Partie:choixTypePartie }
+
+jouer_classique:
+    path: /jouer/classique
+    defaults: { _controller: MafiaPartieBundle:Partie:jouerClassique }
