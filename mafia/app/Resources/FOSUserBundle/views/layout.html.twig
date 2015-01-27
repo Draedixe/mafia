@@ -3,11 +3,11 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <script type="text/javascript" src="{{ asset('js/jquery-1.11.2.min.js') }}"></script>
-    {% stylesheets '@MafiaUserBundle/Resources/public/css/*'  %}
+
+    {% stylesheets 'css/*'  %}
     <link rel="stylesheet" href="{{ asset_url }}" type="text/css" />
     {% endstylesheets %}
-    {% javascripts '@MafiaUserBundle/Resources/public/js/*' %}
+    {% javascripts 'js/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
     <title>Mafia</title>
@@ -26,7 +26,7 @@
             <a href="{{ path('liste_roles') }}">Les rôles</a>
             <a href="{{ path('liste_compositions') }}">Les compositions</a>
             <a href="{{ path('liste_parametres') }}">Paramètres</a>
-            <a href="#">Jouer</a>
+            <a href="{{ path('choix_type_partie') }}">Jouer</a>
             <a href="http://fr.french-mafia.wikia.com/wiki/Accueil">Lien vers le wiki</a>
         </nav>
 

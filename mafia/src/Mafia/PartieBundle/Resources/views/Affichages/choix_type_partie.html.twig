@@ -1,0 +1,10 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block title %}Mafia - Jouer{% endblock %}
+
+{% block fos_user_content %}
+
+    <a href="{{ path('jouer_classique') }}"><h2>Partie classique</h2></a>
+
+    <a href="#"><h2>Partie personnalisée</h2></a>
+{% endblock %}
