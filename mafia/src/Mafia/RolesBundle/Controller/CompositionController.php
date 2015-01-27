@@ -55,12 +55,9 @@ class CompositionController extends Controller{
 
         $options = $compo->getOptionsRoles();
         $optionsRes = array();
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:Role');
         foreach($options as $option)
         {
-            $role = $repository->find($option->getIdRole());
+            $role = $option->getRole();
             $optionsRes[$option->getEnumOption()] = OptionsRoles::getName($role->getEnumRole())[$option->getEnumOption()];
         }
 
@@ -98,20 +95,21 @@ class CompositionController extends Controller{
         $importances = $request->get("importances");
 
         $em = $this->getDoctrine()->getManager();
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Role');
         if($options){
             foreach($options as $option)
             {
+                $role = $repository->find($option['role']);
                 $newOption = new OptionRole();
-                $newOption->setIdRole($option['role']);
+                $newOption->setRole($role);
                 $newOption->setEnumOption($option['option']);
                 $newOption->setValeur($option['valeur']);
                 $em->persist($newOption);
                 $newComposition->addOptionRole($newOption);
             }
         }
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:Role');
         if($request->get("nom") != "")
         {
             $newComposition->setNomCompo($request->get("nom"));

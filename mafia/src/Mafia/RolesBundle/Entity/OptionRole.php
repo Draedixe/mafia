@@ -27,12 +27,11 @@ class OptionRole
      * @ORM\Column(name="enumOption", type="integer")
      */
     private $enumOption;
+
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="idRole", type="integer")
+     * @ORM\ManyToOne(targetEntity="Mafia\RolesBundle\Entity\Role")
      */
-    private $idRole;
+    private $role;
 
     /**
      * @var integer
@@ -99,21 +98,19 @@ class OptionRole
     }
 
     /**
-     * get idRole
-     * @return int
+     * @return Role
      */
-    public function getIdRole()
+    public function getRole()
     {
-        return $this->idRole;
+        return $this->role;
     }
 
     /**
-     * set idRole
-     * @param int $idRole
+     * @param Role $role
      */
-    public function setIdRole($idRole)
+    public function setRole($role)
     {
-        $this->idRole = $idRole;
+        $this->role = $role;
     }
 
 
