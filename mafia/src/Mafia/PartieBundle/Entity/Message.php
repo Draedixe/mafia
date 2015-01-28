@@ -36,15 +36,17 @@ class Message
     private $date;
 
     /**
-     *  @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     *  @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
      */
-    private $userPartie;
+    private $user;
 
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\Chat")
+     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\Chat")
      */
     private $chat;
+
+
 
     /**
      * @return mixed
@@ -62,23 +64,25 @@ class Message
         $this->chat = $chat;
     }
 
-
-
     /**
      * @return mixed
      */
-    public function getUserPartie()
+    public function getUser()
     {
-        return $this->userPartie;
+        return $this->user;
     }
 
     /**
-     * @param mixed $userPartie
+     * @param mixed $user
      */
-    public function setUserPartie($userPartie)
+    public function setUser($user)
     {
-        $this->userPartie = $userPartie;
+        $this->user = $user;
     }
+
+
+
+
 
 
 

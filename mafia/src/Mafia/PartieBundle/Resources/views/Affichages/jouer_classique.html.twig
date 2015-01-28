@@ -4,6 +4,30 @@
 
 {% block fos_user_content %}
 
+    <script>
+        $(function() {
+            $("#envoie_chat").click(function () {
+
+                var message = $("#form_message").val();
+
+                var DATA = 'message=' + message;
+                $("#form_message").val("");
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('chat_message')}}",
+                    data: DATA,
+                    cache: false,
+                    success: function(data){
+                        $('.jouer_chat').append("<br/>" + data.name);
+
+                    }
+                });
+                return false;
+
+            });
+        });
+    </script>
+
     <h2>Rejoindre/créer une partie</h2>
 
     <div class="table">
@@ -12,8 +36,14 @@
     </div>
 
     <div class="table">
-        <p class="jouer_chat">Chat</p>
+        <p class="jouer_chat">Chat        </p>
         <p class="jouer_user_connectes">Liste des joueurs connectés</p>
     </div>
+    <form id="form_chat"  method="post">
+        {{ form_widget(form) }}
+
+        <button type="button" id="envoie_chat" title="Envoyer">Envoyer</button>
+    </form>
+
 
 {% endblock %}

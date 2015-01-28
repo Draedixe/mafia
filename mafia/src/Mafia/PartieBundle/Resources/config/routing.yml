@@ -21,3 +21,7 @@ choix_type_partie:
 jouer_classique:
     path: /jouer/classique
     defaults: { _controller: MafiaPartieBundle:Partie:jouerClassique }
+
+chat_message:
+  pattern: /chat/message
+  defaults: { _controller: MafiaPartieBundle:Chat:envoyerMessage }

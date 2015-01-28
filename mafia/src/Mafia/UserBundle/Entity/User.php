@@ -27,6 +27,8 @@ class User extends BaseUser
      */
     private $famille;
 
+
+
     public function __construct()
     {
         parent::__construct();

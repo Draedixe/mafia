@@ -98,6 +98,42 @@ class UserPartie
     private $votePour;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nom;
+
+    function __construct()
+    {
+        $this->vivant = true;
+        $this->deathNote = '';
+        $this->lastWord = '';
+        $this->essencePar = -1;
+        $this->capaciteRestante = -1;
+        $this->tempsEntreCapacite = -1;
+        $this->derniereActivite = new \DateTime();
+    }
+
+    /**
+     * @return string
+     */
+    public function getNom()
+    {
+        return $this->nom;
+    }
+
+    /**
+     * @param string $nom
+     */
+    public function setNom($nom)
+    {
+        $this->nom = $nom;
+    }
+
+
+
+    /**
      * @return mixed
      */
     public function getVotePour()

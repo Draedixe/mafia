@@ -44,7 +44,7 @@ class Partie
      * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\Parametres")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $paramètres;
+    private $parametres;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mafia\RolesBundle\Entity\Composition")
@@ -78,6 +78,36 @@ class Partie
      * @ORM\Column(type="boolean")
      */
        private $maireAnnonce;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $nombreJoueursMax;
+
+    function __construct()
+    {
+        $this->nombreJoueursMax = 15;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNombreJoueursMax()
+    {
+        return $this->nombreJoueursMax;
+    }
+
+    /**
+     * @param int $nombreJoueursMax
+     */
+    public function setNombreJoueursMax($nombreJoueursMax)
+    {
+        $this->nombreJoueursMax = $nombreJoueursMax;
+    }
+
+
 
     /**
      * @return boolean
@@ -166,17 +196,17 @@ class Partie
     /**
      * @return mixed
      */
-    public function getParamètres()
+    public function getParametres()
     {
-        return $this->paramètres;
+        return $this->parametres;
     }
 
     /**
-     * @param mixed $paramètres
+     * @param mixed $parametres
      */
-    public function setParamètres($paramètres)
+    public function setParametres($parametres)
     {
-        $this->paramètres = $paramètres;
+        $this->parametres = $parametres;
     }
 
     /**
