@@ -2,6 +2,7 @@
 
 namespace Mafia\RolesBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,12 +36,23 @@ class Composition
      */
     private $officielle;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\Importance", cascade={"persist"})
+     * @ORM\JoinTable(name="importances_roles_compo")
+     */
+    private $importances;
 
     /**
      * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\OptionRole", cascade={"persist"})
      * @ORM\JoinTable(name="options_roles_compo")
      */
     private $optionsRoles;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\RolesCompos", cascade={"persist"})
+     * @ORM\JoinTable(name="roles_compo")
+     */
+    private $rolesCompo;
 
     /**
      * Get id
@@ -100,8 +112,9 @@ class Composition
 
     public function __construct()
     {
-        $this->rolesCompo = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->optionsRoles = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->rolesCompo = new ArrayCollection();
+        $this->optionsRoles = new ArrayCollection();
+        $this->importances = new ArrayCollection();
     }
 
     /**
@@ -130,4 +143,55 @@ class Composition
         return $this->optionsRoles;
     }
 
+    /**
+     * @param Importance $importance
+     */
+    public function addImportance(Importance $importance)
+    {
+        $this->importances[] = $importance;
+    }
+
+    /**
+     * @param Importance $importance
+     */
+    public function removeImportance(Importance $importance)
+    {
+        $this->importances->removeElement($importance);
+    }
+
+    /**
+     * Get importances
+     *
+     * @return ArrayCollection
+     */
+    public function getImportances()
+    {
+        return $this->importances;
+    }
+
+    /**
+     * @param RolesCompos $roleCompo
+     */
+    public function addRoleCompo(RolesCompos $roleCompo)
+    {
+        $this->rolesCompo[] = $roleCompo;
+    }
+
+    /**
+     * @param RolesCompos $roleCompo
+     */
+    public function removeRoleCompo(RolesCompos $roleCompo)
+    {
+        $this->rolesCompo->removeElement($roleCompo);
+    }
+
+    /**
+     * Get rolesCompo
+     *
+     * @return ArrayCollection
+     */
+    public function getRolesCompo()
+    {
+        return $this->rolesCompo;
+    }
 }

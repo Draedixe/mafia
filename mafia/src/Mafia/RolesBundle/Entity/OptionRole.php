@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class OptionRole
 {
+
     /**
      * @var integer
      *
@@ -23,7 +24,6 @@ class OptionRole
 
     /**
      * @var integer
-     *
      * @ORM\Column(name="enumOption", type="integer")
      */
     private $enumOption;
@@ -35,21 +35,10 @@ class OptionRole
 
     /**
      * @var integer
-     *
      * @ORM\Column(name="valeur", type="integer")
      */
     private $valeur;
 
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * Set enumOption
@@ -111,6 +100,22 @@ class OptionRole
     public function setRole($role)
     {
         $this->role = $role;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
 
