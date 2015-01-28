@@ -17,6 +17,7 @@ use Mafia\RolesBundle\Entity\OptionsRolesEnum;
 use Mafia\RolesBundle\Entity\Role;
 use Mafia\RolesBundle\Entity\RolesCompos;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class CompositionController extends Controller{
@@ -61,18 +62,8 @@ class CompositionController extends Controller{
             $optionsRes[$option->getEnumOption()] = OptionsRoles::getName($role->getEnumRole())[$option->getEnumOption()];
         }
 
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:RolesCompos');
-        $roles = $repository->findBy(array('composition' => $compo));
-
-        $repository = $this->getDoctrine()
-        ->getManager()
-        ->getRepository('MafiaRolesBundle:Importance');
-        $importances = $repository->findBy(array('composition' => $compo));
-
         $importancesArr = array();
-        foreach($importances as $importance)
+        foreach($compo->getImportances() as $importance)
         {
             $importancesArr[$importance->getRole()->getId()] = $importance->getValeur();
         }
@@ -80,7 +71,7 @@ class CompositionController extends Controller{
         return $this->render('MafiaRolesBundle:Affichages:vue_composition.html.twig', array(
             'composition' => $compo,
             'options' => $optionsRes,
-            'roles' => $roles,
+            'roles' => $compo->getRolesCompo(),
             'importances' => $importancesArr
         ));
 
@@ -88,28 +79,15 @@ class CompositionController extends Controller{
 
     public function ajoutCompositionAction()
     {
-        $newComposition = new Composition();
+        // Recupérations des infos envoyées en POST \\
         $request = $this->get('request');
         $composition = $request->get("composition");
         $options = $request->get("options");
         $importances = $request->get("importances");
 
-        $em = $this->getDoctrine()->getManager();
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:Role');
-        if($options){
-            foreach($options as $option)
-            {
-                $role = $repository->find($option['role']);
-                $newOption = new OptionRole();
-                $newOption->setRole($role);
-                $newOption->setEnumOption($option['option']);
-                $newOption->setValeur($option['valeur']);
-                $em->persist($newOption);
-                $newComposition->addOptionRole($newOption);
-            }
-        }
+
+        // On prepare \\
+        $newComposition = new Composition();
         if($request->get("nom") != "")
         {
             $newComposition->setNomCompo($request->get("nom"));
@@ -119,34 +97,115 @@ class CompositionController extends Controller{
             $newComposition->setNomCompo("Composition");
         }
         $newComposition->setOfficielle(false);
-        $arrOccurences = array();
-        foreach($composition as $idRole)
+
+        // ACCES BDD \\
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Role');
+        $repositoryOptions = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:OptionRole');
+        $repositoryImportances = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Importance');
+        $repositoryRoleCompo = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:RolesCompos');
+        $em = $this->getDoctrine()->getManager();
+
+        // Les options \\
+        if($options){
+            foreach($options as $option)
+            {
+                if($option['option'] >= 0 and $option['option'] <= 124){
+                    $role = $repository->find($option['role']);
+                    if($role != null) {
+                        $newOption = $repositoryOptions->findOneBy(array("enumOption"=>$option['option'],"valeur"=>$option['valeur'],"role"=>$role));
+                        if($newOption == null)
+                        {
+                            $newOption = new OptionRole();
+                            $newOption->setRole($role);
+                            $newOption->setEnumOption($option['option']);
+                            $newOption->setValeur($option['valeur']);
+                            $em->persist($newOption);
+                        }
+                        $newComposition->addOptionRole($newOption);
+                    }
+                    else
+                    {
+                        return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$option['role']." n'existe pas"));
+                    }
+                }
+            }
+        }
+
+        // Les importances \\
+        if($importances){
+            foreach($importances as $importance)
+            {
+                if($importance['valeur'] >= 0 and $importance['valeur'] <= 200){
+
+                    $role = $repository->find($importance['role']);
+                    if($role != null) {
+                        $newImportance = $repositoryImportances->findOneBy(array("valeur" => $importance['valeur'], "role" => $role));
+                        if ($newImportance == null) {
+                            $newImportance = new Importance();
+                            $newImportance->setRole($role);
+                            $newImportance->setValeur($importance['valeur']);
+                            $em->persist($newImportance);
+                        }
+                        $newComposition->addImportance($newImportance);
+                    }
+                    else
+                    {
+                        return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$importance['role']." n'existe pas"));
+                    }
+                }
+                else
+                {
+                    return new JsonResponse(array('type' => "Importance", 'erreur' => "L'importance du rôle ".$importance['role']." doit être comprise en 0 et 200, actuellement elle est à ".$importance['valeur']));
+                }
+            }
+        }
+        else
         {
-            $arrOccurences[$idRole] = $this->nombreOccurences($composition,$idRole);
+            return new JsonResponse(array('type' => "Importance", 'erreur' => "Merci de préciser des importances pour les rôle de la composition"));
+        }
+
+        // Les roles \\
+        if($composition){
+            $arrOccurences = array();
+            foreach($composition as $idRole)
+            {
+                $arrOccurences[$idRole] = $this->nombreOccurences($composition,$idRole);
+            }
+            foreach($arrOccurences as $idRole => $quantite)
+            {
+                $role = $repository->find($idRole);
+                if($role != null) {
+                    $newRoleCompo = $repositoryRoleCompo->findOneBy(array("quantite" => $quantite, "role" => $role));
+                    if($newRoleCompo == null){
+                        $newRoleCompo = new RolesCompos();
+                        $newRoleCompo->setRole($role);
+                        $newRoleCompo->setQuantite($quantite);
+                        $em->persist($newRoleCompo);
+                    }
+                    $newComposition->addRoleCompo($newRoleCompo);
+                }
+                else
+                {
+                    return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$idRole." n'existe pas"));
+                }
+            }
+
+        }
+        else
+        {
+            return new JsonResponse(array('type' => "Role", 'erreur' => "Merci d'ajouter des rôles à la composition"));
         }
 
         $em->persist($newComposition);
         $em->flush();
-        foreach($arrOccurences as $idRole => $quantite)
-        {
-            $roleCompo = new RolesCompos();
-            $role = $repository->find($idRole);
-            $roleCompo->setRole($role);
-            $roleCompo->setComposition($newComposition);
-            $roleCompo->setQuantite($quantite);
-            $em->persist($roleCompo);
-        }
-        if($importances){
-            foreach($importances as $importance)
-            {
-                $newImportance = new Importance();
-                $role = $repository->find($importance['role']);
-                $newImportance->setRole($role);
-                $newImportance->setComposition($newComposition);
-                $newImportance->setValeur($importance['valeur']);
-                $em->persist($newImportance);
-            }
-        }
         $em->flush();
 
         return new Response($this->generateUrl('vue_composition', array('id'=>$newComposition->getId())));

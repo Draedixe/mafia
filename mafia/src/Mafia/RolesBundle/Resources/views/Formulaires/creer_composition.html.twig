@@ -71,7 +71,8 @@
         {
             if(!actionEnCours)
             {
-                $("#importanceTD").empty();
+                var importanceTD = $("#importanceTD");
+                importanceTD.empty();
                 var label, range, div;
                 label = document.createElement("label");
                 label.setAttribute('for','importanceRange');
@@ -89,11 +90,12 @@
                 }
                 else{
                     range.setAttribute('value', '100');
+                    importances.push({role:id,valeur: 100});
                 }
                 div = document.createElement("div");
                 div.setAttribute('id','importanceValeur');
                 div.appendChild(document.createTextNode(range.value));
-                $("#importanceTD").append(label).append(range).append(div);
+                importanceTD.append(label).append(range).append(div);
                 recupererOptions(role,id);
                 idSelectionnee = id;
                 roleSelectionne = role;
@@ -112,7 +114,8 @@
         {
             if(!actionEnCours)
             {
-                $("#importanceTD").empty();
+                var importanceTD = $("#importanceTD");
+                importanceTD.empty();
                 var label, range, div;
                 label = document.createElement("label");
                 label.setAttribute('for','importanceRange');
@@ -129,11 +132,12 @@
                 }
                 else{
                     range.setAttribute('value', '100');
+                    importances.push({role:id,valeur: 100});
                 }
                 div = document.createElement("div");
                 div.setAttribute('id','importanceValeur');
                 div.appendChild(document.createTextNode(range.value));
-                $("#importanceTD").append(label).append(range).append(div);
+                importanceTD.append(label).append(range).append(div);
                 recupererOptions(role,id);
                 idSelectionnee = id;
                 nomSelectionne = nom;
@@ -153,16 +157,32 @@
         function validerCompo()
         {
             if(!actionEnCours) {
-                actionEnCours=true;
-                $.post('{{ path('ajout_compo')}}', {
-                    composition: composition,
-                    options: options,
-                    nom: $('#nomComposition').val(),
-                    importances: importances
-                }, function (data) {
-                    actionEnCours = false;
-                    document.location.href = data;
-                });
+                if(composition.length > 0)
+                {
+                    actionEnCours=true;
+                    $.post('{{ path('ajout_compo')}}', {
+                        composition: composition,
+                        options: options,
+                        nom: $('#nomComposition').val(),
+                        importances: importances
+                    }, function (data) {
+                        actionEnCours = false;
+                        if(data == "FAIL"){
+                            alert("Composition invalide, merci de ne pas inventer d'options, rôles ou de respecter l'échelle d'importance");
+                        }
+                        else if(data['type'] != null){
+                            alert(data['erreur']);
+                        }
+                        else
+                        {
+                            document.location.href = data;
+                        }
+                    });
+                }
+                else
+                {
+                    alert("Composition vide, merci d'ajouter des rôles");
+                }
             }
             else
             {

@@ -13,38 +13,24 @@ use Doctrine\ORM\Mapping as ORM;
 class RolesCompos
 {
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Mafia\RolesBundle\Entity\Role")
      */
     private $role;
 
     /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Mafia\RolesBundle\Entity\Composition")
-     */
-    private $composition;
-    /**
      * @var integer
-     *
      * @ORM\Column(name="quantite", type="integer")
      */
     private $quantite;
-
-    /**
-     * @return Composition
-     */
-    public function getComposition()
-    {
-        return $this->composition;
-    }
-
-    /**
-     * @param Composition $composition
-     */
-    public function setComposition($composition)
-    {
-        $this->composition = $composition;
-    }
 
     /**
      * @return Role
@@ -85,4 +71,22 @@ class RolesCompos
     {
         return $this->quantite;
     }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+
 }
