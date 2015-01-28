@@ -93,6 +93,29 @@ class UserPartie
     private $user;
 
     /**
+     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     */
+    private $votePour;
+
+    /**
+     * @return mixed
+     */
+    public function getVotePour()
+    {
+        return $this->votePour;
+    }
+
+    /**
+     * @param mixed $votePour
+     */
+    public function setVotePour($votePour)
+    {
+        $this->votePour = $votePour;
+    }
+
+
+
+    /**
      * @return mixed
      */
     public function getUser()
