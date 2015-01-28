@@ -42,19 +42,7 @@ class UserPartie
      */
     private $vivant;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="bloquePar", type="integer")
-     */
-    private $bloquePar;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="protegePar", type="integer")
-     */
-    private $protegePar;
 
     /**
      * @var integer
@@ -63,40 +51,6 @@ class UserPartie
      */
     private $essencePar;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="controlePar", type="integer")
-     */
-    private $controlePar;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="sauvePar", type="integer")
-     */
-    private $sauvePar;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="echangePar", type="integer")
-     */
-    private $echangePar;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="emprisonnePar", type="integer")
-     */
-    private $emprisonnePar;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="piegePar", type="integer")
-     */
-    private $piegePar;
 
     /**
      * @var integer
@@ -113,7 +67,7 @@ class UserPartie
     private $tempsEntreCapacite;
 
     /**
-     * @var dateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="derniereActivite", type="datetime")
      */
@@ -131,6 +85,48 @@ class UserPartie
      */
 
     private $partie;
+
+    /**
+     * @ORM\OneToOne(targetEntity="Mafia\UserBundle\Entity\User")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+
+
+    /**
+     * @return mixed
+     */
+    public function getPartie()
+    {
+        return $this->partie;
+    }
+
+    /**
+     * @param mixed $partie
+     */
+    public function setPartie($partie)
+    {
+        $this->partie = $partie;
+    }
+
+
 
     /**
      * @return mixed
@@ -228,51 +224,8 @@ class UserPartie
         return $this->vivant;
     }
 
-    /**
-     * Set bloquePar
-     *
-     * @param integer $bloquePar
-     * @return UserPartie
-     */
-    public function setBloquePar($bloquePar)
-    {
-        $this->bloquePar = $bloquePar;
 
-        return $this;
-    }
 
-    /**
-     * Get bloquePar
-     *
-     * @return integer 
-     */
-    public function getBloquePar()
-    {
-        return $this->bloquePar;
-    }
-
-    /**
-     * Set protegePar
-     *
-     * @param integer $protegePar
-     * @return UserPartie
-     */
-    public function setProtegePar($protegePar)
-    {
-        $this->protegePar = $protegePar;
-
-        return $this;
-    }
-
-    /**
-     * Get protegePar
-     *
-     * @return integer 
-     */
-    public function getProtegePar()
-    {
-        return $this->protegePar;
-    }
 
     /**
      * Set essencePar
@@ -297,120 +250,7 @@ class UserPartie
         return $this->essencePar;
     }
 
-    /**
-     * Set controlePar
-     *
-     * @param integer $controlePar
-     * @return UserPartie
-     */
-    public function setControlePar($controlePar)
-    {
-        $this->controlePar = $controlePar;
 
-        return $this;
-    }
-
-    /**
-     * Get controlePar
-     *
-     * @return integer 
-     */
-    public function getControlePar()
-    {
-        return $this->controlePar;
-    }
-
-    /**
-     * Set sauvePar
-     *
-     * @param integer $sauvePar
-     * @return UserPartie
-     */
-    public function setSauvePar($sauvePar)
-    {
-        $this->sauvePar = $sauvePar;
-
-        return $this;
-    }
-
-    /**
-     * Get sauvePar
-     *
-     * @return integer 
-     */
-    public function getSauvePar()
-    {
-        return $this->sauvePar;
-    }
-
-    /**
-     * Set echangePar
-     *
-     * @param integer $echangePar
-     * @return UserPartie
-     */
-    public function setEchangePar($echangePar)
-    {
-        $this->echangePar = $echangePar;
-
-        return $this;
-    }
-
-    /**
-     * Get echangePar
-     *
-     * @return integer 
-     */
-    public function getEchangePar()
-    {
-        return $this->echangePar;
-    }
-
-    /**
-     * Set emprisonnePar
-     *
-     * @param integer $emprisonnePar
-     * @return UserPartie
-     */
-    public function setEmprisonnePar($emprisonnePar)
-    {
-        $this->emprisonnePar = $emprisonnePar;
-
-        return $this;
-    }
-
-    /**
-     * Get emprisonnePar
-     *
-     * @return integer 
-     */
-    public function getEmprisonnePar()
-    {
-        return $this->emprisonnePar;
-    }
-
-    /**
-     * Set piegePar
-     *
-     * @param integer $piegePar
-     * @return UserPartie
-     */
-    public function setPiegePar($piegePar)
-    {
-        $this->piegePar = $piegePar;
-
-        return $this;
-    }
-
-    /**
-     * Get piegePar
-     *
-     * @return integer 
-     */
-    public function getPiegePar()
-    {
-        return $this->piegePar;
-    }
 
     /**
      * Set capaciteRestante
@@ -459,7 +299,7 @@ class UserPartie
     }
 
     /**
-     * @return dateTime
+     * @return \DateTime
      */
     public function getDerniereActivite()
     {
@@ -467,7 +307,7 @@ class UserPartie
     }
 
     /**
-     * @param dateTime $derniereActivite
+     * @param \DateTime $derniereActivite
      */
     public function setDerniereActivite($derniereActivite)
     {

@@ -22,6 +22,11 @@ class User extends BaseUser
      */
     protected $id;
 
+    /**
+     * @ORM\OneToOne(targetEntity="Mafia\UserBundle\Entity\Famille")
+     */
+    private $famille;
+
     public function __construct()
     {
         parent::__construct();
@@ -34,6 +39,24 @@ class User extends BaseUser
      * @ORM\Column(name="points", type="integer")
      */
     private $points;
+
+    /**
+     * @return mixed
+     */
+    public function getFamille()
+    {
+        return $this->famille;
+    }
+
+    /**
+     * @param mixed $famille
+     */
+    public function setFamille($famille)
+    {
+        $this->famille = $famille;
+    }
+
+
 
 
     /**a

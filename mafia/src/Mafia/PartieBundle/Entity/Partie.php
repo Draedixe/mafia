@@ -53,6 +53,101 @@ class Partie
     private $composition;
 
     /**
+     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\Chat")
+     */
+    private $chat;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="commencee", type="boolean")
+     */
+     private $commencee;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="terminee", type="boolean")
+     */
+    private $terminee;
+
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean")
+     */
+       private $maireAnnonce;
+
+    /**
+     * @return boolean
+     */
+    public function isMaireAnnonce()
+    {
+        return $this->maireAnnonce;
+    }
+
+    /**
+     * @param boolean $maireAnnonce
+     */
+    public function setMaireAnnonce($maireAnnonce)
+    {
+        $this->maireAnnonce = $maireAnnonce;
+    }
+
+
+
+    /**
+     * @return boolean
+     */
+    public function isCommencee()
+    {
+        return $this->commencee;
+    }
+
+    /**
+     * @param boolean $commencee
+     */
+    public function setCommencee($commencee)
+    {
+        $this->commencee = $commencee;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isTerminee()
+    {
+        return $this->terminee;
+    }
+
+    /**
+     * @param boolean $terminee
+     */
+    public function setTerminee($terminee)
+    {
+        $this->terminee = $terminee;
+    }
+
+
+
+    /**
+     * @return mixed
+     */
+    public function getChat()
+    {
+        return $this->chat;
+    }
+
+    /**
+     * @param mixed $chat
+     */
+    public function setChat($chat)
+    {
+        $this->chat = $chat;
+    }
+
+    /**
      * @return mixed
      */
     public function getUserPartie()
