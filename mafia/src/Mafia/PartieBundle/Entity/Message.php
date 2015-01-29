@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Message
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Mafia\PartieBundle\Entity\MessageRepository")
  */
 class Message
 {
@@ -142,4 +142,7 @@ class Message
     {
         return $this->date;
     }
+
+
+
 }
