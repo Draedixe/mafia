@@ -96,9 +96,33 @@ class PartieController extends Controller{
             ->add('message', 'text', array('label' => 'Message'));
 
 
+        //RECUPERATION DES MESSAGES
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $partie = $user->getPartie();
+        $chat = $partie->getChat();
+
+        $repositoryMessage = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Message');
+
+
+        $pid = 0;
+
+        $messages = $repositoryMessage->myFind($chat,$pid);
+
+        $data = array();
+        $id = 0;
+        foreach($messages as $message){
+            $data[$id] = array("id"=>$message->getId(),"pseudo"=>$message->getUser()->getUsername(),"message"=>$message->getTexte());
+            $id++;
+        }
 
         return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig' , array(
-            'partie' => $partieChoisie, 'form' => $formBuilder->createView()
+            'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data
         ));
     }
 }

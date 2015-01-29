@@ -31,13 +31,40 @@ class ChatController extends Controller{
         $newMessage->setTexte($message);
         $newMessage->setUser($this->getUser());
 
-
         $em->persist($newMessage);
         $em->flush();
 
-        $response = new JsonResponse(array('name' => $message, 'user' => $user->getId()));
+        return new JsonResponse();
+
+    }
+
+    public function recevoirMessageAction(){
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $partie = $user->getPartie();
+        $chat = $partie->getChat();
+
+        $repositoryMessage = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Message');
+
+        $request = $this->container->get('request');
+        $id = $request->get('premierid');
+
+        $messages = $repositoryMessage->myFind($chat,$id);
+
+        $data = array();
+        $id = 0;
+        foreach($messages as $message){
+            $data[$id] = array("id"=>$message->getId(),"pseudo"=>$message->getUser()->getUsername(),"message"=>$message->getTexte());
+            $id++;
+        }
+
+        $response = new JsonResponse(array('messages' => $data));
 
         return $response;
-
     }
 }

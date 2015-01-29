@@ -23,5 +23,9 @@ jouer_classique:
     defaults: { _controller: MafiaPartieBundle:Partie:jouerClassique }
 
 chat_message:
-  pattern: /chat/message
-  defaults: { _controller: MafiaPartieBundle:Chat:envoyerMessage }
+    path: /chat/message
+    defaults: { _controller: MafiaPartieBundle:Chat:envoyerMessage }
+
+chat_message_recevoir:
+    path: /chat/message_recevoir
+    defaults: { _controller: MafiaPartieBundle:Chat:recevoirMessage }

@@ -44,7 +44,8 @@ nav a{
     width: 600px;
     padding: 5px;
     height: 300px;
-
+    overflow: auto;
+    max-height: 300px;
 }
 
 .jouer_user_connectes{

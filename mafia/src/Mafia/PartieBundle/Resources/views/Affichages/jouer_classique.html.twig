@@ -9,8 +9,9 @@
             $("#envoie_chat").click(function () {
 
                 var message = $("#form_message").val();
-
-                var DATA = 'message=' + message;
+                var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
+                if(premierID == undefined){premierID = 0;}
+                var DATA = 'message=' + message + '&premierid=' + premierID;
                 $("#form_message").val("");
                 $.ajax({
                     type: "POST",
@@ -18,14 +19,36 @@
                     data: DATA,
                     cache: false,
                     success: function(data){
-                        $('.jouer_chat').append("<br/>" + data.name);
 
                     }
                 });
                 return false;
 
             });
+
         });
+
+        function charger(){
+            setInterval( function(){
+                var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
+                if(premierID == undefined){premierID = 0;}
+                var DATA = 'premierid=' + premierID;
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('chat_message_recevoir')}}",
+                    data: DATA,
+                    cache: false,
+                    success: function(data){
+                        for(var i in data.messages){
+                            $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
+                        }
+
+                    }
+                });
+            }, 4000);
+        }
+
+        charger();
     </script>
 
     <h2>Rejoindre/créer une partie</h2>
@@ -36,7 +59,13 @@
     </div>
 
     <div class="table">
-        <p class="jouer_chat">Chat        </p>
+        <div class="jouer_chat">
+            <h2>Chat</h2>
+            {% for msg in messages %}
+                <div id="{{ msg.id }}">{{ msg.pseudo }}: {{ msg.message }}
+                </div>
+            {% endfor %}
+        </div>
         <p class="jouer_user_connectes">Liste des joueurs connectés</p>
     </div>
     <form id="form_chat"  method="post">
