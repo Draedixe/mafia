@@ -32,6 +32,11 @@ class RolesCompos
      */
     private $quantite;
 
+    public function __construct(Role $role, $qte)
+    {
+        $this->role = $role;
+        $this->quantite = $qte;
+    }
     /**
      * @return Role
      */

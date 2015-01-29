@@ -16,11 +16,10 @@ namespace Mafia\RolesBundle\Entity;
 abstract class RolesEnum{
 
     // VILLE \\
-    const SHERIFF = 0;
-    const INSPECTEUR = 1;
-    const DOCTEUR = 2;
-    const GARDE_DU_CORPS = 3;
-    const VIGIL = 4;
+    const SHERIFF = 1;
+    const INSPECTEUR = 2;
+    const DOCTEUR = 3;
+    const GARDE_DU_CORPS = 4;
     const CITOYEN = 5;
     const CONDUCTEUR_DE_BUS = 6;
     const MEDECIN_LEGISTE = 7;
@@ -77,7 +76,7 @@ abstract class RolesEnum{
     const MAITRE_SILENCE = 52;
     const AVANT_GARDE = 53;
 
-    private static $nomsPouvoirs = array('SHERIFF' => 0, 'INSPECTEUR' => 1, 'DOCTEUR' => 2, 'GARDE_DU_CORPS' => 3, 'VIGIL' => 4, 'CITOYEN' => 5, 'CONDUCTEUR_DE_BUS' => 6, 'MEDECIN_LEGISTE' => 7, 'DETECTIVE' => 8, 'MARSHALL' => 9,
+    private static $nomsPouvoirs = array('SHERIFF' => 1, 'INSPECTEUR' => 2, 'DOCTEUR' => 3, 'GARDE_DU_CORPS' => 4,'CITOYEN' => 5, 'CONDUCTEUR_DE_BUS' => 6, 'MEDECIN_LEGISTE' => 7, 'DETECTIVE' => 8, 'MARSHALL' => 9,
                                     'MACON' => 10, 'MACON_CHEF' => 11, 'GARDIEN_DE_PRISON' => 12, 'VEILLEUR' => 13, 'CRIEUR' => 14, 'ESCORT' => 15, 'ESPION' => 16, 'JUSTICIER' => 17, 'MAIRE' => 18, 'VETERAN' => 19,
                                     'AGENT' => 20, 'PILLEUR' => 21, 'MAITRE_CHANTEUR' => 22, 'CONSEILLER' => 23, 'PROSTITUERR' => 24, 'MAITRE_DU_DEGUISEMENT' => 25, 'CONTREFACTEUR' => 26, 'PARRAIN' => 27, 'CONCIERGE' => 28,
                                     'KIDNAPPER' => 29, 'MAFIOSO' => 30, 'AMNESIQUE' => 31, 'PYROMANE' => 32, 'AUDITEUR' => 33, 'CULTISTE' => 34, 'BOURREAU' => 35, 'BOUFFON' => 36, 'JUGE' => 37,
