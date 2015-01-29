@@ -38,14 +38,14 @@ nav a{
 }
 
 .jouer_chat{
-    display: table-cell;
+
     border: solid green 1px;
     border-radius: 5px;
     width: 600px;
     padding: 5px;
     height: 300px;
     overflow: auto;
-    max-height: 300px;
+
 }
 
 .jouer_user_connectes{

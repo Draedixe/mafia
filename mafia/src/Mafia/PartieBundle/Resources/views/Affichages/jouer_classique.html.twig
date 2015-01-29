@@ -26,6 +26,9 @@
 
             });
 
+            var mydiv = $('.jouer_chat');
+            mydiv.scrollTop(mydiv.prop('scrollHeight'));
+
         });
 
         function charger(){
@@ -42,7 +45,8 @@
                         for(var i in data.messages){
                             $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
                         }
-
+                        var mydiv = $('.jouer_chat');
+                        mydiv.scrollTop(mydiv.prop('scrollHeight'));
                     }
                 });
             }, 4000);
