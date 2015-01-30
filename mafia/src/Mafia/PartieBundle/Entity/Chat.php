@@ -22,28 +22,6 @@ class Chat
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\UserBundle\Entity\Famille")
-     */
-    private $famille;
-
-    /**
-     * @return mixed
-     */
-    public function getFamille()
-    {
-        return $this->famille;
-    }
-
-    /**
-     * @param mixed $famille
-     */
-    public function setFamille($famille)
-    {
-        $this->famille = $famille;
-    }
-
-
-    /**
      * Get id
      *
      * @return integer 
