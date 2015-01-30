@@ -1,0 +1,42 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block title %}Mafia - Famille{% endblock %}
+
+{% block fos_user_content %}
+
+    <h3>{{ famille.nom }}</h3>
+
+    {% if app.user.famille == null %}<a href="{{ path("postuler_famille",{id : famille.id}) }}">Postuler</a>{% endif %}
+    <div style="display:table;width: 80%">
+        <ul style="display:table-cell">
+            {% for membre in membres %}
+
+                <li>{% if famille.chef == app.user %}Créateur : {% endif %}{{ membre.username }}</li>
+
+            {% endfor %}
+        </ul>
+
+        <div style="display:table-cell">
+            Description : {{ famille.description }}
+        </div>
+
+    </div>
+
+    {% if app.user.famille == famille %}
+        <div style="border: solid 2px blue">
+            {% include 'MafiaFamilleBundle:Templates:chat.html.twig' with {'chat' : famille.chat}  %}
+            <div class="well">
+                <form method="post" {{ form_enctype(form) }}>
+                    {{ form_widget(form) }}
+                    <input type="submit" class="btn btn-primary" />
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if app.user == famille.chef %}
+        {% for demande in famille.demandes %}
+            {% include 'MafiaFamilleBundle:Templates:demandeEntree.html.twig' with {'demande' : demande}  %}
+        {% endfor %}
+    {% endif %}
+{% endblock %}

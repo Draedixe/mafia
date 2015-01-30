@@ -81,12 +81,6 @@ class Message
     }
 
 
-
-
-
-
-
-
     /**
      * Get id
      *

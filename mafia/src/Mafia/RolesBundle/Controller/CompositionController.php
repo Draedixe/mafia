@@ -206,7 +206,6 @@ class CompositionController extends Controller{
 
         $em->persist($newComposition);
         $em->flush();
-        $em->flush();
 
         return new Response($this->generateUrl('vue_composition', array('id'=>$newComposition->getId())));
 
