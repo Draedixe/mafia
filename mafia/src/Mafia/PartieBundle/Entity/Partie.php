@@ -86,10 +86,33 @@ class Partie
      */
     private $nombreJoueursMax;
 
+    /**
+     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     */
+    private $createur;
+
     function __construct()
     {
         $this->nombreJoueursMax = 15;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCreateur()
+    {
+        return $this->createur;
+    }
+
+    /**
+     * @param mixed $createur
+     */
+    public function setCreateur($createur)
+    {
+        $this->createur = $createur;
+    }
+
+
 
     /**
      * @return int

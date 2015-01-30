@@ -63,7 +63,48 @@ class ChatController extends Controller{
             $id++;
         }
 
-        $response = new JsonResponse(array('messages' => $data));
+        //VERIFICATION DES INACTIFS
+
+
+        $em = $this->getDoctrine()->getManager();
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+        $now = new \DateTime();
+        $user->setDerniereActivite($now);
+        $em->persist($user);
+        $em->flush();
+
+        $createur_supprime = false;
+        foreach($userList as $ul){
+            if(($now->getTimestamp()- $ul->getDerniereActivite()->getTimestamp()) > 10){
+                if($partie->getCreateur() == $ul){
+                    $partie->setCreateur(NULL);
+                    $createur_supprime = true;
+                }
+                $em->remove($ul);
+                $em->flush();
+            }
+        }
+        if($createur_supprime){
+            $userCreateur = $repositoryUser->findOneBy(array("partie"=>$partie));
+            $partie->setCreateur($userCreateur);
+            $em->persist($partie);
+            $em->flush();
+        }
+
+        //LISTE DES UTILISATEURS
+        $userData = array();
+        $id = 0;
+        foreach($userList as $ul){
+            if($ul == $partie->getCreateur()){
+                $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
+            }
+            else{
+                $userData[$id] = $ul->getUser()->getUsername();
+            }
+            $id ++;
+        }
+
+        $response = new JsonResponse(array('messages' => $data, 'users' => $userData));
 
         return $response;
     }

@@ -44,7 +44,14 @@
                     success: function(data){
                         for(var i in data.messages){
                             $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
+
                         }
+                        var listeUsers = "";
+                        for(var j in data.users){
+                            listeUsers = listeUsers + data.users[j] + "<br/>";
+                        }
+
+                        $('#liste_user').html(listeUsers);
                         var mydiv = $('.jouer_chat');
                         mydiv.scrollTop(mydiv.prop('scrollHeight'));
                     }
@@ -70,9 +77,11 @@
                 </div>
             {% endfor %}
         </div>
-        <p class="jouer_user_connectes">Liste des joueurs connectés</p>
+        <div class="jouer_user_connectes"><h2>Liste des joueurs connectés</h2>
+            <div id="liste_user"></div>
+        </div>
     </div>
-    <form id="form_chat"  method="post">
+    <form id="form_chat"  method="post" onsubmit = "return false;">
         {{ form_widget(form) }}
 
         <button type="button" id="envoie_chat" title="Envoyer">Envoyer</button>

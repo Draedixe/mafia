@@ -8,6 +8,7 @@ use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
 use Mafia\PartieBundle\Entity\UserPartie;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Constraints\Null;
 
 class PartieController extends Controller{
 
@@ -54,7 +55,7 @@ class PartieController extends Controller{
             $repositoryRoles = $this->getDoctrine()
                 ->getManager()
                 ->getRepository('MafiaRolesBundle:Composition');
-            $compo = $repositoryRoles->findOneBy(array("nomCompo"=>"Officiel"));
+            $compo = $repositoryRoles->findOneBy(array("nomCompo"=>"Officielle"));
             $partieChoisie->setComposition($compo);
 
             $chat = new Chat();
@@ -76,9 +77,14 @@ class PartieController extends Controller{
             ->getRepository('MafiaPartieBundle:UserPartie');
         $userResponse = $repositoryUser->findOneBy(array("user" => $this->getUser()));
         if(count($userResponse) != null){
+            if($partieChoisie->getCreateur() == $userResponse){
+                $partieChoisie->setCreateur(NULL);
+            }
             $em -> remove($userResponse);
             $em -> flush();
         }
+
+
         $userPartie = new UserPartie();
         $userPartie->setPartie($partieChoisie);
         $userPartie->setUser($this->getUser());
@@ -86,6 +92,11 @@ class PartieController extends Controller{
 
         $em->persist($userPartie);
         $em->flush();
+
+        $userResponse = $repositoryUser->findBy(array("partie"=> $partieChoisie));
+        if(count($userResponse) == 1 || $partieChoisie->getCreateur() == NULL){
+            $partieChoisie->setCreateur($userPartie);
+        }
 
         $em->persist($partieChoisie);
         $em->flush();
@@ -120,6 +131,8 @@ class PartieController extends Controller{
             $data[$id] = array("id"=>$message->getId(),"pseudo"=>$message->getUser()->getUsername(),"message"=>$message->getTexte());
             $id++;
         }
+
+
 
         return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig' , array(
             'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data
