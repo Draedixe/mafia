@@ -17,6 +17,7 @@ class PartieController extends Controller{
         return $this->render('MafiaPartieBundle:Affichages:choix_type_partie.html.twig' );
     }
 
+    //Un utilisateur rejoint / crée une partie
     public function jouerClassiqueAction(){
         if($this->getUser() != null) {
             $repository = $this->getDoctrine()
@@ -74,15 +75,25 @@ class PartieController extends Controller{
             $repositoryUser = $this->getDoctrine()
                 ->getManager()
                 ->getRepository('MafiaPartieBundle:UserPartie');
-            $userResponse = $repositoryUser->findOneBy(array("user" => $this->getUser()));
-            if (count($userResponse) != null) {
-                if ($partieChoisie->getCreateur() == $userResponse) {
+            $userResponse = $repositoryUser->findBy(array("user" => $this->getUser()));
+
+            $userDansAutrePartie = null;
+            foreach($userResponse as $ur){
+                if($ur->getPartie()->isCommencee() && $ur->getVivant()){
+                    return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
+                }
+                if(!($ur->getPartie()->isCommencee())){
+                    $userDansAutrePartie = $ur;
+                }
+            }
+            //Si on a trouve un UserPartie qui correspond au User
+            if ($userDansAutrePartie != null) {
+                if ($partieChoisie->getCreateur() == $userDansAutrePartie) {
                     $partieChoisie->setCreateur(NULL);
                 }
-                $em->remove($userResponse);
+                $em->remove($userDansAutrePartie);
                 $em->flush();
             }
-
 
             $userPartie = new UserPartie();
             $userPartie->setPartie($partieChoisie);
