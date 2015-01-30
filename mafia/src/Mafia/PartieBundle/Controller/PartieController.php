@@ -8,7 +8,7 @@ use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
 use Mafia\PartieBundle\Entity\UserPartie;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Validator\Constraints\Null;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PartieController extends Controller{
 
@@ -132,10 +132,54 @@ class PartieController extends Controller{
             $id++;
         }
 
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+        //LISTE DES UTILISATEURS
+        $userData = array();
+        $id = 0;
+        foreach($userList as $ul){
+            if($ul == $partie->getCreateur()){
+                $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
+            }
+            else{
+                $userData[$id] = $ul->getUser()->getUsername();
+            }
+            $id ++;
+        }
 
 
         return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig' , array(
-            'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data
+            'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data, 'users' => $userData
         ));
+
+
+    }
+
+    public function lancerPartieAction(){
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $partie = $user->getPartie();
+
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+
+
+        if($user == $partie->getCreateur()) {
+
+            //  if(count($userList) == $partie->getNombreJoueursMax()){
+            if (count($userList) == 2) {
+                $em = $this->getDoctrine()->getManager();
+                $partie->setCommencee(true);
+                $em->persist($partie);
+                $em->flush();
+                return new JsonResponse(array('lancer' => true));
+            } else {
+                return new JsonResponse(array('lancer' => false));
+            }
+        }
+        else{
+            return new JsonResponse(array('lancer' => false));
+        }
     }
 }

@@ -5,25 +5,10 @@
 {% block fos_user_content %}
 
     <script>
+        var lock = false;
         $(function() {
             $("#envoie_chat").click(function () {
-
-                var message = $("#form_message").val();
-                var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
-                if(premierID == undefined){premierID = 0;}
-                var DATA = 'message=' + message + '&premierid=' + premierID;
-                $("#form_message").val("");
-                $.ajax({
-                    type: "POST",
-                    url: "{{ path('chat_message')}}",
-                    data: DATA,
-                    cache: false,
-                    success: function(data){
-
-                    }
-                });
-                return false;
-
+                envoyer();
             });
 
             var mydiv = $('.jouer_chat');
@@ -31,31 +16,102 @@
 
         });
 
-        function charger(){
-            setInterval( function(){
+        function envoyer(){
+            if(!lock) {
+                lock = true;
+                var message = $("#form_message").val();
                 var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
-                if(premierID == undefined){premierID = 0;}
-                var DATA = 'premierid=' + premierID;
+                if (premierID == undefined) {
+                    premierID = 0;
+                }
+                var DATA = 'message=' + message + '&premierid=' + premierID;
+                $("#form_message").val("");
                 $.ajax({
                     type: "POST",
-                    url: "{{ path('chat_message_recevoir')}}",
+                    url: "{{ path('chat_message')}}",
                     data: DATA,
                     cache: false,
-                    success: function(data){
-                        for(var i in data.messages){
+                    success: function (data) {
+                        for (var i in data.messages) {
                             $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
 
                         }
                         var listeUsers = "";
-                        for(var j in data.users){
+                        for (var j in data.users) {
                             listeUsers = listeUsers + data.users[j] + "<br/>";
                         }
 
                         $('#liste_user').html(listeUsers);
                         var mydiv = $('.jouer_chat');
                         mydiv.scrollTop(mydiv.prop('scrollHeight'));
+
+                        lock = false;
                     }
                 });
+
+                return false;
+            }
+        }
+
+        function lancerPartie(){
+            $.ajax({
+                type: "POST",
+                url: "{{ path('lancer_partie')}}",
+                cache: false,
+                success: function (data) {
+                   if(data.lancer){
+                       alert("GOGOGO");
+                   }
+                    else{
+                       alert("Pas assez de joueurs");
+                   }
+                }
+            });
+        }
+
+        function charger(){
+            setInterval( function(){
+                if(!lock) {
+                    lock = true;
+                    var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    var DATA = 'premierid=' + premierID;
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ path('chat_message_recevoir')}}",
+                        data: DATA,
+                        cache: false,
+                        success: function (data) {
+                            for (var i in data.messages) {
+                                $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
+
+                            }
+                            var listeUsers = "";
+                            for (var j in data.users) {
+                                listeUsers = listeUsers + data.users[j] + "<br/>";
+                            }
+
+                            $('#liste_user').html(listeUsers);
+                            var mydiv = $('.jouer_chat');
+                            mydiv.scrollTop(mydiv.prop('scrollHeight'));
+
+                            if(data.createur){
+                                $('#lancer_partie').prop('disabled', false);
+                            }
+                            else{
+                                $('#lancer_partie').prop('disabled', true);
+                            }
+
+                            if(data.lancer){
+                                alert("fo lancé");
+                            }
+
+                            lock = false;
+                        }
+                    });
+                }
             }, 4000);
         }
 
@@ -78,14 +134,18 @@
             {% endfor %}
         </div>
         <div class="jouer_user_connectes"><h2>Liste des joueurs connectés</h2>
-            <div id="liste_user"></div>
+            <div id="liste_user">
+                {% for us in users %}
+                    {{ us }}<br/>
+                {% endfor %}
+            </div>
         </div>
     </div>
-    <form id="form_chat"  method="post" onsubmit = "return false;">
+    <form id="form_chat"  method="post" onsubmit = "envoyer(); return false;">
         {{ form_widget(form) }}
 
         <button type="button" id="envoie_chat" title="Envoyer">Envoyer</button>
     </form>
 
-
+    <button type="button" id="lancer_partie" title="Lancer la partie !" onclick="lancerPartie();">Lancer la partie !</button>
 {% endblock %}

@@ -29,3 +29,11 @@ chat_message:
 chat_message_recevoir:
     path: /chat/message_recevoir
     defaults: { _controller: MafiaPartieBundle:Chat:recevoirMessage }
+
+jeu:
+    path: /jeu/
+    defaults: { _controller: MafiaPartieBundle:Jeu:debutPartie }
+
+lancer_partie:
+    path: /jouer/lancer
+    defaults: { _controller: MafiaPartieBundle:Partie:lancerPartie }
