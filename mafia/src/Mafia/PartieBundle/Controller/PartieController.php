@@ -3,6 +3,7 @@
 namespace Mafia\PartieBundle\Controller;
 
 
+use Guzzle\Http\Message\Response;
 use Mafia\PartieBundle\Entity\Chat;
 use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
@@ -17,141 +18,140 @@ class PartieController extends Controller{
     }
 
     public function jouerClassiqueAction(){
-
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaPartieBundle:Partie');
-        $em = $this->getDoctrine()->getManager();
-        $partiesEnAttentes = $repository->findBy(array("commencee"=>false));
-        $nombreParties = count($partiesEnAttentes);
-        if($nombreParties <= 0){
-            $partieChoisie = new Partie();
-            $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
-            $partieChoisie->setTempsEnCours(new \DateTime);
-            $partieChoisie->setCommencee(false);
-            $partieChoisie->setTerminee(false);
-            $partieChoisie->setMaireAnnonce(false);
-
-            $repositoryParam = $this->getDoctrine()
+        if($this->getUser() != null) {
+            $repository = $this->getDoctrine()
                 ->getManager()
-                ->getRepository('MafiaPartieBundle:Parametres');
+                ->getRepository('MafiaPartieBundle:Partie');
+            $em = $this->getDoctrine()->getManager();
+            $partiesEnAttentes = $repository->findBy(array("commencee" => false));
+            $nombreParties = count($partiesEnAttentes);
+            if ($nombreParties <= 0) {
+                $partieChoisie = new Partie();
+                $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
+                $partieChoisie->setTempsEnCours(new \DateTime);
+                $partieChoisie->setCommencee(false);
+                $partieChoisie->setTerminee(false);
+                $partieChoisie->setMaireAnnonce(false);
 
-           // $param = $repositoryParam->findOneBy(array("nomParametres"=>"Officiel"));
-           // $partieChoisie->setParametres($param);
+                $repositoryParam = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaPartieBundle:Parametres');
 
-            $allParam = $repositoryParam->findAll();
-            if(count($allParam) == 0){
-                $param = new Parametres();
-                $param->setNomParametres("Par Défaut");
-                $em->persist($param);
+                // $param = $repositoryParam->findOneBy(array("nomParametres"=>"Officiel"));
+                // $partieChoisie->setParametres($param);
+
+                $allParam = $repositoryParam->findAll();
+                if (count($allParam) == 0) {
+                    $param = new Parametres();
+                    $param->setNomParametres("Par Défaut");
+                    $em->persist($param);
+                    $em->flush();
+                } else {
+                    $param = $allParam[0];
+                }
+
+                $partieChoisie->setParametres($param);
+
+                $repositoryRoles = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaRolesBundle:Composition');
+                $compo = $repositoryRoles->findOneBy(array("nomCompo" => "Officielle"));
+                $partieChoisie->setComposition($compo);
+
+                $chat = new Chat();
+                $em->persist($chat);
+                $em->flush();
+
+                $partieChoisie->setChat($chat);
+
+                $em->persist($partieChoisie);
+                $em->flush();
+
+            } else {
+                $partieChoisie = $partiesEnAttentes[0];
+            }
+
+            $repositoryUser = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaPartieBundle:UserPartie');
+            $userResponse = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+            if (count($userResponse) != null) {
+                if ($partieChoisie->getCreateur() == $userResponse) {
+                    $partieChoisie->setCreateur(NULL);
+                }
+                $em->remove($userResponse);
                 $em->flush();
             }
-            else{
-                $param = $allParam[0];
-            }
 
-            $partieChoisie->setParametres($param);
 
-            $repositoryRoles = $this->getDoctrine()
-                ->getManager()
-                ->getRepository('MafiaRolesBundle:Composition');
-            $compo = $repositoryRoles->findOneBy(array("nomCompo"=>"Officielle"));
-            $partieChoisie->setComposition($compo);
+            $userPartie = new UserPartie();
+            $userPartie->setPartie($partieChoisie);
+            $userPartie->setUser($this->getUser());
+            $userPartie->setNom($this->getUser()->getUsername());
 
-            $chat = new Chat();
-            $em->persist($chat);
+            $em->persist($userPartie);
             $em->flush();
 
-            $partieChoisie->setChat($chat);
+            $userResponse = $repositoryUser->findBy(array("partie" => $partieChoisie));
+            if (count($userResponse) == 1 || $partieChoisie->getCreateur() == NULL) {
+                $partieChoisie->setCreateur($userPartie);
+            }
 
             $em->persist($partieChoisie);
             $em->flush();
 
+
+            $formBuilder = $this->get('form.factory')->create();
+            $formBuilder
+                ->add('message', 'text', array('label' => 'Message'));
+
+
+            //RECUPERATION DES MESSAGES
+            $repositoryUser = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaPartieBundle:UserPartie');
+
+            $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+            $partie = $user->getPartie();
+            $chat = $partie->getChat();
+
+            $repositoryMessage = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaPartieBundle:Message');
+
+
+            $pid = 0;
+
+            $messages = $repositoryMessage->myFind($chat, $pid);
+
+            $data = array();
+            $id = 0;
+            foreach ($messages as $message) {
+                $data[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte());
+                $id++;
+            }
+
+            $userList = $repositoryUser->findBy(array("partie" => $partie));
+            //LISTE DES UTILISATEURS
+            $userData = array();
+            $id = 0;
+            foreach ($userList as $ul) {
+                if ($ul == $partie->getCreateur()) {
+                    $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
+                } else {
+                    $userData[$id] = $ul->getUser()->getUsername();
+                }
+                $id++;
+            }
+
+
+            return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig', array(
+                'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data, 'users' => $userData
+            ));
         }
         else{
-            $partieChoisie = $partiesEnAttentes[0];
+            return $this->forward('MafiaUserBundle:Default:menu');
         }
-
-        $repositoryUser = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaPartieBundle:UserPartie');
-        $userResponse = $repositoryUser->findOneBy(array("user" => $this->getUser()));
-        if(count($userResponse) != null){
-            if($partieChoisie->getCreateur() == $userResponse){
-                $partieChoisie->setCreateur(NULL);
-            }
-            $em -> remove($userResponse);
-            $em -> flush();
-        }
-
-
-        $userPartie = new UserPartie();
-        $userPartie->setPartie($partieChoisie);
-        $userPartie->setUser($this->getUser());
-        $userPartie->setNom($this->getUser()->getUsername());
-
-        $em->persist($userPartie);
-        $em->flush();
-
-        $userResponse = $repositoryUser->findBy(array("partie"=> $partieChoisie));
-        if(count($userResponse) == 1 || $partieChoisie->getCreateur() == NULL){
-            $partieChoisie->setCreateur($userPartie);
-        }
-
-        $em->persist($partieChoisie);
-        $em->flush();
-
-
-        $formBuilder = $this->get('form.factory')->create();
-        $formBuilder
-            ->add('message', 'text', array('label' => 'Message'));
-
-
-        //RECUPERATION DES MESSAGES
-        $repositoryUser = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaPartieBundle:UserPartie');
-
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
-        $partie = $user->getPartie();
-        $chat = $partie->getChat();
-
-        $repositoryMessage = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaPartieBundle:Message');
-
-
-        $pid = 0;
-
-        $messages = $repositoryMessage->myFind($chat,$pid);
-
-        $data = array();
-        $id = 0;
-        foreach($messages as $message){
-            $data[$id] = array("id"=>$message->getId(),"pseudo"=>$message->getUser()->getUsername(),"message"=>$message->getTexte());
-            $id++;
-        }
-
-        $userList = $repositoryUser->findBy(array("partie"=>$partie));
-        //LISTE DES UTILISATEURS
-        $userData = array();
-        $id = 0;
-        foreach($userList as $ul){
-            if($ul == $partie->getCreateur()){
-                $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
-            }
-            else{
-                $userData[$id] = $ul->getUser()->getUsername();
-            }
-            $id ++;
-        }
-
-
-        return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig' , array(
-            'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data, 'users' => $userData
-        ));
-
-
     }
 
     public function lancerPartieAction(){

@@ -22,6 +22,9 @@ class ChatController extends Controller{
 
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        if($user == null){
+            return new JsonResponse(array('messages' => array(), 'users' => array()));
+        }
         $partie = $user->getPartie();
         $chat = $partie->getChat();
 
@@ -47,8 +50,9 @@ class ChatController extends Controller{
             }
             $id ++;
         }
-        //MEssages
-        $messages = $repositoryMessage->myFind($chat,$id);
+        //Messages
+        $idPremier = $request->get('premierid');
+        $messages = $repositoryMessage->myFind($chat,$idPremier);
 
         $data = array();
         $id = 0;
@@ -66,6 +70,9 @@ class ChatController extends Controller{
             ->getRepository('MafiaPartieBundle:UserPartie');
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        if($user == null){
+            return new JsonResponse(array('messages' => array(), 'users' => array()));
+        }
         $partie = $user->getPartie();
         $chat = $partie->getChat();
 
@@ -85,16 +92,18 @@ class ChatController extends Controller{
             $id++;
         }
 
-        //VERIFICATION DES INACTIFS
+        //VERIFICATION MAJ DE L ACTIVITE DU USER
 
         $em = $this->getDoctrine()->getManager();
-        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+
         $now = new \DateTime();
         $user->setDerniereActivite($now);
         $em->persist($user);
         $em->flush();
 
-        //VERIFICATION : CREATEUR SUPPRIME (A CAUSE DE SUPPRESSION INACTIF)
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+
+        //VERIFICATION : SUPPRESSION INACTIF
         $createur_supprime = false;
         foreach($userList as $ul){
             if(($now->getTimestamp()- $ul->getDerniereActivite()->getTimestamp()) > 10){
@@ -117,6 +126,7 @@ class ChatController extends Controller{
         $userData = array();
         $createur = false;
         $id = 0;
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
         foreach($userList as $ul){
             if($ul == $partie->getCreateur()){
                 $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
@@ -131,7 +141,7 @@ class ChatController extends Controller{
         }
 
         //VERIFICATION: PARTIE LANCEE
-        if($partie->getCommencee()){
+        if($partie->isCommencee()){
             $lancer = true;
         }
         else{

@@ -60,7 +60,8 @@
                 cache: false,
                 success: function (data) {
                    if(data.lancer){
-                       alert("GOGOGO");
+                       $('.jouer_chat').append("<div >Lancement de la partie...</div>");
+
                    }
                     else{
                        alert("Pas assez de joueurs");
@@ -105,7 +106,7 @@
                             }
 
                             if(data.lancer){
-                                alert("fo lancé");
+                                window.location.replace("{{ path('jeu') }}")
                             }
 
                             lock = false;
@@ -133,7 +134,7 @@
                 </div>
             {% endfor %}
         </div>
-        <div class="jouer_user_connectes"><h2>Liste des joueurs connectés</h2>
+        <div class="jouer_user_connectes"><h4>Liste des joueurs connectés</h4>
             <div id="liste_user">
                 {% for us in users %}
                     {{ us }}<br/>

@@ -87,7 +87,7 @@ class UserPartie
     private $partie;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\UserBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
