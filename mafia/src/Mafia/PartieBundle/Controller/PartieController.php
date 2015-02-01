@@ -25,6 +25,17 @@ class PartieController extends Controller{
                 ->getRepository('MafiaPartieBundle:Partie');
             $em = $this->getDoctrine()->getManager();
             $partiesEnAttentes = $repository->findBy(array("commencee" => false));
+
+            $repositoryUserPartie = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaPartieBundle:UserPartie');
+
+            foreach($partiesEnAttentes as $key => $p){
+                $nbJoueurs = count($repositoryUserPartie->findBy(array("partie" => $p)));
+                if($nbJoueurs >= $p->getNombreJoueursMax()){
+                    unset($partiesEnAttentes[$key]);
+                }
+            }
             $nombreParties = count($partiesEnAttentes);
             if ($nombreParties <= 0) {
                 $partieChoisie = new Partie();
@@ -86,10 +97,15 @@ class PartieController extends Controller{
                     $userDansAutrePartie = $ur;
                 }
             }
+
             //Si on a trouve un UserPartie qui correspond au User
             if ($userDansAutrePartie != null) {
-                if ($partieChoisie->getCreateur() == $userDansAutrePartie) {
-                    $partieChoisie->setCreateur(NULL);
+                //On vérifie que le user n'est pas créateur dans une autre partie
+                $autrePartie = $repository->findOneBy(array("createur" => $userDansAutrePartie));
+                if($autrePartie != null){
+                    $autrePartie->setCreateur(Null);
+                    $em->persist($autrePartie);
+                    $em->flush();
                 }
                 $em->remove($userDansAutrePartie);
                 $em->flush();
@@ -103,6 +119,7 @@ class PartieController extends Controller{
             $em->persist($userPartie);
             $em->flush();
 
+            //Si c'est le seul utilisateur de la partie, le joueur devient le créateur
             $userResponse = $repositoryUser->findBy(array("partie" => $partieChoisie));
             if (count($userResponse) == 1 || $partieChoisie->getCreateur() == NULL) {
                 $partieChoisie->setCreateur($userPartie);
@@ -122,7 +139,7 @@ class PartieController extends Controller{
                 ->getManager()
                 ->getRepository('MafiaPartieBundle:UserPartie');
 
-            $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+            $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "partie" => $partieChoisie));
             $partie = $user->getPartie();
             $chat = $partie->getChat();
 
@@ -178,8 +195,7 @@ class PartieController extends Controller{
 
         if($user == $partie->getCreateur()) {
 
-            //  if(count($userList) == $partie->getNombreJoueursMax()){
-            if (count($userList) == 2) {
+             if(count($userList) == $partie->getNombreJoueursMax()){
                 $em = $this->getDoctrine()->getManager();
                 $partie->setCommencee(true);
                 $em->persist($partie);

@@ -21,7 +21,7 @@ class ChatController extends Controller{
         $em = $this->getDoctrine()->getManager();
 
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         if($user == null){
             return new JsonResponse(array('messages' => array(), 'users' => array()));
         }
@@ -69,7 +69,7 @@ class ChatController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         if($user == null){
             return new JsonResponse(array('messages' => array(), 'users' => array()));
         }
