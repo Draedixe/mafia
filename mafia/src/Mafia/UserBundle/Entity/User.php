@@ -4,6 +4,7 @@ namespace Mafia\UserBundle\Entity;
 
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
+use Mafia\FamilleBundle\Entity\Famille;
 
 /**
  * User
@@ -23,7 +24,7 @@ class User extends BaseUser
     protected $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\UserBundle\Entity\Famille")
+     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille")
      */
     private $famille;
 
@@ -43,7 +44,7 @@ class User extends BaseUser
     private $points;
 
     /**
-     * @return mixed
+     * @return Famille
      */
     public function getFamille()
     {
@@ -51,7 +52,7 @@ class User extends BaseUser
     }
 
     /**
-     * @param mixed $famille
+     * @param Famille $famille
      */
     public function setFamille($famille)
     {

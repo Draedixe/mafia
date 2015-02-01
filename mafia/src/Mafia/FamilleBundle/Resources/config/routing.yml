@@ -1,0 +1,11 @@
+creation_famille:
+    path:     /famille/creation
+    defaults: { _controller: MafiaFamilleBundle:Famille:creationFamille }
+
+vue_famille:
+    path:     /famille/affichage/{id}
+    defaults: { _controller: MafiaFamilleBundle:Famille:affichageFamille, id:1 }
+
+postuler_famille:
+    path:     /famille/entree/{id}
+    defaults: { _controller: MafiaFamilleBundle:Famille:creationDemandeEntree, id:1 }

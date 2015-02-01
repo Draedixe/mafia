@@ -1,3 +1,0 @@
-mafia_chat_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: MafiaChatBundle:Default:index }

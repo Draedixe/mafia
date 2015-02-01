@@ -1,0 +1,6 @@
+<fieldset class="chat">
+    <h2>Chat</h2>
+    {% for msg in chat.messages %}
+        <div id="{{ msg.id }}">[{{ msg.date|date("d/m/Y H:i:s") }}] {{ msg.user.username }}: {{ msg.texte }}</div>
+    {% endfor %}
+</fieldset>

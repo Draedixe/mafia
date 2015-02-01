@@ -9,6 +9,7 @@
 namespace Mafia\RolesBundle\Controller;
 
 
+use Mafia\RolesBundle\Entity\CategorieCompo;
 use Mafia\RolesBundle\Entity\Composition;
 use Mafia\RolesBundle\Entity\Importance;
 use Mafia\RolesBundle\Entity\OptionRole;
@@ -42,8 +43,15 @@ class CompositionController extends Controller{
 
         $roles = $repository->findAll();
 
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Categorie');
+
+        $categories = $repository->findAll();
+
         return $this->render('MafiaRolesBundle:Formulaires:creer_composition.html.twig', array(
-            'roles' => $roles
+            'roles' => $roles,
+            'categories' => $categories
         ));
     }
 
@@ -71,7 +79,6 @@ class CompositionController extends Controller{
         return $this->render('MafiaRolesBundle:Affichages:vue_composition.html.twig', array(
             'composition' => $compo,
             'options' => $optionsRes,
-            'roles' => $compo->getRolesCompo(),
             'importances' => $importancesArr
         ));
 
@@ -111,6 +118,12 @@ class CompositionController extends Controller{
         $repositoryRoleCompo = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaRolesBundle:RolesCompos');
+        $repositoryCategorieCompo = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:CategorieCompo');
+        $repositoryCategorie = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Categorie');
         $em = $this->getDoctrine()->getManager();
 
         // Les options \\
@@ -172,7 +185,7 @@ class CompositionController extends Controller{
             return new JsonResponse(array('type' => "Importance", 'erreur' => "Merci de préciser des importances pour les rôle de la composition"));
         }
 
-        // Les roles \\
+        // Les roles et categories \\
         if($composition){
             $arrOccurences = array();
             foreach($composition as $idRole)
@@ -181,20 +194,36 @@ class CompositionController extends Controller{
             }
             foreach($arrOccurences as $idRole => $quantite)
             {
-                $role = $repository->find($idRole);
-                if($role != null) {
-                    $newRoleCompo = $repositoryRoleCompo->findOneBy(array("quantite" => $quantite, "role" => $role));
-                    if($newRoleCompo == null){
-                        $newRoleCompo = new RolesCompos();
-                        $newRoleCompo->setRole($role);
-                        $newRoleCompo->setQuantite($quantite);
-                        $em->persist($newRoleCompo);
+                if($idRole >= 0){
+                    $role = $repository->find($idRole);
+                    if($role != null) {
+                        $newRoleCompo = $repositoryRoleCompo->findOneBy(array("quantite" => $quantite, "role" => $role));
+                        if($newRoleCompo == null){
+                            $newRoleCompo = new RolesCompos($role,$quantite);
+                            $em->persist($newRoleCompo);
+                        }
+                        $newComposition->addRoleCompo($newRoleCompo);
                     }
-                    $newComposition->addRoleCompo($newRoleCompo);
+                    else
+                    {
+                        return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$idRole." n'existe pas"));
+                    }
                 }
                 else
                 {
-                    return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$idRole." n'existe pas"));
+                    $categorie = $repositoryCategorie->find($idRole);
+                    if($categorie != null) {
+                        $newCategorieCompo = $repositoryCategorieCompo->findOneBy(array("quantite" => $quantite, "categorie" => $categorie));
+                        if($newCategorieCompo == null){
+                            $newCategorieCompo = new CategorieCompo($categorie,$quantite);
+                            $em->persist($newCategorieCompo);
+                        }
+                        $newComposition->addCategorieCompo($newCategorieCompo);
+                    }
+                    else
+                    {
+                        return new JsonResponse(array('type' => "Categorie", 'erreur' => "La catégorie ".$idRole." n'existe pas"));
+                    }
                 }
             }
 
@@ -205,7 +234,6 @@ class CompositionController extends Controller{
         }
 
         $em->persist($newComposition);
-        $em->flush();
         $em->flush();
 
         return new Response($this->generateUrl('vue_composition', array('id'=>$newComposition->getId())));

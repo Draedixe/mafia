@@ -1,6 +1,6 @@
 <?php
 
-namespace Mafia\ChatBundle\Tests\Controller;
+namespace Mafia\FamilleBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

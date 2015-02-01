@@ -55,6 +55,12 @@ class Composition
     private $rolesCompo;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\CategorieCompo", cascade={"persist"})
+     * @ORM\JoinTable(name="categories_compo")
+     */
+    private $categoriesCompo;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -115,6 +121,7 @@ class Composition
         $this->rolesCompo = new ArrayCollection();
         $this->optionsRoles = new ArrayCollection();
         $this->importances = new ArrayCollection();
+        $this->categoriesCompo = new ArrayCollection();
     }
 
     /**
@@ -193,5 +200,31 @@ class Composition
     public function getRolesCompo()
     {
         return $this->rolesCompo;
+    }
+
+    /**
+     * @param CategorieCompo $categorieCompo
+     */
+    public function addCategorieCompo(CategorieCompo $categorieCompo)
+    {
+        $this->categoriesCompo[] = $categorieCompo;
+    }
+
+    /**
+     * @param CategorieCompo $categorieCompo
+     */
+    public function removeCategorieCompo(CategorieCompo $categorieCompo)
+    {
+        $this->categoriesCompo->removeElement($categorieCompo);
+    }
+
+    /**
+     * Get categoriesCompo
+     *
+     * @return ArrayCollection
+     */
+    public function getCategoriesCompo()
+    {
+        return $this->categoriesCompo;
     }
 }

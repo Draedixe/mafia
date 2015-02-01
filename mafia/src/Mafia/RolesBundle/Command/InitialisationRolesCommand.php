@@ -2,6 +2,7 @@
 namespace Mafia\RolesBundle\Command;
 
 use Mafia\RolesBundle\Entity\Categorie;
+use Mafia\RolesBundle\Entity\CategorieCompo;
 use Mafia\RolesBundle\Entity\Composition;
 use Mafia\RolesBundle\Entity\Crime;
 use Mafia\RolesBundle\Entity\FactionEnum;
@@ -58,8 +59,8 @@ class InitialisationRolesCommand extends ContainerAwareCommand
             $output->write(".");
         }
 
-        $output->writeln("Creation des catégories");
-        $newCategories = new SplFixedArray(14);
+        $output->writeln("\nCreation des catégories");
+        $newCategories = new SplFixedArray(19);
         $newCategories[0] = new Categorie();
         $newCategories[0]->setNomCategorie("Ville Investigateur");
         $newCategories[1] = new Categorie();
@@ -88,34 +89,49 @@ class InitialisationRolesCommand extends ContainerAwareCommand
         $newCategories[12]->setNomCategorie("Neutre Malveillant");
         $newCategories[13] = new Categorie();
         $newCategories[13]->setNomCategorie("Neutre Tueur");
+        $newCategories[14] = new Categorie();
+        $newCategories[14]->setNomCategorie("Ville Aleatoire");
+        $newCategories[15] = new Categorie();
+        $newCategories[15]->setNomCategorie("Mafia Aleatoire");
+        $newCategories[16] = new Categorie();
+        $newCategories[16]->setNomCategorie("Triade Aleatoire");
+        $newCategories[17] = new Categorie();
+        $newCategories[17]->setNomCategorie("Neutre Aleatoire");
+        $newCategories[18] = new Categorie();
+        $newCategories[18]->setNomCategorie("Role Aleatoire");
         foreach($newCategories as $categorie)
         {
             $em->persist($categorie);
             $output->write(".");
         }
 
-        $output->writeln("Creation des rôles");
+        $output->writeln("\nCreation des rôles");
         $newImportanceBase = new SplFixedArray(54);
         $newRoles = new SplFixedArray(54);
         for($i = 1; $i < 54; $i++)
         {
             $newRoles[$i] = new Role();
+            $newRoles[$i]->addCategorieRole($newCategories[18]);
             $newRoles[$i]->setEnumRole($i);
             if($i < 20)
             {
                 $newRoles[$i]->setEnumFaction(FactionEnum::VILLE);
+                $newRoles[$i]->addCategorieRole($newCategories[14]);
             }
             elseif($i < 31)
             {
                 $newRoles[$i]->setEnumFaction(FactionEnum::MAFIA);
+                $newRoles[$i]->addCategorieRole($newCategories[15]);
             }
             elseif($i < 43)
             {
                 $newRoles[$i]->setEnumFaction(FactionEnum::NEUTRE);
+                $newRoles[$i]->addCategorieRole($newCategories[17]);
             }
             else
             {
                 $newRoles[$i]->setEnumFaction(FactionEnum::TRIADE);
+                $newRoles[$i]->addCategorieRole($newCategories[16]);
             }
 
             switch($i)
@@ -527,7 +543,7 @@ class InitialisationRolesCommand extends ContainerAwareCommand
 
         }
 
-        $output->writeln("Creation de la composition officielle 15 joueurs");
+        $output->writeln("\nCreation de la composition officielle 15 joueurs");
         $newCompo = new Composition();
         $newCompo->setNomCompo("Officielle");
         $newCompo->setOfficielle(true);
@@ -535,32 +551,19 @@ class InitialisationRolesCommand extends ContainerAwareCommand
         $newCompo->addImportance($newImportanceBase[RolesEnum::SHERIFF]);
         $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::INSPECTEUR],1));
         $newCompo->addImportance($newImportanceBase[RolesEnum::INSPECTEUR]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::GARDIEN_DE_PRISON],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::GARDIEN_DE_PRISON]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::JUSTICIER],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::JUSTICIER]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::MAIRE],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::MAIRE]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::DOCTEUR],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::DOCTEUR]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::VETERAN],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::VETERAN]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::CITOYEN],2));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::CITOYEN]);
-
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::PYROMANE],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::PYROMANE]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::BOURREAU],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::BOURREAU]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::SURVIVANT],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::SURVIVANT]);
-
         $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::PARRAIN],1));
         $newCompo->addImportance($newImportanceBase[RolesEnum::PARRAIN]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::MAFIOSO],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::MAFIOSO]);
-        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::CONSEILLER],1));
-        $newCompo->addImportance($newImportanceBase[RolesEnum::CONSEILLER]);
+
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[3],2));
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[2],1));
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[1],1));
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[4],1));
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[14],2));
+
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[11],2));
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[12],1));
+
+        $newCompo->addCategorieCompo(new CategorieCompo($newCategories[15],2));
 
         $em->persist($newCompo);
         $em->flush();

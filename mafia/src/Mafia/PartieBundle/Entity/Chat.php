@@ -1,7 +1,7 @@
 <?php
 
 namespace Mafia\PartieBundle\Entity;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -22,26 +22,9 @@ class Chat
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\UserBundle\Entity\Famille")
+     * @ORM\OneToMany(targetEntity="Mafia\PartieBundle\Entity\Message",mappedBy="chat")
      */
-    private $famille;
-
-    /**
-     * @return mixed
-     */
-    public function getFamille()
-    {
-        return $this->famille;
-    }
-
-    /**
-     * @param mixed $famille
-     */
-    public function setFamille($famille)
-    {
-        $this->famille = $famille;
-    }
-
+    private $messages;
 
     /**
      * Get id
@@ -52,4 +35,36 @@ class Chat
     {
         return $this->id;
     }
+
+    /**
+     * @param Message $message
+     */
+    public function addMessage(Message $message)
+    {
+        $this->messages[] = $message;
+    }
+
+    /**
+     * @param Message $message
+     */
+    public function removeMessage(Message $message)
+    {
+        $this->messages->removeElement($message);
+    }
+
+    /**
+     * Get messages
+     *
+     * @return ArrayCollection
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    public function __construct()
+    {
+        $this->messages = new ArrayCollection();
+    }
+
 }
