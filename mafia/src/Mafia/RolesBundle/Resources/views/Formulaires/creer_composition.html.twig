@@ -73,36 +73,41 @@
             {
                 var importanceTD = $("#importanceTD");
                 importanceTD.empty();
-                var label, range, div;
-                label = document.createElement("label");
-                label.setAttribute('for','importanceRange');
-                label.appendChild(document.createTextNode('Importance du rôle : '));
-                range = document.createElement("input");
-                range.setAttribute('onchange','changementValeurImportance(' + id + ')');
-                range.setAttribute('id','importanceRange');
-                range.setAttribute('type', 'range');
-                range.setAttribute('step', '1');
-                range.setAttribute('min', '0');
-                range.setAttribute('max', '200');
-                var valeur = valeurImportance(id);
-                if(valeur > -1){
-                    range.setAttribute('value',valeur );
+                if(role >= 0){
+                    var label, range, div;
+                    label = document.createElement("label");
+                    label.setAttribute('for','importanceRange');
+                    label.appendChild(document.createTextNode('Importance du rôle : '));
+                    range = document.createElement("input");
+                    range.setAttribute('onchange','changementValeurImportance(' + id + ')');
+                    range.setAttribute('id','importanceRange');
+                    range.setAttribute('type', 'range');
+                    range.setAttribute('min', '0');
+                    range.setAttribute('max', '200');
+                    var valeur = valeurImportance(id);
+                    if(valeur > -1){
+                        range.setAttribute('value',valeur );
+                    }
+                    else{
+                        range.setAttribute('value', '100');
+                        importances.push({role:id,valeur: 100});
+                    }
+                    div = document.createElement("div");
+                    div.setAttribute('id','importanceValeur');
+                    div.appendChild(document.createTextNode(range.value));
+                    importanceTD.append(label).append(range).append(div);
+                    recupererOptions(role,id);
+                    $(ancienSelect).css('background-color','');
+                    idSelectionnee = id;
                 }
-                else{
-                    range.setAttribute('value', '100');
-                    importances.push({role:id,valeur: 100});
+                else
+                {
+                    $(ancienSelect).css('background-color','');
+                    idSelectionnee = id * -1;
                 }
-                div = document.createElement("div");
-                div.setAttribute('id','importanceValeur');
-                div.appendChild(document.createTextNode(range.value));
-                importanceTD.append(label).append(range).append(div);
-                recupererOptions(role,id);
-                idSelectionnee = id;
                 roleSelectionne = role;
-                $(ancienSelect).css('background-color','');
                 ancienSelect = "#"+identifiantElem;
                 $(ancienSelect).css('background-color','#00CCFF');
-
             }
             else
             {
@@ -116,36 +121,44 @@
             {
                 var importanceTD = $("#importanceTD");
                 importanceTD.empty();
-                var label, range, div;
-                label = document.createElement("label");
-                label.setAttribute('for','importanceRange');
-                label.appendChild(document.createTextNode('Importance du rôle : '));
-                range = document.createElement("input");
-                range.setAttribute('onchange','changementValeurImportance(' + id + ')');
-                range.setAttribute('id','importanceRange');
-                range.setAttribute('type', 'range');
-                range.setAttribute('min', '0');
-                range.setAttribute('max', '200');
-                var valeur = valeurImportance(id);
-                if(valeur > -1){
-                    range.setAttribute('value',valeur );
+                if(role >= 0){
+                    var label, range, div;
+                    label = document.createElement("label");
+                    label.setAttribute('for','importanceRange');
+                    label.appendChild(document.createTextNode('Importance du rôle : '));
+                    range = document.createElement("input");
+                    range.setAttribute('onchange','changementValeurImportance(' + id + ')');
+                    range.setAttribute('id','importanceRange');
+                    range.setAttribute('type', 'range');
+                    range.setAttribute('min', '0');
+                    range.setAttribute('max', '200');
+                    var valeur = valeurImportance(id);
+                    if(valeur > -1){
+                        range.setAttribute('value',valeur );
+                    }
+                    else{
+                        range.setAttribute('value', '100');
+                        importances.push({role:id,valeur: 100});
+                    }
+                    div = document.createElement("div");
+                    div.setAttribute('id','importanceValeur');
+                    div.appendChild(document.createTextNode(range.value));
+                    importanceTD.append(label).append(range).append(div);
+                    recupererOptions(role,id);
+                    roleSelectionne = role;
+                    $(ancienSelect).css('background-color','');
+                    ancienSelect = "#role" + id;
+                    idSelectionnee = id;
                 }
-                else{
-                    range.setAttribute('value', '100');
-                    importances.push({role:id,valeur: 100});
+                else
+                {
+                    $(ancienSelect).css('background-color','');
+                    ancienSelect = "#categorie" + id;
+                    idSelectionnee = id * -1;
                 }
-                div = document.createElement("div");
-                div.setAttribute('id','importanceValeur');
-                div.appendChild(document.createTextNode(range.value));
-                importanceTD.append(label).append(range).append(div);
-                recupererOptions(role,id);
-                idSelectionnee = id;
                 nomSelectionne = nom;
                 uniqueSelectionne = unique;
-                roleSelectionne = role;
-                $(ancienSelect).css('background-color','');
-                ancienSelect = "#role" + id;
-                $("#role" + id).css('background-color','#00CCFF');
+                $(ancienSelect).css('background-color','#00CCFF');
 
             }
             else
@@ -332,68 +345,61 @@
     <h3>Création d'une composition</h3>
 
     <p>
-        Nom de la composition :
-        <input type="text" id="nomComposition">
+        <label for="nomComposition">Nom de la composition :</label><input type="text" id="nomComposition">
     </p>
-    <table width="80%">
-        <tr>
-            <th>
-                Roles
-            </th>
-            <th>
-                Options
-            </th>
-            <th>
-                Composition
-            </th>
-        </tr>
-        <tr>
-            <td>
-                <h4>Ville</h4>
+    <div style="display: table;width: 80%">
+        <div style="display:table-row">
+            <div style="display:table-cell">
+                <h4 style="display: inline-block">Ville</h4>
                 <ul>
                     {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
                         <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }},{{ role.enumRole }});">{{ role.nomRole }}  </li>
                     {% endfor %}
                 </ul>
-            </td>
-            <td id="importanceTD">
-
-            </td>
-            <td rowspan="3">
-                <ul id="tableauCompo">
-
-                </ul>
-            </td>
-        <tr>
-            <td>
+            </div>
+            <div style="display:table-cell">
                 <h4>Mafia</h4>
                 <ul>
                     {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
                         <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }},{{ role.enumRole }});">{{ role.nomRole }} </li>
                     {% endfor %}
                 </ul>
-            </td>
-            <td>
-                <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne, roleSelectionne);"  >></button>
-                <button id="boutonEnleve" onclick="enleveCompo(idSelectionnee,nomSelectionne,uniqueSelectionne,roleSelectionne);"  ><</button>
-            </td>
-        </tr>
-        <tr>
-            <td>
+            </div>
+            <div style="display:table-cell">
                 <h4>Neutre</h4>
                 <ul>
                     {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
                         <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }},{{ role.enumRole }});">{{ role.nomRole }}  </li>
                     {% endfor %}
                 </ul>
-            </td>
-            <td>
-                <p style="border: 1px #296cff solid" id="optionsRole">
+            </div>
+            <div style="display:table-cell">
+                <h4>Neutre</h4>
+                <ul>
+                    {% for categorie in categories %}
+                        <li id="{{ "categorie" ~ categorie.id }}" onclick="boutonAjout({{ categorie.id }},'{{ categorie.nomCategorie }}',0,-1);">{{ categorie.nomCategorie }}  </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <hr width="80%">
+        <div style="display:table-row">
+            <div style="display:table-cell" id="importanceTD"></div>
+            <div style="display:table-cell">
+                <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne, roleSelectionne);"  >></button>
+                <button id="boutonEnleve" onclick="enleveCompo(idSelectionnee,nomSelectionne,uniqueSelectionne,roleSelectionne);"  ><</button>
+            </div>
+            <div style="display:table-cell;border: 1px #296cff solid" id="optionsRole">
 
-                </p>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+        <hr width="80%">
+        <div style="display:table-row">
+            <ul style="display:table-cell;border:solid 2px darkred" id="tableauCompo">
+
+            </ul>
+        </div>
+    </div>
     <button onclick="validerCompo();">
         Valider
     </button>
