@@ -5,6 +5,7 @@ namespace Mafia\FamilleBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mafia\PartieBundle\Entity\Chat;
+use Mafia\UserBundle\Entity\User;
 
 /**
  * Famille
@@ -56,6 +57,36 @@ class Famille
      * @ORM\OneToMany(targetEntity="Mafia\FamilleBundle\Entity\Proposition",mappedBy="familleProposante")
      */
     private $propositions;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Mafia\UserBundle\Entity\User",mappedBy="famille")
+     */
+    private $membres;
+    /**
+     * @param User $membre
+     */
+    public function addMembre(User $membre)
+    {
+        $this->membres[] = $membre;
+    }
+
+    /**
+     * @param User $membre
+     */
+    public function removeMembre(User $membre)
+    {
+        $this->membres->removeElement($membre);
+    }
+
+    /**
+     * Get membres
+     *
+     * @return ArrayCollection
+     */
+    public function getMembres()
+    {
+        return $this->membres;
+    }
 
     /**
      * @param Proposition $proposition

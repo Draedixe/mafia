@@ -314,4 +314,38 @@ class FamilleController extends Controller{
             return $this->render('MafiaFamilleBundle:Affichages:liste_propositions.html.twig');
         }
     }
+
+    public function quitterFamilleAction()
+    {
+        $user = $this->getUser();
+        $famille = $user->getFamille();
+
+        if($famille != null)
+        {
+            $em = $this->getDoctrine()->getManager();
+            if($famille->getChef()->getId() == $user->getId())
+            {
+                if(count($famille->getMembres()) <= 1)
+                {
+                    $em->remove($famille);
+                }
+                else
+                {
+                    if($famille->getMembres()->first()->getId() != $user->getId())
+                    {
+                        $famille->setChef($famille->getMembres()->first());
+                    }
+                    else
+                    {
+                        $famille->setChef($famille->getMembres()->next());
+                    }
+                }
+            }
+                $user->setFamille(null);
+                $em->persist($user);
+                $em->flush();
+
+        }
+        return $this->redirect($this->generateUrl('mafia_user_homepage'));
+    }
 } 

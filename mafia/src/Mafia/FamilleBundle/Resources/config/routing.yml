@@ -34,6 +34,10 @@ virer_membre:
     path: /famille/virer/{id}
     defaults: { _controller: MafiaFamilleBundle:Famille:virerMembre, id:1 }
 
+quitter_famille:
+    path: /famille/quitter
+    defaults: { _controller: MafiaFamilleBundle:Famille:quitterFamille }
+
 creation_proposition:
     path:     /famille/creationProposition
     defaults: { _controller: MafiaFamilleBundle:Famille:creationProposition }

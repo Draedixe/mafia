@@ -7,6 +7,7 @@
     <h3>{{ famille.nom }}</h3>
 
     {% if app.user.famille == null %}<a href="{{ path("postuler_famille",{id : famille.id}) }}">Postuler</a>{% endif %}
+    {% if app.user.famille == famille %}<a href="{{ path("quitter_famille") }}">Quitter</a>{% endif %}
     <div style="display:table;width: 80%">
         <ul style="display:table-cell">
             {% for membre in membres %}
