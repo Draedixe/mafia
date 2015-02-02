@@ -12,9 +12,6 @@ class ChatController extends Controller{
         $request = $this->container->get('request');
         $message = $request->get('message');
 
-        $repositoryMessage = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaPartieBundle:Message');
         $repositoryUser = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
@@ -37,31 +34,7 @@ class ChatController extends Controller{
         $em->persist($newMessage);
         $em->flush();
 
-        //LISTE DES UTILISATEURS
-        $userList = $repositoryUser->findBy(array("partie"=>$partie));
-        $userData = array();
-        $id = 0;
-        foreach($userList as $ul){
-            if($ul == $partie->getCreateur()){
-                $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
-            }
-            else{
-                $userData[$id] = $ul->getUser()->getUsername();
-            }
-            $id ++;
-        }
-        //Messages
-        $idPremier = $request->get('premierid');
-        $messages = $repositoryMessage->myFind($chat,$idPremier);
-
-        $data = array();
-        $id = 0;
-        foreach($messages as $message){
-            $data[$id] = array("id"=>$message->getId(),"pseudo"=>$message->getUser()->getUsername(),"message"=>$message->getTexte());
-            $id++;
-        }
-
-        return new JsonResponse(array('messages' => $data, 'users' => $userData));
+        return new JsonResponse();
     }
 
     public function recevoirMessageAction(){

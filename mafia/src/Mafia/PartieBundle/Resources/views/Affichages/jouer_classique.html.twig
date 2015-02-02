@@ -13,44 +13,27 @@
 
             var mydiv = $('.jouer_chat');
             mydiv.scrollTop(mydiv.prop('scrollHeight'));
-
         });
 
         function envoyer(){
-            if(!lock) {
-                lock = true;
-                var message = $("#form_message").val();
-                var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
-                if (premierID == undefined) {
-                    premierID = 0;
-                }
-                var DATA = 'message=' + message + '&premierid=' + premierID;
-                $("#form_message").val("");
-                $.ajax({
-                    type: "POST",
-                    url: "{{ path('chat_message')}}",
-                    data: DATA,
-                    cache: false,
-                    success: function (data) {
-                        for (var i in data.messages) {
-                            $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
-
-                        }
-                        var listeUsers = "";
-                        for (var j in data.users) {
-                            listeUsers = listeUsers + data.users[j] + "<br/>";
-                        }
-
-                        $('#liste_user').html(listeUsers);
-                        var mydiv = $('.jouer_chat');
-                        mydiv.scrollTop(mydiv.prop('scrollHeight'));
-
-                        lock = false;
-                    }
-                });
-
-                return false;
+            var message = $("#form_message").val();
+            var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
+            if (premierID == undefined) {
+                premierID = 0;
             }
+            var DATA = 'message=' + message + '&premierid=' + premierID;
+            $("#form_message").val("");
+            $.ajax({
+                type: "POST",
+                url: "{{ path('chat_message')}}",
+                data: DATA,
+                cache: false,
+                success: function (data) {
+                    recevoirMessage();
+                }
+            });
+
+            return false;
         }
 
         function lancerPartie(){
@@ -72,48 +55,52 @@
 
         function charger(){
             setInterval( function(){
-                if(!lock) {
-                    lock = true;
-                    var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
-                    if (premierID == undefined) {
-                        premierID = 0;
-                    }
-                    var DATA = 'premierid=' + premierID;
-                    $.ajax({
-                        type: "POST",
-                        url: "{{ path('chat_message_recevoir')}}",
-                        data: DATA,
-                        cache: false,
-                        success: function (data) {
-                            for (var i in data.messages) {
-                                $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
-
-                            }
-                            var listeUsers = "";
-                            for (var j in data.users) {
-                                listeUsers = listeUsers + data.users[j] + "<br/>";
-                            }
-
-                            $('#liste_user').html(listeUsers);
-                            var mydiv = $('.jouer_chat');
-                            mydiv.scrollTop(mydiv.prop('scrollHeight'));
-
-                            if(data.createur){
-                                $('#lancer_partie').prop('disabled', false);
-                            }
-                            else{
-                                $('#lancer_partie').prop('disabled', true);
-                            }
-
-                            if(data.lancer){
-                                window.location.replace("{{ path('jeu') }}")
-                            }
-
-                            lock = false;
-                        }
-                    });
-                }
+                recevoirMessage();
             }, 4000);
+        }
+
+        function recevoirMessage(){
+            if(!lock) {
+                lock = true;
+                var premierID = $('.jouer_chat div:last').attr('id'); // on récupère l'id le plus récent
+                if (premierID == undefined) {
+                    premierID = 0;
+                }
+                var DATA = 'premierid=' + premierID;
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('chat_message_recevoir')}}",
+                    data: DATA,
+                    cache: false,
+                    success: function (data) {
+                        for (var i in data.messages) {
+                            $('.jouer_chat').append("<div id='" + data.messages[i]['id'] + "'> " + data.messages[i]['pseudo'] + ": " + data.messages[i]['message'] + "</div>");
+
+                        }
+                        var listeUsers = "";
+                        for (var j in data.users) {
+                            listeUsers = listeUsers + data.users[j] + "<br/>";
+                        }
+
+                        $('#liste_user').html(listeUsers);
+                        var mydiv = $('.jouer_chat');
+                        mydiv.scrollTop(mydiv.prop('scrollHeight'));
+
+                        if(data.createur){
+                            $('#lancer_partie').prop('disabled', false);
+                        }
+                        else{
+                            $('#lancer_partie').prop('disabled', true);
+                        }
+
+                        if(data.lancer){
+                            window.location.replace("{{ path('jeu') }}")
+                        }
+
+                        lock = false;
+                    }
+                });
+            }
         }
 
         charger();

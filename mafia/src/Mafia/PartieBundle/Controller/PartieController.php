@@ -2,8 +2,6 @@
 
 namespace Mafia\PartieBundle\Controller;
 
-
-use Guzzle\Http\Message\Response;
 use Mafia\PartieBundle\Entity\Chat;
 use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
