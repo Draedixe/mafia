@@ -9,3 +9,33 @@ vue_famille:
 postuler_famille:
     path:     /famille/entree/{id}
     defaults: { _controller: MafiaFamilleBundle:Famille:creationDemandeEntree, id:1 }
+
+choix_demande:
+    path:     /famille/demandeChoix
+    defaults: { _controller: MafiaFamilleBundle:Famille:choixDemande }
+    requirements:
+      _method: POST
+
+choix_proposition:
+    path:     /famille/propositionChoix
+    defaults: { _controller: MafiaFamilleBundle:Famille:choixProposition }
+    requirements:
+      _method: POST
+
+annuler_proposition:
+    path:     /famille/annulerProposition
+    defaults: { _controller: MafiaFamilleBundle:Famille:annulerProposition }
+
+liste_proposition:
+    path: /famille/proposition
+    defaults: { _controller: MafiaFamilleBundle:Famille:affichageListePropositions }
+
+virer_membre:
+    path: /famille/virer/{id}
+    defaults: { _controller: MafiaFamilleBundle:Famille:virerMembre, id:1 }
+
+creation_proposition:
+    path:     /famille/creationProposition
+    defaults: { _controller: MafiaFamilleBundle:Famille:creationProposition }
+    requirements:
+      _method: POST

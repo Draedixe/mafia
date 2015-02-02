@@ -1,4 +1,10 @@
-<div style="border: solid 2px red" class="demande">
+<form method="post" action="{{ path('choix_demande') }}" style="border: solid 2px red" class="demande">
     <p>[{{ demande.dateDemande|date("d/m/Y H:i:s") }}] - {{ demande.demandeur.username }}</p>
     <p>{{ demande.messageDemande }}</p>
-</div>
+    <input name="idDemande" value="{{ demande.id }}" hidden="hidden">
+    <label>
+        Oui<input name="accepter" value="oui" type="radio">
+        Non<input name="accepter" value="non" type="radio">
+    </label>
+    <input type="submit">
+</form>

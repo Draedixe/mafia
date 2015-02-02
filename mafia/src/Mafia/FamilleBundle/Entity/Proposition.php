@@ -3,6 +3,7 @@
 namespace Mafia\FamilleBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mafia\UserBundle\Entity\User;
 
 /**
  * Proposition
@@ -35,6 +36,15 @@ class Proposition
      */
     private $dateProposition;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
+     */
+    private $userPropose;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille")
+     */
+    private $familleProposante;
 
     /**
      * Get id
@@ -90,5 +100,37 @@ class Proposition
     public function getDateProposition()
     {
         return $this->dateProposition;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUserPropose()
+    {
+        return $this->userPropose;
+    }
+
+    /**
+     * @param User $userPropose
+     */
+    public function setUserPropose(User $userPropose)
+    {
+        $this->userPropose = $userPropose;
+    }
+
+    /**
+     * @return Famille
+     */
+    public function getFamilleProposante()
+    {
+        return $this->familleProposante;
+    }
+
+    /**
+     * @param Famille $familleProposante
+     */
+    public function setFamilleProposante(Famille $familleProposante)
+    {
+        $this->familleProposante = $familleProposante;
     }
 }

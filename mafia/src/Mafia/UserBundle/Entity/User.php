@@ -2,9 +2,11 @@
 
 namespace Mafia\UserBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 use Mafia\FamilleBundle\Entity\Famille;
+use Mafia\FamilleBundle\Entity\Proposition;
 
 /**
  * User
@@ -28,11 +30,41 @@ class User extends BaseUser
      */
     private $famille;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Mafia\FamilleBundle\Entity\Proposition",mappedBy="userPropose")
+     */
+    private $propositions;
 
+    /**
+     * @param Proposition $proposition
+     */
+    public function addProposition(Proposition $proposition)
+    {
+        $this->propositions[] = $proposition;
+    }
+
+    /**
+     * @param Proposition $proposition
+     */
+    public function removeProposition(Proposition $proposition)
+    {
+        $this->propositions->removeElement($proposition);
+    }
+
+    /**
+     * Get propositions
+     *
+     * @return ArrayCollection
+     */
+    public function getPropositions()
+    {
+        return $this->propositions;
+    }
 
     public function __construct()
     {
         parent::__construct();
+        $this->propositions = new ArrayCollection();
         $this->points = 0;
     }
 

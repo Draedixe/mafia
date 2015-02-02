@@ -11,9 +11,11 @@ namespace Mafia\FamilleBundle\Controller;
 
 use Mafia\FamilleBundle\Entity\DemandeEntree;
 use Mafia\FamilleBundle\Entity\Famille;
+use Mafia\FamilleBundle\Entity\Proposition;
 use Mafia\PartieBundle\Entity\Chat;
 use Mafia\PartieBundle\Entity\Message;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class FamilleController extends Controller{
 
@@ -145,5 +147,171 @@ class FamilleController extends Controller{
             ));
         }
 
+    }
+
+    public function choixDemandeAction()
+    {
+        $request = $this->get('request');
+        if ($request->getMethod() == 'POST') {
+            $repositoryDemande = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaFamilleBundle:DemandeEntree');
+            $demande = $repositoryDemande->find($request->get("idDemande"));
+            if($demande != null)
+            {
+                if($this->getUser()->getId() == $demande->getFamilleDemandee()->getChef()->getId())
+                {
+                    $em = $this->getDoctrine()->getManager();
+                    if($request->get("accepter") == "oui")
+                    {
+                        $demande->getDemandeur()->setFamille($demande->getFamilleDemandee());
+                        $em->persist($demande->getDemandeur());
+                    }
+                    $em->remove($demande);
+                    $em->flush();
+                }
+            }
+
+        }
+        return $this->redirect($this->generateUrl('vue_famille',array("id" => $this->getUser()->getFamille()->getId())));
+    }
+
+    public function choixPropositionAction()
+    {
+        $request = $this->get('request');
+        if ($request->getMethod() == 'POST') {
+            $repositoryProposition = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaFamilleBundle:Proposition');
+            $proposition = $repositoryProposition->find($request->get("idProposition"));
+            if($proposition != null)
+            {
+                if($this->getUser()->getId() == $proposition->getUserPropose()->getId())
+                {
+                    $em = $this->getDoctrine()->getManager();
+                    if($request->get("accepter") == "oui")
+                    {
+                        $this->getUser()->setFamille($proposition->getFamilleProposante());
+                        $em->persist($this->getUser());
+                        $propositions = $repositoryProposition->findBy(array("userPropose" => $this->getUser()));
+                        foreach($propositions as $propositionUser)
+                        {
+                            $em->remove($propositionUser);
+                        }
+                        $em->flush();
+                    }
+                    elseif($request->get("accepter") == "non")
+                    {
+                        $em->remove($proposition);
+                        $em->flush();
+                    }
+                }
+            }
+        }
+        if($request->get("accepter") == "oui")
+        {
+            return $this->redirect($this->generateUrl('vue_famille',array("id" => $this->getUser()->getFamille()->getId())));
+        }
+        else
+        {
+            return $this->redirect($this->generateUrl('liste_propositions'));
+        }
+
+    }
+
+    public function annulerPropositionAction($id)
+    {
+            $repositoryProposition = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaFamilleBundle:Proposition');
+            $proposition = $repositoryProposition->find($id);
+            if($proposition != null)
+            {
+                if($this->getUser()->getId() == $proposition->getFamilleProposante()->getChef()->getId())
+                {
+                    $em = $this->getDoctrine()->getManager();
+                    $em->remove($proposition);
+                    $em->flush();
+                }
+            }
+
+        return $this->redirect($this->generateUrl('vue_famille',array("id" => $this->getUser()->getFamille()->getId())));
+    }
+
+    public function affichageListePropositionsAction()
+    {
+        return $this->render('MafiaFamilleBundle:Affichages:liste_propositions.html.twig');
+    }
+
+    public function creationPropositionAction()
+    {
+        $request = $this->get('request');
+        if ($request->getMethod() == 'POST') {
+            $repositoryUser = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaUserBundle:User');
+            $user = $repositoryUser->findOneBy(array("username" => $request->get("pseudoUser")));
+            if($user != null && $user->getFamille() == null)
+            {
+                if($this->getUser()->getFamille() != null && $this->getUser()->getId() == $this->getUser()->getFamille()->getChef()->getId())
+                {
+                    $repositoryProposition = $this->getDoctrine()
+                        ->getManager()
+                        ->getRepository('MafiaFamilleBundle:Proposition');
+                    $proposition = $repositoryProposition->findOneBy(array("userPropose" => $user , "familleProposante" => $this->getUser()->getFamille()));
+                    if($proposition == null)
+                    {
+                        $proposition = new Proposition();
+                        $proposition->setUserPropose($user);
+                        $proposition->setFamilleProposante($this->getUser()->getFamille());
+                        $proposition->setDateProposition(new \DateTime());
+                    }
+                    $proposition->setMessageProposition($request->get("messageProposition"));
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($proposition);
+                    $em->flush();
+                }
+            }
+
+        }
+        if($this->getUser()->getFamille() != null)
+        {
+            return $this->redirect($this->generateUrl('vue_famille',array("id" => $this->getUser()->getFamille()->getId())));
+        }
+        else
+        {
+            return $this->redirect($this->generateUrl('liste_proposition'));
+        }
+
+    }
+
+    public function virerMembreAction($id)
+    {
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaUserBundle:User');
+        $user = $repositoryUser->find($id);
+
+        if($user != null && $this->getUser()->getId() != $id)
+        {
+            if($user->getFamille() != null ){
+                if($user->getFamille()->getChef()->getId() == $this->getUser()->getId())
+                {
+                    $user->setFamille(null);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($user);
+                    $em->flush();
+                }
+
+            }
+        }
+        if($this->getUser()->getFamille() != null)
+        {
+            return $this->redirect($this->generateUrl('vue_famille',array("id" => $this->getUser()->getFamille()->getId())));
+        }
+        else
+        {
+            return $this->render('MafiaFamilleBundle:Affichages:liste_propositions.html.twig');
+        }
     }
 } 

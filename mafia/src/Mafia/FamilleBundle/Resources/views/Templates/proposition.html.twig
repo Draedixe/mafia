@@ -1,0 +1,18 @@
+{% if proposition.userPropose == app.user %}
+    <form method="post" action="{{ path('choix_proposition') }}" style="border: solid 2px #ff747c" class="proposition">
+        <p>[{{ proposition.dateProposition|date("d/m/Y H:i:s") }}] - {{ proposition.familleProposante.nom }}</p>
+        <p>{{ proposition.messageProposition }}</p>
+        <input name="idProposition" value="{{ proposition.id }}" hidden="hidden">
+        <label>
+            Oui<input name="accepter" value="oui" type="radio">
+            Non<input name="accepter" value="non" type="radio">
+        </label>
+        <input type="submit">
+    </form>
+{% else %}
+    <div style="border: solid 2px #ff747c" class="proposition">
+        <p>[{{ proposition.dateProposition|date("d/m/Y H:i:s") }}] - {{ proposition.userPropose.username }}</p>
+        <p>{{ proposition.messageProposition }}</p>
+        {% if proposition.familleProposante.chef == app.user %}<a href="{{ path("annuler_proposition",{'id' : proposition.id}) }}">- Annuler</a>{% endif %}
+    </div>
+{% endif %}

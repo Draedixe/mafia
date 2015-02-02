@@ -11,7 +11,7 @@
         <ul style="display:table-cell">
             {% for membre in membres %}
 
-                <li>{% if famille.chef == app.user %}Créateur : {% endif %}{{ membre.username }}</li>
+                <li>{% if famille.chef == membre %}Créateur : {% endif %}{{ membre.username }}{% if app.user == famille.chef and membre != app.user %}<a href="{{ path("virer_membre",{'id':membre.id}) }}">Eliminer</a>{% endif %}</li>
 
             {% endfor %}
         </ul>
@@ -35,8 +35,28 @@
     {% endif %}
 
     {% if app.user == famille.chef %}
-        {% for demande in famille.demandes %}
-            {% include 'MafiaFamilleBundle:Templates:demandeEntree.html.twig' with {'demande' : demande}  %}
-        {% endfor %}
+        <div style="display:table;width: 80%">
+            <div style="display:table-cell">
+                {% for demande in famille.demandes %}
+                    {% include 'MafiaFamilleBundle:Templates:demandeEntree.html.twig' with {'demande' : demande}  %}
+                {% endfor %}
+            </div>
+            <div style="display:table-cell">
+                {% if app.user == famille.chef %}
+                    <form action="{{ path("creation_proposition") }}" method="post">
+                        <label>
+                            Pseudo de la personne à inviter :<input name="pseudoUser" type="text"/>
+                        </label>
+                        <label>
+                            Message de la proposition :<textarea name="messageProposition">Viens dans notre famille !</textarea>
+                        </label>
+                        <input type="submit" value="Proposer" />
+                    </form>
+                {% endif %}
+                {% for proposition in famille.propositions %}
+                    {% include 'MafiaFamilleBundle:Templates:proposition.html.twig' with {'proposition' : proposition}  %}
+                {% endfor %}
+            </div>
+        </div>
     {% endif %}
 {% endblock %}

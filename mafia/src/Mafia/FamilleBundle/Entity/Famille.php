@@ -53,6 +53,37 @@ class Famille
     private $demandes;
 
     /**
+     * @ORM\OneToMany(targetEntity="Mafia\FamilleBundle\Entity\Proposition",mappedBy="familleProposante")
+     */
+    private $propositions;
+
+    /**
+     * @param Proposition $proposition
+     */
+    public function addProposition(Proposition $proposition)
+    {
+        $this->propositions[] = $proposition;
+    }
+
+    /**
+     * @param Proposition $proposition
+     */
+    public function removeProposition(Proposition $proposition)
+    {
+        $this->propositions->removeElement($proposition);
+    }
+
+    /**
+     * Get propositions
+     *
+     * @return ArrayCollection
+     */
+    public function getPropositions()
+    {
+        return $this->propositions;
+    }
+
+    /**
      * @param DemandeEntree $demande
      */
     public function addDemande(DemandeEntree $demande)
@@ -81,6 +112,7 @@ class Famille
     public function __construct()
     {
         $this->demandes = new ArrayCollection();
+        $this->propositions = new ArrayCollection();
     }
 
     /**
