@@ -21,7 +21,10 @@ class ChatController extends Controller{
         $em = $this->getDoctrine()->getManager();
 
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user == null){
+            return new JsonResponse(array('messages' => array(), 'users' => array()));
+        }
         $partie = $user->getPartie();
         $chat = $partie->getChat();
 
@@ -34,8 +37,31 @@ class ChatController extends Controller{
         $em->persist($newMessage);
         $em->flush();
 
-        return new JsonResponse();
+        //LISTE DES UTILISATEURS
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+        $userData = array();
+        $id = 0;
+        foreach($userList as $ul){
+            if($ul == $partie->getCreateur()){
+                $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
+            }
+            else{
+                $userData[$id] = $ul->getUser()->getUsername();
+            }
+            $id ++;
+        }
+        //Messages
+        $idPremier = $request->get('premierid');
+        $messages = $repositoryMessage->myFind($chat,$idPremier);
 
+        $data = array();
+        $id = 0;
+        foreach($messages as $message){
+            $data[$id] = array("id"=>$message->getId(),"pseudo"=>$message->getUser()->getUsername(),"message"=>$message->getTexte());
+            $id++;
+        }
+
+        return new JsonResponse(array('messages' => $data, 'users' => $userData));
     }
 
     public function recevoirMessageAction(){
@@ -43,7 +69,10 @@ class ChatController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user == null){
+            return new JsonResponse(array('messages' => array(), 'users' => array()));
+        }
         $partie = $user->getPartie();
         $chat = $partie->getChat();
 
@@ -63,16 +92,18 @@ class ChatController extends Controller{
             $id++;
         }
 
-        //VERIFICATION DES INACTIFS
-
+        //VERIFICATION MAJ DE L ACTIVITE DU USER
 
         $em = $this->getDoctrine()->getManager();
-        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+
         $now = new \DateTime();
         $user->setDerniereActivite($now);
         $em->persist($user);
         $em->flush();
 
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+
+        //VERIFICATION : SUPPRESSION INACTIF
         $createur_supprime = false;
         foreach($userList as $ul){
             if(($now->getTimestamp()- $ul->getDerniereActivite()->getTimestamp()) > 10){
@@ -93,10 +124,15 @@ class ChatController extends Controller{
 
         //LISTE DES UTILISATEURS
         $userData = array();
+        $createur = false;
         $id = 0;
+        $userList = $repositoryUser->findBy(array("partie"=>$partie));
         foreach($userList as $ul){
             if($ul == $partie->getCreateur()){
                 $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
+                if($partie->getCreateur() == $user){
+                    $createur = true;
+                }
             }
             else{
                 $userData[$id] = $ul->getUser()->getUsername();
@@ -104,8 +140,14 @@ class ChatController extends Controller{
             $id ++;
         }
 
-        $response = new JsonResponse(array('messages' => $data, 'users' => $userData));
+        //VERIFICATION: PARTIE LANCEE
+        if($partie->isCommencee()){
+            $lancer = true;
+        }
+        else{
+            $lancer = false;
+        }
 
-        return $response;
+        return new JsonResponse(array('messages' => $data, 'users' => $userData, 'createur' => $createur, 'lancer' => $lancer));
     }
 }
