@@ -72,6 +72,7 @@ class DefaultController extends Controller
             ->add('dureeDuJour', new RangeType(), array('label' => 'Durée du jour'))
             ->add('enumTypeDeJugement', 'choice',array('label' => 'Type de jugement','choices' => array_flip(TypeJugementEnum::getTypeJugement())))
             ->add('dureeDeLaNuit', new RangeType(), array('label' => 'Durée de la nuit'))
+            ->add('tempsTribunal', new RangeType(), array('label' => 'Durée du tribunal'))
             ->add('dernieresVolontes', 'choice', array('choices'=>array(1 => 'Oui',0 => 'Non'),'label' => 'Dernières volontés'))
             ->add('tempsDeDiscussion', new RangeType(), array('label' => 'Temps de discussion: '))
             ->add('debutDuJeu', 'choice',array('label' => 'Début du jeu','choices' => array_flip(DebutPartieEnum::getDebutPartie())))

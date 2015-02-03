@@ -28,6 +28,10 @@ class PartieController extends Controller{
                 ->getManager()
                 ->getRepository('MafiaPartieBundle:UserPartie');
 
+            $repositoryParam = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaPartieBundle:Parametres');
+
             foreach($partiesEnAttentes as $key => $p){
                 $nbJoueurs = count($repositoryUserPartie->findBy(array("partie" => $p)));
                 if($nbJoueurs >= $p->getNombreJoueursMax()){
@@ -43,17 +47,13 @@ class PartieController extends Controller{
                 $partieChoisie->setTerminee(false);
                 $partieChoisie->setMaireAnnonce(false);
 
-                $repositoryParam = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('MafiaPartieBundle:Parametres');
 
-                // $param = $repositoryParam->findOneBy(array("nomParametres"=>"Officiel"));
-                // $partieChoisie->setParametres($param);
 
                 $allParam = $repositoryParam->findAll();
                 if (count($allParam) == 0) {
                     $param = new Parametres();
                     $param->setNomParametres("Par Défaut");
+                    $param->setOfficiel(true);
                     $em->persist($param);
                     $em->flush();
                 } else {
@@ -170,9 +170,37 @@ class PartieController extends Controller{
                 $id++;
             }
 
+            //Liste Parametres
+            $parametres = $repositoryParam->findBy(array("officiel" => true));
+            $paramTab = array();
+
+            foreach($parametres as $pa){
+                $paramTab[$pa->getId()] = $pa->getNomParametres();
+            }
+
+            $formBuilderParam = $this->get('form.factory')->create();
+
+            if($user == $partieChoisie->getCreateur()) {
+                $formBuilderParam->add('param', 'choice',
+                    array('choices' => $paramTab,
+                        'data' => $partieChoisie->getParametres()->getId(),
+                        'label' => 'Paramètres'
+                    ));
+            }
+            else{
+                $formBuilderParam->add('param', 'choice',
+                    array('choices' => $paramTab,
+                        'data' => $partieChoisie->getParametres()->getId(),
+                        'label' => 'Paramètres',
+                        'disabled' => true
+                    ));
+            }
+
 
             return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig', array(
-                'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data, 'users' => $userData
+                'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data, 'users' => $userData,
+                'compo' => $partieChoisie->getComposition()->getNomCompo(),
+                'paramForm' => $formBuilderParam->createView()
             ));
         }
         else{
@@ -185,7 +213,7 @@ class PartieController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser()));
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         $partie = $user->getPartie();
 
         $userList = $repositoryUser->findBy(array("partie"=>$partie));
@@ -206,5 +234,32 @@ class PartieController extends Controller{
         else{
             return new JsonResponse(array('lancer' => false));
         }
+    }
+
+    public function changerParametresAction(){
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+        $em = $this->getDoctrine()->getManager();
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $partie = $user->getPartie();
+        //On vérifie que le joueur est le créateur
+        if($user == $partie->getCreateur()) {
+            $request = $this->container->get('request');
+            $paramId = $request->get('param');
+            //On vérifie s'il a bien envoyé le parametre
+            if($paramId != null) {
+                $repositoryParametres = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaPartieBundle:Parametres');
+                $param = $repositoryParametres->find($paramId);
+                if($param != null) {
+                    $partie->setParametres($param);
+                    $em->persist($partie);
+                    $em->flush();
+                }
+            }
+        }
+        return new JsonResponse();
     }
 }

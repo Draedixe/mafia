@@ -11,6 +11,20 @@
                 envoyer();
             });
 
+            $("#form_param").change(function (){
+
+                var DATA = 'param=' + $(this).val();
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('changer_param')}}",
+                    data: DATA,
+                    cache: false,
+                    success: function (data) {
+
+                    }
+                });
+            });
+
             var mydiv = $('.jouer_chat');
             mydiv.scrollTop(mydiv.prop('scrollHeight'));
         });
@@ -88,9 +102,11 @@
 
                         if(data.createur){
                             $('#lancer_partie').prop('disabled', false);
+                            $('#form_param').prop('disabled', false);
                         }
                         else{
                             $('#lancer_partie').prop('disabled', true);
+                            $('#form_param').prop('disabled', true);
                         }
 
                         if(data.lancer){
@@ -109,8 +125,15 @@
     <h2>Rejoindre/créer une partie</h2>
 
     <div class="table">
-        <p class="jouer_choix_param">Choix paramètres</p>
-        <p class="jouer_choix_compo">Choix composition</p>
+        <div class="jouer_choix_param">
+        <form id="form_parametres"  method="post" onsubmit = "return false;">
+            {{ form_widget(paramForm) }}
+
+        </form>
+        </div>
+        <div class="jouer_choix_compo">
+            Choix composition: {{ compo }}
+        </div>
     </div>
 
     <div class="table">
