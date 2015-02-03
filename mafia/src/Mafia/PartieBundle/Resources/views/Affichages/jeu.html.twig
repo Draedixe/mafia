@@ -3,6 +3,78 @@
 {% block title %}Mafia - Jouer{% endblock %}
 
 {% block fos_user_content %}
+    <script>
+        var phase = {{ partie.phaseEnCours }};
 
-   <h2>Cay le jeu !</h2>
+        function charger(){
+            setInterval( function(){
+                demanderInfo();
+            }, 4000);
+        }
+
+        function demanderInfo()
+        {
+            if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE'))
+            {
+                $.post('{{ path('demande_info_aube')}}', {
+                }, function (data) {
+                    if(data == "FAIL"){
+
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+            else if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR'))
+            {
+                $.post('{{ path('demande_info_jour')}}', {
+                }, function (data) {
+                    if(data == "FAIL"){
+
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+            else if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION'))
+            {
+                $.post('{{ path('demande_info_discussion')}}', {
+                }, function (data) {
+                    if(data == "FAIL"){
+
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+            else if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT'))
+            {
+                $.post('{{ path('demande_info_nuit')}}', {
+                }, function (data) {
+                    if(data == "FAIL"){
+
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+        }
+    </script>
+
+
+    <h2>Cay le jeu !</h2>
+
+    <p id="phaseEnCours"></p>
 {% endblock %}

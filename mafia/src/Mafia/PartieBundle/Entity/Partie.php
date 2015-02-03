@@ -29,11 +29,32 @@ class Partie
     private $nomPartie;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="phaseEnCours", type="integer")
+     */
+    private $phaseEnCours;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="dureePhase", type="integer")
+     */
+    private $dureePhase;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="tempsJourRestant", type="integer")
+     */
+    private $tempsJourRestant;
+
+    /**
      * @var \DateTime
      *
-     * @ORM\Column(name="tempsEnCours", type="datetime")
+     * @ORM\Column(name="debutPhase", type="datetime")
      */
-    private $tempsEnCours;
+    private $debutPhase;
 
     /**
      * @ORM\OneToMany(targetEntity="Mafia\PartieBundle\Entity\UserPartie", mappedBy="Partie")
@@ -284,25 +305,75 @@ class Partie
     }
 
     /**
-     * Set tempsEnCours
+     * Set debutPhase
      *
      * @param \DateTime $tempsEnCours
      * @return Partie
      */
-    public function setTempsEnCours($tempsEnCours)
+    public function setDebutPhase($tempsEnCours)
     {
-        $this->tempsEnCours = $tempsEnCours;
+        $this->debutPhase = $tempsEnCours;
 
         return $this;
     }
 
     /**
-     * Get tempsEnCours
+     * Get debutPhase
      *
      * @return \DateTime 
      */
-    public function getTempsEnCours()
+    public function getDebutPhase()
     {
-        return $this->tempsEnCours;
+        return $this->debutPhase;
     }
+
+    /**
+     * @return int
+     */
+    public function getPhaseEnCours()
+    {
+        return $this->phaseEnCours;
+    }
+
+    /**
+     * @param int $phaseEnCours
+     */
+    public function setPhaseEnCours($phaseEnCours)
+    {
+        $this->phaseEnCours = $phaseEnCours;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDureePhase()
+    {
+        return $this->dureePhase;
+    }
+
+    /**
+     * @param int $dureePhase
+     */
+    public function setDureePhase($dureePhase)
+    {
+        $this->dureePhase = $dureePhase;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTempsJourRestant()
+    {
+        return $this->tempsJourRestant;
+    }
+
+    /**
+     * @param int $tempsJourRestant
+     */
+    public function setTempsJourRestant($tempsJourRestant)
+    {
+        $this->tempsJourRestant = $tempsJourRestant;
+    }
+
+
 }

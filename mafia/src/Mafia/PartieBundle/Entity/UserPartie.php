@@ -93,6 +93,13 @@ class UserPartie
     private $user;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="voteTribunal", type="integer")
+     */
+    private $voteTribunal;
+
+    /**
      * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
      */
     private $votePour;
@@ -134,7 +141,7 @@ class UserPartie
 
 
     /**
-     * @return mixed
+     * @return UserPartie
      */
     public function getVotePour()
     {
@@ -142,9 +149,9 @@ class UserPartie
     }
 
     /**
-     * @param mixed $votePour
+     * @param UserPartie $votePour
      */
-    public function setVotePour($votePour)
+    public function setVotePour(UserPartie $votePour)
     {
         $this->votePour = $votePour;
     }
@@ -371,6 +378,22 @@ class UserPartie
     public function setDerniereActivite($derniereActivite)
     {
         $this->derniereActivite = $derniereActivite;
+    }
+
+    /**
+     * @return int
+     */
+    public function getVoteTribunal()
+    {
+        return $this->voteTribunal;
+    }
+
+    /**
+     * @param int $voteTribunal
+     */
+    public function setVoteTribunal($voteTribunal)
+    {
+        $this->voteTribunal = $voteTribunal;
     }
 
 

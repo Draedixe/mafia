@@ -61,7 +61,7 @@ demande_info_discussion:
     defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsDiscussion }
     requirements:
       _method: POST
-      
+
 changer_param:
     path: /jouer/changer_parametres
     defaults: { _controller: MafiaPartieBundle:Partie:changerParametres }
