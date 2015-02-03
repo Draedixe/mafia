@@ -11,29 +11,29 @@ class ChatController extends Controller{
     public function envoyerMessageAction(){
         $request = $this->container->get('request');
         $message = $request->get('message');
+        if($message != null) {
+            $repositoryUser = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaPartieBundle:UserPartie');
+            $em = $this->getDoctrine()->getManager();
 
-        $repositoryUser = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaPartieBundle:UserPartie');
-        $em = $this->getDoctrine()->getManager();
 
+            $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+            if ($user == null) {
+                return new JsonResponse(array('messages' => array(), 'users' => array()));
+            }
+            $partie = $user->getPartie();
+            $chat = $partie->getChat();
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
-        if($user == null){
-            return new JsonResponse(array('messages' => array(), 'users' => array()));
+            $newMessage = new Message();
+            $newMessage->setChat($chat);
+            $newMessage->setDate(new \DateTime());
+            $newMessage->setTexte(strip_tags($message));
+            $newMessage->setUser($this->getUser());
+
+            $em->persist($newMessage);
+            $em->flush();
         }
-        $partie = $user->getPartie();
-        $chat = $partie->getChat();
-
-        $newMessage = new Message();
-        $newMessage->setChat($chat);
-        $newMessage->setDate(new \DateTime());
-        $newMessage->setTexte($message);
-        $newMessage->setUser($this->getUser());
-
-        $em->persist($newMessage);
-        $em->flush();
-
         return new JsonResponse();
     }
 

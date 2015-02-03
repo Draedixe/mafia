@@ -37,3 +37,7 @@ jeu:
 lancer_partie:
     path: /jouer/lancer
     defaults: { _controller: MafiaPartieBundle:Partie:lancerPartie }
+
+changer_param:
+    path: /jouer/changer_parametres
+    defaults: { _controller: MafiaPartieBundle:Partie:changerParametres }

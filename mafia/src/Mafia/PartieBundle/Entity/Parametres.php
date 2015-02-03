@@ -116,6 +116,14 @@ class Parametres
     private $officiel;
 
 
+    /**
+     * @var float
+     *
+     * @Assert\Range(min=0.5,max=5.0)
+     * @ORM\Column(type="float")
+     */
+    private $tempsTribunal;
+
     /*
     * Paramètres par défaut
     */
@@ -132,7 +140,25 @@ class Parametres
         $this->choisirNom = true;
         $this->phaseDiscussion = true;
         $this->officiel = false;
+        $this->tempsTribunal = 1.0;
     }
+
+    /**
+     * @return int
+     */
+    public function getTempsTribunal()
+    {
+        return $this->tempsTribunal;
+    }
+
+    /**
+     * @param int $tempsTribunal
+     */
+    public function setTempsTribunal($tempsTribunal)
+    {
+        $this->tempsTribunal = $tempsTribunal;
+    }
+
 
 
     /**
