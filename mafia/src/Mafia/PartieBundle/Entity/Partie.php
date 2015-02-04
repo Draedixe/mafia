@@ -115,6 +115,9 @@ class Partie
     function __construct()
     {
         $this->nombreJoueursMax = 15;
+        $this->phaseEnCours=PhaseJeuEnum::SELECTION_DU_NOM;
+        $this->dureePhase=0.2;
+        $this->tempsJourRestant=0;
     }
 
     /**

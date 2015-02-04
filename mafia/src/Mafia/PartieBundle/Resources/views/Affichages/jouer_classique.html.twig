@@ -113,6 +113,10 @@
                             window.location.replace("{{ path('jeu') }}")
                         }
 
+                        if(data.param != $("#form_param").val()){
+                            $("#form_param").val(data.param);
+                        }
+
                         lock = false;
                     }
                 });

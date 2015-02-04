@@ -121,6 +121,6 @@ class ChatController extends Controller{
             $lancer = false;
         }
 
-        return new JsonResponse(array('messages' => $data, 'users' => $userData, 'createur' => $createur, 'lancer' => $lancer));
+        return new JsonResponse(array('messages' => $data, 'users' => $userData, 'createur' => $createur, 'lancer' => $lancer, 'param' => $partie->getParametres()->getId()));
     }
 }

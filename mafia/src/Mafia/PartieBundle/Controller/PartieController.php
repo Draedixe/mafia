@@ -42,7 +42,7 @@ class PartieController extends Controller{
             if ($nombreParties <= 0) {
                 $partieChoisie = new Partie();
                 $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
-                $partieChoisie->setTempsEnCours(new \DateTime);
+                $partieChoisie->setDebutPhase(new \DateTime);
                 $partieChoisie->setCommencee(false);
                 $partieChoisie->setTerminee(false);
                 $partieChoisie->setMaireAnnonce(false);

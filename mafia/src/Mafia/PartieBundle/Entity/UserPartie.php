@@ -95,7 +95,7 @@ class UserPartie
     /**
      * @var integer
      *
-     * @ORM\Column(name="voteTribunal", type="integer")
+     * @ORM\Column(name="voteTribunal", type="integer", nullable=true)
      */
     private $voteTribunal;
 
