@@ -119,8 +119,9 @@ class JeuController extends Controller{
                 {
                     if($vote > $majorite)
                     {
-                        $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
-                        $partie->setDureePhase($partie->getTempsJourRestant());
+                        $partie->setPhaseEnCours(PhaseJeuEnum::TRIBUNAL_DEFENSE);
+                        $partie->setTempsJourRestant($parametres->getDureeDuJour() - (((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())) );
+                        $partie->setDureePhase($parametres->getTempsTribunal());
 
                     }
                 }
