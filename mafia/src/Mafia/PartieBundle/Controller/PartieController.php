@@ -170,21 +170,37 @@ class PartieController extends Controller{
                 $id++;
             }
 
-            //Liste Parametres
+            //LISTE DES PARAMETRES ET DES COMPOSITIONS
             $parametres = $repositoryParam->findBy(array("officiel" => true));
             $paramTab = array();
+
+            $repositoryComposition = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaRolesBundle:Composition');
+            $compositions = $repositoryComposition->findBy(array("officielle" => true));
+            $compoTab = array();
 
             foreach($parametres as $pa){
                 $paramTab[$pa->getId()] = $pa->getNomParametres();
             }
 
+            foreach($compositions as $co){
+                $compoTab[$co->getId()] = $co->getNomCompo();
+            }
+
             $formBuilderParam = $this->get('form.factory')->create();
+            $formBuilderCompo = $this->get('form.factory')->create();
 
             if($user == $partieChoisie->getCreateur()) {
                 $formBuilderParam->add('param', 'choice',
                     array('choices' => $paramTab,
                         'data' => $partieChoisie->getParametres()->getId(),
                         'label' => 'Paramètres'
+                    ));
+                $formBuilderCompo->add('compo', 'choice',
+                    array('choices' => $compoTab,
+                        'data' => $partieChoisie->getComposition()->getId(),
+                        'label' => 'Composition'
                     ));
             }
             else{
@@ -194,13 +210,27 @@ class PartieController extends Controller{
                         'label' => 'Paramètres',
                         'disabled' => true
                     ));
+                $formBuilderCompo->add('compo', 'choice',
+                    array('choices' => $compoTab,
+                        'data' => $partieChoisie->getComposition()->getId(),
+                        'label' => 'Composition',
+                        'disabled' => true
+                    ));
             }
 
+            //ROLES
+            $compo = $partie->getComposition();
+            $roles = $compo->getRolesCompo();
+            $rolesData = array();
+            foreach($roles as $r){
+                array_push($rolesData, $r->getRole()->getNomRole());
+            }
 
             return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig', array(
                 'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data, 'users' => $userData,
-                'compo' => $partieChoisie->getComposition()->getNomCompo(),
-                'paramForm' => $formBuilderParam->createView()
+                'paramForm' => $formBuilderParam->createView(),
+                'compoForm' => $formBuilderCompo->createView(),
+                'roles' => $rolesData
             ));
         }
         else{
@@ -218,22 +248,23 @@ class PartieController extends Controller{
 
         $userList = $repositoryUser->findBy(array("partie"=>$partie));
 
+        if($user != null) {
+            if ($user == $partie->getCreateur()) {
 
-        if($user == $partie->getCreateur()) {
-
-             if(count($userList) == $partie->getNombreJoueursMax()){
-                $em = $this->getDoctrine()->getManager();
-                $partie->setCommencee(true);
-                $em->persist($partie);
-                $em->flush();
-                return new JsonResponse(array('lancer' => true));
+                if (count($userList) == $partie->getNombreJoueursMax()) {
+                    $em = $this->getDoctrine()->getManager();
+                    $partie->setCommencee(true);
+                    $em->persist($partie);
+                    $em->flush();
+                    return new JsonResponse(array('lancer' => true));
+                } else {
+                    return new JsonResponse(array('lancer' => false));
+                }
             } else {
                 return new JsonResponse(array('lancer' => false));
             }
         }
-        else{
-            return new JsonResponse(array('lancer' => false));
-        }
+        return new JsonResponse();
     }
 
     public function changerParametresAction(){
@@ -242,23 +273,77 @@ class PartieController extends Controller{
             ->getRepository('MafiaPartieBundle:UserPartie');
         $em = $this->getDoctrine()->getManager();
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
-        $partie = $user->getPartie();
-        //On vérifie que le joueur est le créateur
-        if($user == $partie->getCreateur()) {
-            $request = $this->container->get('request');
-            $paramId = $request->get('param');
-            //On vérifie s'il a bien envoyé le parametre
-            if($paramId != null) {
-                $repositoryParametres = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('MafiaPartieBundle:Parametres');
-                $param = $repositoryParametres->find($paramId);
-                if($param != null) {
-                    $partie->setParametres($param);
-                    $em->persist($partie);
-                    $em->flush();
+        if($user != null) {
+            $partie = $user->getPartie();
+            //On vérifie que le joueur est le créateur
+            if ($user == $partie->getCreateur()) {
+                $request = $this->container->get('request');
+                $paramId = $request->get('param');
+                //On vérifie s'il a bien envoyé le parametre
+                if ($paramId != null) {
+                    $repositoryParametres = $this->getDoctrine()
+                        ->getManager()
+                        ->getRepository('MafiaPartieBundle:Parametres');
+                    $param = $repositoryParametres->find($paramId);
+                    if ($param != null) {
+                        if ($param->getOfficiel()) {
+                            $partie->setParametres($param);
+                            $em->persist($partie);
+                            $em->flush();
+                        }
+                    }
                 }
             }
+        }
+        return new JsonResponse();
+    }
+
+    public function changerCompositionAction(){
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+        $em = $this->getDoctrine()->getManager();
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $partie = $user->getPartie();
+            //On vérifie que le joueur est le créateur
+            if ($user == $partie->getCreateur()) {
+                $request = $this->container->get('request');
+                $compoId = $request->get('compo');
+                //On vérifie s'il a bien envoyé le parametre
+                if ($compoId != null) {
+                    $repositoryComposition = $this->getDoctrine()
+                        ->getManager()
+                        ->getRepository('MafiaRolesBundle:Composition');
+                    $compo = $repositoryComposition->find($compoId);
+                    if ($compo != null) {
+                        if ($compo->getOfficielle()) {
+                            $partie->setComposition($compo);
+                            $em->persist($partie);
+                            $em->flush();
+                        }
+                    }
+                }
+            }
+        }
+        return new JsonResponse();
+    }
+
+    public function getCompositionAction(){
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $partie = $user->getPartie();
+            $compo = $partie->getComposition();
+            $roles = $compo->getRolesCompo();
+            $rolesData = array();
+            foreach($roles as $r){
+                array_push($rolesData, $r->getRole()->getNomRole());
+            }
+            return new JsonResponse(array('roles' => $rolesData));
         }
         return new JsonResponse();
     }

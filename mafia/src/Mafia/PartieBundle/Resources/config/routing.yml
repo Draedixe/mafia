@@ -65,3 +65,11 @@ demande_info_discussion:
 changer_param:
     path: /jouer/changer_parametres
     defaults: { _controller: MafiaPartieBundle:Partie:changerParametres }
+
+changer_compo:
+    path: /jouer/changer_composition
+    defaults: { _controller: MafiaPartieBundle:Partie:changerComposition }
+
+get_composition:
+    path: /jouer/get_composition
+    defaults: { _controller: MafiaPartieBundle:Partie:getComposition }
