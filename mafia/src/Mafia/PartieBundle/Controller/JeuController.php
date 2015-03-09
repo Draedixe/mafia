@@ -20,12 +20,48 @@ class JeuController extends Controller{
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => 1));
 
         $partie = $user->getPartie();
+        $usersPartie = $repositoryUser->findBy(array("partie"=> $partie, "vivant" => true));
+
+        $enVie = array();
+        foreach($usersPartie as $userEnVie)
+        {
+            $enVie[$userEnVie->getId()] = $userEnVie->getNom();
+        }
 
         return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
             array(
-                "partie" => $partie
+                "partie" => $partie,
+                "enVie" => json_encode($enVie)
             )
         );
+    }
+
+    public function razVotes()
+    {
+
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $partie = $user->getPartie();
+            $qB = $this->getDoctrine()->getManager()->createQueryBuilder();
+            $qB ->update('MafiaPartieBundle:UserPartie', 'j')
+                ->set('j.votePour', '?1')
+                ->set('j.voteTribunal', '?2')
+                ->where('j.partie = ?3')
+                ->andWhere('j.vivant = ?4')
+                ->setParameter(1, null)
+                ->setParameter(2, 2)
+                ->setParameter(3, $partie)
+                ->setParameter(4, true);
+
+            $query = $qB->getQuery();
+
+            $results = $query->getResult();
+        }
+
     }
 
     public function verifPhase()
@@ -43,7 +79,7 @@ class JeuController extends Controller{
             $parametres = $partie->getParametres();
 
             $usersPartie = $repositoryUser->findBy(array("partie"=> $partie, "vivant" => true));
-            if (((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp()) < ($partie->getDureePhase()*60)) {
+            if (((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp()) > ($partie->getDureePhase()*60)) {
 
                 switch ($partie->getPhaseEnCours()) {
                     case PhaseJeuEnum::AUBE :
@@ -55,14 +91,18 @@ class JeuController extends Controller{
                         $partie->setDureePhase(0.2);
                         break;
                     case PhaseJeuEnum::DISCUSSION :
+                        $this->razVotes();
                         $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
                         $partie->setDureePhase($parametres->getDureeDuJour());
                         break;
                     case PhaseJeuEnum::EXECUTION :
+                        $this->razVotes();
                         $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
                         $partie->setDureePhase($parametres->getDureeDeLaNuit());
                         break;
                     case PhaseJeuEnum::JOUR :
+                        $this->razVotes();
+
                         $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
                         $partie->setDureePhase($parametres->getDureeDeLaNuit());
                         break;
@@ -78,11 +118,13 @@ class JeuController extends Controller{
                         {
                             if($partie->getTempsJourRestant() > 0)
                             {
+                                $this->razVotes();
                                 $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
                                 $partie->setDureePhase($partie->getTempsJourRestant());
                             }
                             else
                             {
+                                $this->razVotes();
                                 $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
                                 $partie->setDureePhase($parametres->getDureeDeLaNuit());
                             }
@@ -98,6 +140,7 @@ class JeuController extends Controller{
                         break;
 
                 }
+                $partie->setDebutPhase(new \DateTime());
 
             }
             if($partie->getPhaseEnCours() == PhaseJeuEnum::JOUR)
@@ -127,7 +170,6 @@ class JeuController extends Controller{
                 }
 
             }
-
             $em->persist($partie);
             $em->flush();
             return $partie->getPhaseEnCours();
@@ -137,79 +179,180 @@ class JeuController extends Controller{
 
     public function recevoirInformationsNuitAction()
     {
-        $em = $this->getDoctrine()->getManager();
         $repositoryUser = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::NUIT)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
 
-        $partie = $user->getPartie();
-        $em->flush();
-        return new JsonResponse(array('phase' => $partie->getPhase()));
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
     }
 
     public function recevoirInformationsExecutionAction()
     {
-        $em = $this->getDoctrine()->getManager();
         $repositoryUser = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::EXECUTION)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
 
-        $partie = $user->getPartie();
-
-
-        $em->flush();
-        return new JsonResponse(array('phase' => $partie->getPhase()));
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
     }
 
     public function recevoirInformationsAubeAction()
     {
-        $em = $this->getDoctrine()->getManager();
         $repositoryUser = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::AUBE)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
 
-        $partie = $user->getPartie();
-
-
-        $em->flush();
-        return new JsonResponse(array('phase' => $partie->getPhase()));
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
     }
 
     public function recevoirInformationsDiscussionAction()
     {
-        $em = $this->getDoctrine()->getManager();
         $repositoryUser = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::DISCUSSION)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
 
-        $partie = $user->getPartie();
-
-
-        $em->flush();
-        return new JsonResponse(array('phase' => $partie->getPhase()));
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
     }
 
     public function recevoirInformationsJourAction()
     {
-        $em = $this->getDoctrine()->getManager();
         $repositoryUser = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
 
-        $partie = $user->getPartie();
+        $usersPartie = $repositoryUser->findBy(array("partie"=> $user->getPartie(), "vivant" => true));
 
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::JOUR)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase, "enVie" => $usersPartie));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
 
-        $em->flush();
-        return new JsonResponse(array('phase' => $partie->getPhase()));
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
+    }
+
+    public function recevoirInformationsTribunalDefenseAction()
+    {
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::TRIBUNAL_DEFENSE)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
+
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
+    }
+
+    public function recevoirInformationsTribunalVoteAction()
+    {
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::TRIBUNAL_VOTE)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
+
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
+    }
+
+    public function recevoirInformationsVoteResultatAction()
+    {
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $phase = $this->verifPhase();
+            if($phase == PhaseJeuEnum::RESULTAT_VOTE)
+            {
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase));
+            }
+            else
+            {
+                return new JsonResponse(array("statut" => "CHANGEMENT",'phase' => $phase));
+            }
+
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
     }
 }

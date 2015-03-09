@@ -5,6 +5,7 @@ namespace Mafia\PartieBundle\Controller;
 use Mafia\PartieBundle\Entity\Chat;
 use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
+use Mafia\PartieBundle\Entity\PhaseJeuEnum;
 use Mafia\PartieBundle\Entity\UserPartie;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -42,7 +43,10 @@ class PartieController extends Controller{
             if ($nombreParties <= 0) {
                 $partieChoisie = new Partie();
                 $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
-                $partieChoisie->setTempsEnCours(new \DateTime);
+                $partieChoisie->setPhaseEnCours(PhaseJeuEnum::JOUR);
+                $partieChoisie->setDureePhase(1);
+                $partieChoisie->setTempsJourRestant(1);
+                $partieChoisie->setDebutPhase(new \DateTime());
                 $partieChoisie->setCommencee(false);
                 $partieChoisie->setTerminee(false);
                 $partieChoisie->setMaireAnnonce(false);

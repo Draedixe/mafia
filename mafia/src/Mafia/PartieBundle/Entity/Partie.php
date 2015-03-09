@@ -109,6 +109,7 @@ class Partie
 
     /**
      * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     * @ORM\JoinColumn(nullable=true)
      */
     private $createur;
 

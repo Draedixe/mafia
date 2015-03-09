@@ -62,6 +62,30 @@ demande_info_discussion:
     requirements:
       _method: POST
 
+demande_info_tribunal_defense:
+    path: /jeu/tribunal/defense
+    defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsTribunalDefense }
+    requirements:
+      _method: POST
+
+demande_info_tribunal_vote:
+    path: /jeu/tribunal/vote
+    defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsTribunalVote }
+    requirements:
+      _method: POST
+
+demande_info_vote_resultat:
+    path: /jeu/resultat/vote
+    defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsVoteResultat }
+    requirements:
+      _method: POST
+
+demande_info_execution:
+    path: /jeu/execution
+    defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsExecution }
+    requirements:
+      _method: POST
+
 changer_param:
     path: /jouer/changer_parametres
     defaults: { _controller: MafiaPartieBundle:Partie:changerParametres }

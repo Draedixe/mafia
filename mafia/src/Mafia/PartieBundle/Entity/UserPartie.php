@@ -101,6 +101,7 @@ class UserPartie
 
     /**
      * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     * @ORM\JoinColumn(nullable=true)
      */
     private $votePour;
 
@@ -114,6 +115,7 @@ class UserPartie
     function __construct()
     {
         $this->vivant = true;
+        $this->voteTribunal = 2;
         $this->deathNote = '';
         $this->lastWord = '';
         $this->essencePar = -1;

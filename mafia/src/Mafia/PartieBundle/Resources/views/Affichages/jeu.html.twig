@@ -4,22 +4,41 @@
 
 {% block fos_user_content %}
     <script>
-        var phase = {{ partie.phaseEnCours }};
 
+        alert ({{ enVie }});
+        var phase = {{ partie.phaseEnCours }};
+        var enVie = {{ enVie }};
         function charger(){
             setInterval( function(){
                 demanderInfo();
             }, 4000);
         }
 
-        function demanderInfo()
+
+        function chargerVivants()
         {
-            if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE'))
+            var listeEnVie = $("#joueursEnVie");
+            var li;
+            if(document.getElementsByClassName("joueurEnVie").length != enVie.length)
+            {
+                listeEnVie.empty();
+                for(var i in enVie)
+                {
+                    li = document.createElement("li");
+                    li.appendChild(document.createTextNode(enVie[i]["nom"]));
+                    li.className = "joueurEnVie";
+                    listeEnVie.append(li);
+                }
+            }
+        }
+
+        function demanderInfo(){
+            if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }})
             {
                 $.post('{{ path('demande_info_aube')}}', {
                 }, function (data) {
-                    if(data == "FAIL"){
-
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
                     }
                     else
                     {
@@ -28,26 +47,28 @@
                     }
                 });
             }
-            else if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR'))
+            else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') }})
             {
                 $.post('{{ path('demande_info_jour')}}', {
                 }, function (data) {
-                    if(data == "FAIL"){
-
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
                     }
                     else
                     {
+                        enVie = data['enVie'];
+                        chargerVivants();
                         phase = data["phase"];
                         $('#phaseEnCours').text(phase);
                     }
                 });
             }
-            else if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION'))
+            else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }})
             {
                 $.post('{{ path('demande_info_discussion')}}', {
                 }, function (data) {
-                    if(data == "FAIL"){
-
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
                     }
                     else
                     {
@@ -56,12 +77,12 @@
                     }
                 });
             }
-            else if(phase == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT'))
+            else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }})
             {
                 $.post('{{ path('demande_info_nuit')}}', {
                 }, function (data) {
-                    if(data == "FAIL"){
-
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
                     }
                     else
                     {
@@ -70,11 +91,72 @@
                     }
                 });
             }
+            else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }})
+            {
+                $.post('{{ path('demande_info_tribunal_defense')}}', {
+                }, function (data) {
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+            else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') }})
+            {
+                $.post('{{ path('demande_info_tribunal_vote')}}', {
+                }, function (data) {
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+            else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') }})
+            {
+                $.post('{{ path('demande_info_vote_resultat')}}', {
+                }, function (data) {
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+            else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') }})
+            {
+                $.post('{{ path('demande_info_execution')}}', {
+                }, function (data) {
+                    if(data['statut'] == "FAIL"){
+                        alert("fail");
+                    }
+                    else
+                    {
+                        phase = data["phase"];
+                        $('#phaseEnCours').text(phase);
+                    }
+                });
+            }
+
         }
+        charger();
+        chargerVivants();
     </script>
 
 
     <h2>Cay le jeu !</h2>
 
     <p id="phaseEnCours"></p>
+
+    <ul id="joueursEnVie"></ul>
 {% endblock %}
