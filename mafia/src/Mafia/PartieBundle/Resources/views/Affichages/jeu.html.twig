@@ -4,14 +4,17 @@
 
 {% block fos_user_content %}
     <script>
-
-        alert ({{ enVie }});
         var phase = {{ partie.phaseEnCours }};
-        var enVie = {{ enVie }};
+
+        var enVie = {};
+        {% for key, vivant in enVie %}
+            enVie[{{ key }}] = "{{ vivant }}";
+        {% endfor %}
+
         function charger(){
             setInterval( function(){
                 demanderInfo();
-            }, 4000);
+        }, 4000);
         }
 
 

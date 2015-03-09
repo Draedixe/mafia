@@ -31,7 +31,7 @@ class JeuController extends Controller{
         return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
             array(
                 "partie" => $partie,
-                "enVie" => json_encode($enVie)
+                "enVie" => $enVie//json_encode($enVie)
             )
         );
     }
