@@ -55,6 +55,15 @@ nav a{
     padding: 5px;
 }
 
+
+
+#liste_roles{
+    display: table-cell;
+    border: solid brown 1px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
 .jouer_choix_compo{
     display: table-cell;
     border: solid violet 1px;

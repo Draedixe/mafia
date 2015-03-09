@@ -12,7 +12,6 @@
             });
 
             $("#form_param").change(function (){
-
                 var DATA = 'param=' + $(this).val();
                 $.ajax({
                     type: "POST",
@@ -20,7 +19,21 @@
                     data: DATA,
                     cache: false,
                     success: function (data) {
+                        recevoirMessage();
+                    }
+                });
+            });
 
+            $("#form_compo").change(function (){
+                var DATA = 'compo=' + $(this).val();
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('changer_compo')}}",
+                    data: DATA,
+                    cache: false,
+                    success: function (data) {
+                        recevoirMessage();
+                        getComposition();
                     }
                 });
             });
@@ -73,6 +86,20 @@
             }, 4000);
         }
 
+        function getComposition(){
+            $.ajax({
+                type: "POST",
+                url: "{{ path('get_composition')}}",
+                cache: false,
+                success: function (data) {
+                    $("#liste_roles").html("");
+                    for (var i in data.roles) {
+                        $("#liste_roles").append(data.roles[i] + "<br/>");
+                    }
+                }
+            });
+        }
+
         function recevoirMessage(){
             if(!lock) {
                 lock = true;
@@ -103,14 +130,25 @@
                         if(data.createur){
                             $('#lancer_partie').prop('disabled', false);
                             $('#form_param').prop('disabled', false);
+                            $('#form_compo').prop('disabled', false);
                         }
                         else{
                             $('#lancer_partie').prop('disabled', true);
                             $('#form_param').prop('disabled', true);
+                            $('#form_compo').prop('disabled', true);
                         }
 
                         if(data.lancer){
                             window.location.replace("{{ path('jeu') }}")
+                        }
+
+                        if(data.param != $("#form_param").val()){
+                            $("#form_param").val(data.param);
+                        }
+
+                        if(data.compo != $("#form_compo").val()){
+                            $("#form_compo").val(data.compo);
+                            getComposition();
                         }
 
                         lock = false;
@@ -126,13 +164,14 @@
 
     <div class="table">
         <div class="jouer_choix_param">
-        <form id="form_parametres"  method="post" onsubmit = "return false;">
-            {{ form_widget(paramForm) }}
-
-        </form>
+            <form id="form_parametres"  method="post" onsubmit = "return false;">
+                {{ form_widget(paramForm) }}
+            </form>
         </div>
         <div class="jouer_choix_compo">
-            Choix composition: {{ compo }}
+            <form id="form_compositions"  method="post" onsubmit = "return false;">
+                {{ form_widget(compoForm) }}
+            </form>
         </div>
     </div>
 
@@ -150,6 +189,11 @@
                     {{ us }}<br/>
                 {% endfor %}
             </div>
+        </div>
+        <div id="liste_roles">
+            {% for r in roles %}
+                {{ r }}<br/>
+            {% endfor %}
         </div>
     </div>
     <form id="form_chat"  method="post" onsubmit = "envoyer(); return false;">
