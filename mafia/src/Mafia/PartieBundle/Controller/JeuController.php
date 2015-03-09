@@ -22,16 +22,19 @@ class JeuController extends Controller{
         $partie = $user->getPartie();
         $usersPartie = $repositoryUser->findBy(array("partie"=> $partie, "vivant" => true));
 
-        $enVie = array();
+        $enVieId = array();
+        $enViePseudo = array();
         foreach($usersPartie as $userEnVie)
         {
-            $enVie[$userEnVie->getId()] = $userEnVie->getNom();
+            $enVieId[] = $userEnVie->getId();
+            $enViePseudo[] = $userEnVie->getNom();
         }
 
         return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
             array(
                 "partie" => $partie,
-                "enVie" => $enVie//json_encode($enVie)
+                "enVieId" => json_encode($enVieId),
+                "enViePseudo" => json_encode($enViePseudo)
             )
         );
     }
@@ -279,7 +282,15 @@ class JeuController extends Controller{
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::JOUR)
             {
-                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase, "enVie" => $usersPartie));
+
+                $enVieId = array();
+                $enViePseudo = array();
+                foreach($usersPartie as $userEnVie)
+                {
+                    $enVieId[] = $userEnVie->getId();
+                    $enViePseudo[] = $userEnVie->getNom();
+                }
+                return new JsonResponse(array("statut" => "SUCCESS",'phase' => $phase, "enVieId" => $enVieId,"enViePseudo" => $enViePseudo));
             }
             else
             {

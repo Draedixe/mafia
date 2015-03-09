@@ -6,10 +6,8 @@
     <script>
         var phase = {{ partie.phaseEnCours }};
 
-        var enVie = {};
-        {% for key, vivant in enVie %}
-            enVie[{{ key }}] = "{{ vivant }}";
-        {% endfor %}
+        var enVieId = {{ enVieId }};
+        var enViePseudo = {{ enViePseudo }};
 
         function charger(){
             setInterval( function(){
@@ -28,7 +26,7 @@
                 for(var i in enVie)
                 {
                     li = document.createElement("li");
-                    li.appendChild(document.createTextNode(enVie[i]["nom"]));
+                    li.appendChild(document.createTextNode(enVie[i]));
                     li.className = "joueurEnVie";
                     listeEnVie.append(li);
                 }
@@ -39,15 +37,15 @@
             if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }})
             {
                 $.post('{{ path('demande_info_aube')}}', {
-                }, function (data) {
-                    if(data['statut'] == "FAIL"){
-                        alert("fail");
-                    }
-                    else
-                    {
-                        phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
-                    }
+                    }, function (data) {
+                        if(data['statut'] == "FAIL"){
+                            alert("fail");
+                        }
+                        else
+                        {
+                            phase = data["phase"];
+                            $('#phaseEnCours').text(phase);
+                        }
                 });
             }
             else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') }})
