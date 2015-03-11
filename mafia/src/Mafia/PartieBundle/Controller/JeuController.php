@@ -26,8 +26,8 @@ class JeuController extends Controller{
         $enViePseudo = array();
         foreach($usersPartie as $userEnVie)
         {
-            $enVieId[] = $userEnVie->getId();
-            $enViePseudo[] = $userEnVie->getNom();
+            array_push($enVieId,$userEnVie->getId());
+            array_push($enViePseudo,$userEnVie->getNom());
         }
 
         return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',

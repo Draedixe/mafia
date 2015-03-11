@@ -6,8 +6,13 @@
     <script>
         var phase = {{ partie.phaseEnCours }};
 
-        var enVieId = {{ enVieId }};
-        var enViePseudo = {{ enViePseudo }};
+        var enVieId = [];
+        var enViePseudo = [];
+        {% for key, vivant in enVieId %}
+            enVieId[{{ key }}] = {{ vivant }};
+            enViePseudo[{{ key }}] = {{ enViePseudo[key] }};
+
+        {% endfor %}
 
         function charger(){
             setInterval( function(){
@@ -20,13 +25,13 @@
         {
             var listeEnVie = $("#joueursEnVie");
             var li;
-            if(document.getElementsByClassName("joueurEnVie").length != enVie.length)
+            if(document.getElementsByClassName("joueurEnVie").length != enVieId.length)
             {
                 listeEnVie.empty();
-                for(var i in enVie)
+                for(var i in enViePseudo)
                 {
                     li = document.createElement("li");
-                    li.appendChild(document.createTextNode(enVie[i]));
+                    li.appendChild(document.createTextNode(enViePseudo[i]));
                     li.className = "joueurEnVie";
                     listeEnVie.append(li);
                 }
