@@ -74,7 +74,12 @@
 
                    }
                     else{
-                       alert("Pas assez de joueurs");
+                       if(data.compo){
+                           alert("Pas assez/trop de roles dans la composition");
+                       }
+                       else {
+                           alert("Pas assez de joueurs");
+                       }
                    }
                 }
             });
@@ -84,6 +89,7 @@
             setInterval( function(){
                 recevoirMessage();
             }, 4000);
+
         }
 
         function getComposition(){

@@ -25,15 +25,15 @@
         {
             var listeEnVie = $("#joueursEnVie");
             var li;
-            if(document.getElementsByClassName("joueurEnVie").length != enVieId.length)
-            {
-                listeEnVie.empty();
-                for(var i in enViePseudo)
-                {
-                    li = document.createElement("li");
-                    li.appendChild(document.createTextNode(enViePseudo[i]));
-                    li.className = "joueurEnVie";
-                    listeEnVie.append(li);
+            if(document.getElementsByClassName("joueurEnVie") != undefined) {
+                if (document.getElementsByClassName("joueurEnVie").length != enVieId.length) {
+                    listeEnVie.empty();
+                    for (var i in enViePseudo) {
+                        li = document.createElement("li");
+                        li.appendChild(document.createTextNode(enViePseudo[i]));
+                        li.className = "joueurEnVie";
+                        listeEnVie.append(li);
+                    }
                 }
             }
         }
@@ -163,7 +163,9 @@
 
     <h2>Cay le jeu !</h2>
 
-    <p id="phaseEnCours"></p>
-
+    <div>
+        Phase: <p id="phaseEnCours"></p>
+    </div>
+En Vie:
     <ul id="joueursEnVie"></ul>
 {% endblock %}

@@ -71,6 +71,7 @@ class PartieController extends Controller{
                     ->getRepository('MafiaRolesBundle:Composition');
                 $compo = $repositoryRoles->findOneBy(array("nomCompo" => "Officielle"));
                 $partieChoisie->setComposition($compo);
+                $partieChoisie->setPhaseEnCours(0);
 
                 $chat = new Chat();
                 $em->persist($chat);
@@ -92,9 +93,11 @@ class PartieController extends Controller{
 
             $userDansAutrePartie = null;
             foreach($userResponse as $ur){
+                //Si le user est dans une partie commencee et qu'il est encore vivant
                 if($ur->getPartie()->isCommencee() && $ur->getVivant()){
                     return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
                 }
+                //Si le user est déjà dans une partie pas commencée
                 if(!($ur->getPartie()->isCommencee())){
                     $userDansAutrePartie = $ur;
                 }
@@ -254,21 +257,30 @@ class PartieController extends Controller{
 
         if($user != null) {
             if ($user == $partie->getCreateur()) {
-
-                if (count($userList) == $partie->getNombreJoueursMax()) {
-                    $em = $this->getDoctrine()->getManager();
-                    $partie->setCommencee(true);
-                    $em->persist($partie);
-                    $em->flush();
-                    return new JsonResponse(array('lancer' => true));
-                } else {
-                    return new JsonResponse(array('lancer' => false));
+                //On vérifie que la partie est bien pleine
+                $nbJoueurs = count($userList);
+                if ($nbJoueurs == $partie->getNombreJoueursMax()) {
+                    $compo = $partie->getComposition();
+                    $roles = $compo->getRolesCompo();
+                    $nbRoles = 0;
+                    foreach($roles as $r){
+                       $nbRoles++;
+                    }
+                    //On vérifie qu'il y a autant de roles que de joueurs
+                    if($nbJoueurs == $nbRoles) {
+                        $em = $this->getDoctrine()->getManager();
+                        $partie->setCommencee(true);
+                        $em->persist($partie);
+                        $em->flush();
+                        return new JsonResponse(array('lancer' => true));
+                    }
+                    else{
+                        return new JsonResponse(array('lancer' => false, 'compo' => true));
+                    }
                 }
-            } else {
-                return new JsonResponse(array('lancer' => false));
             }
         }
-        return new JsonResponse();
+        return new JsonResponse(array('lancer' => false, 'compo' => false));
     }
 
     public function changerParametresAction(){
