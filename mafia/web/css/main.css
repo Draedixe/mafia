@@ -55,7 +55,13 @@ nav a{
     padding: 5px;
 }
 
+/*** JEU ***/
 
+#section_jeu{
+    background-color: #ffffff;
+    padding: 10px 10px 10px 10px;
+
+}
 
 #liste_roles{
     display: table-cell;
@@ -76,4 +82,99 @@ nav a{
     border: solid red 1px;
     border-radius: 5px;
     padding: 5px;
+}
+
+#colonne_gauche{
+    display: table-cell;
+    width: 170px;
+
+}
+
+#chat{
+    display: table-cell;
+    max-width: 100%;
+    border: solid 1px blueviolet;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#colonne_droite{
+    display: table-cell;
+    width: 250px;
+
+}
+
+#cimetiere{
+    height: 300px;
+    border: solid 1px blue;
+    text-align: center;
+    padding: 5px;
+    overflow: auto;
+    line-height: 17px;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+#composition{
+    height: 300px;
+    border-radius: 5px;
+    border: solid 1px red;
+    text-align: center;
+    padding: 5px;
+    overflow: auto;
+    line-height: 17px;
+    margin: 5px;
+}
+
+#role{
+    height: 270px;
+    border: solid 1px green;
+    overflow: auto;
+    padding: 5px;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+#liste_composition{
+    margin-top: 5px;
+}
+
+#liste_cimetiere{
+    margin-top: 5px;
+}
+#timer{
+    height: 30px;
+    border: solid 1px brown;
+    text-align: center;
+    padding: 5px;
+    overflow: auto;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+#votes{
+    height: 350px;
+    border: solid 1px gray;
+    text-align: right;
+    padding: 5px;
+    overflow: auto;
+    line-height: 16px;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.colonne_nom_joueur{
+    width: 150px;
+
+}
+
+.colonne_bouton_vote{
+    width: 60px;
+
+
+}
+
+.votepour{
+    color: gray;
+
 }

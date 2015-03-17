@@ -1,4 +1,4 @@
-{% extends "FOSUserBundle::layout.html.twig" %}
+{% extends "FOSUserBundle::jeu.html.twig" %}
 
 {% block title %}Mafia - Jouer{% endblock %}
 
@@ -162,35 +162,126 @@
         chargerVivants();
 
     </script>
-
-
-    <h2>Cay le jeu !</h2>
-
     <div>
-        Phase: <span id="phaseEnCours">
-            {% if partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') %}
-                Discussion
-            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}
-                Jour
-            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') %}
-                Aube
-            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') %}
-                Nuit
-            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') %}
-                Execution
-            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') %}
-                Tribunal: Défense
-            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') %}
-                Tribunal: Vote
-            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') %}
-                Résultat des votes
-            {% endif %}
-        </span>
+        En Vie:
+        <ul id="joueursEnVie">
+            {% for p in enViePseudo %}
+                <li>{{ p }}</li>
+            {% endfor %}
+        </ul>
     </div>
-En Vie:
-    <ul id="joueursEnVie">
-        {% for p in enViePseudo %}
-            <li>{{ p }}</li>
-        {% endfor %}
-    </ul>
+
+    <div class="table">
+        <div id="colonne_gauche">
+            <div id="cimetiere">
+               <b>Cimetiere</b>
+                <div id="liste_cimetiere">
+                    Joueur 1 Mort<br/>
+                    Joueur 2 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort<br/>
+                    Joueur 1 Mort
+                </div>
+            </div>
+            <button type="button" title="Death Note: un petit message attaché avec le corps de vos victimes">DN</button><button type="button" title="Derniere Volontés: un message qui sera révélé à tout le monde quand vous mourrez">Derniere Volontés</button>
+            <div id="composition">
+                <b>Composition</b>
+                <div id="liste_composition">
+                    Sheriff<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Inspecteur<br/>
+                    Mafioso<br/>
+                    Mafioso<br/>
+                    Parrain
+                </div>
+            </div>
+        </div>
+        <div id="chat">
+            <b>Chat</b>
+            <div>
+                <b>J9:</b> Message 1<br/>
+                <b>J4:</b> Message 2<br/>
+                <b>J2:</b> Message 3<br/>
+                <b>C'est la nuit</b><br/>
+                <b>C'est le jour</b>
+            </div>
+
+        </div>
+        <div id="colonne_droite">
+            <div id="role">
+                <b>Parrain:</b><br/>
+                Vous dirigez la mafia. Ca envoie du paté.<br/>
+                Vous pouvez tuer des gens, c'est trop génial.<br/><br/>
+                <b>Equipe:</b><br/>
+                Raph55 <b>(Parrain)</b><br/>
+                Drae <b>(Mafioso)</b><br/>
+                Pascal <b>(Mafioso)</b> - <i>Mort</i>
+
+                <br/><br/><b>Capacité de jour: </b> Aucune
+            </div>
+            <div id="timer">
+                3:54 - Phase:
+                <span id="phaseEnCours">
+                    {% if partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') %}
+                        Discussion
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}
+                        Jour
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') %}
+                        Aube
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') %}
+                        Nuit
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') %}
+                        Execution
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') %}
+                        Tribunal: Défense
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') %}
+                        Tribunal: Vote
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') %}
+                        Résultat des votes
+                    {% endif %}
+                </span>
+            </div>
+            <div id="votes">
+                <table>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote votepour">Annuler</button></td></tr>
+                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+
+
+                </table>
+            </div>
+        </div>
+
+    </div>
 {% endblock %}
