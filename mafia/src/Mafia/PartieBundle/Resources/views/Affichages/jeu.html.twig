@@ -10,14 +10,14 @@
         var enViePseudo = [];
         {% for key, vivant in enVieId %}
             enVieId[{{ key }}] = {{ vivant }};
-            enViePseudo[{{ key }}] = {{ enViePseudo[key] }};
+            enViePseudo[{{ key }}] = "{{ enViePseudo[key] }}";
 
         {% endfor %}
 
         function charger(){
             setInterval( function(){
                 demanderInfo();
-        }, 4000);
+            }, 4000);
         }
 
 
@@ -39,6 +39,7 @@
         }
 
         function demanderInfo(){
+
             if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }})
             {
                 $.post('{{ path('demande_info_aube')}}', {
@@ -49,7 +50,7 @@
                         else
                         {
                             phase = data["phase"];
-                            $('#phaseEnCours').text(phase);
+                            $('#phaseEnCours').text("Aube");
                         }
                 });
             }
@@ -66,7 +67,7 @@
                         enViePseudo = data['enViePseudo'];
                         chargerVivants();
                         phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
+                        $('#phaseEnCours').text("Jour");
                     }
                 });
             }
@@ -80,7 +81,7 @@
                     else
                     {
                         phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
+                        $('#phaseEnCours').text("Discussion");
                     }
                 });
             }
@@ -94,7 +95,7 @@
                     else
                     {
                         phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
+                        $('#phaseEnCours').text("Nuit");
                     }
                 });
             }
@@ -108,7 +109,7 @@
                     else
                     {
                         phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
+                        $('#phaseEnCours').text("Tribunal: Défense");
                     }
                 });
             }
@@ -122,7 +123,7 @@
                     else
                     {
                         phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
+                        $('#phaseEnCours').text("Tribunal: Vote");
                     }
                 });
             }
@@ -136,7 +137,7 @@
                     else
                     {
                         phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
+                        $('#phaseEnCours').text("Résultat des votes");
                     }
                 });
             }
@@ -150,22 +151,46 @@
                     else
                     {
                         phase = data["phase"];
-                        $('#phaseEnCours').text(phase);
+                        $('#phaseEnCours').text("Execution");
                     }
                 });
             }
 
         }
+
         charger();
         chargerVivants();
+
     </script>
 
 
     <h2>Cay le jeu !</h2>
 
     <div>
-        Phase: <p id="phaseEnCours"></p>
+        Phase: <span id="phaseEnCours">
+            {% if partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') %}
+                Discussion
+            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}
+                Jour
+            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') %}
+                Aube
+            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') %}
+                Nuit
+            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') %}
+                Execution
+            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') %}
+                Tribunal: Défense
+            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') %}
+                Tribunal: Vote
+            {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') %}
+                Résultat des votes
+            {% endif %}
+        </span>
     </div>
 En Vie:
-    <ul id="joueursEnVie"></ul>
+    <ul id="joueursEnVie">
+        {% for p in enViePseudo %}
+            <li>{{ p }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
