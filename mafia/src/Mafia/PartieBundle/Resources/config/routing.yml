@@ -107,3 +107,7 @@ changer_compo:
 get_composition:
     path: /jouer/get_composition
     defaults: { _controller: MafiaPartieBundle:Partie:getComposition }
+
+quitter_partie:
+    path: /jouer/quitter_partie
+    defaults: { _controller: MafiaPartieBundle:Partie:quitterPartie }

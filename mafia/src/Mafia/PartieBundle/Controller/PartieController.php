@@ -25,6 +25,45 @@ class PartieController extends Controller{
         return PartieController::jouerPartie("classique");
     }
 
+    public function quitterPartieAction(){
+        $userDansAutrePartie = null;
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+        $em = $this->getDoctrine()->getManager();
+
+        $userResponse = $repositoryUser->findBy(array("user" => $this->getUser()));
+        //On cherche si le joueur est déja dans une partie (dans ce cas on ne change rien et on réaffiche la partie)
+        foreach($userResponse as $ur){
+            //Si le user est dans une partie commencee et qu'il est encore vivant
+            if($ur->getPartie()->isCommencee() && $ur->getVivant()){
+                return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
+            }
+            //Si le user est déjà dans une partie pas commencée
+            if(!($ur->getPartie()->isCommencee())){
+                $userDansAutrePartie = $ur;
+            }
+        }
+        if($userDansAutrePartie != null) {
+            $partie = $userDansAutrePartie->getPartie();
+            //Si le user est la createur de la partie
+            if ($partie->getCreateur() == $userDansAutrePartie) {
+                //Le user n'est plus créateur
+                $partie->setCreateur(NULL);
+                //On supprime le user
+                $em->remove($userDansAutrePartie);
+                $em->persist($partie);
+                $em->flush();
+                //Remplacement du createur par un joueur au hasard
+                $userCreateur = $repositoryUser->findOneBy(array("partie"=>$partie));
+                $partie->setCreateur($userCreateur);
+                $em->persist($partie);
+                $em->flush();
+            }
+        }
+        return $this->forward('MafiaUserBundle:Default:menu');
+    }
+
     //Un utilisateur rejoint / crée une partie
     public function jouerPartie($type){
         if($this->getUser() != null) {
