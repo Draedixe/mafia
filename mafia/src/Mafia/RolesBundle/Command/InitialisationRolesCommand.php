@@ -566,6 +566,19 @@ class InitialisationRolesCommand extends ContainerAwareCommand
         $newCompo->addCategorieCompo(new CategorieCompo($newCategories[15],2));
 
         $em->persist($newCompo);
+
+        $output->writeln("\nCreation de la composition de test");
+        $newCompo = new Composition();
+        $newCompo->setNomCompo("TEST");
+        $newCompo->setOfficielle(true);
+        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::SHERIFF],1));
+        $newCompo->addImportance($newImportanceBase[RolesEnum::SHERIFF]);
+        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::INSPECTEUR],1));
+        $newCompo->addImportance($newImportanceBase[RolesEnum::INSPECTEUR]);
+        $newCompo->addRoleCompo(new RolesCompos($newRoles[RolesEnum::TUEUR_EN_SERIE],1));
+        $newCompo->addImportance($newImportanceBase[RolesEnum::TUEUR_EN_SERIE]);
+
+        $em->persist($newCompo);
         $em->flush();
     }
 
