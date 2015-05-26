@@ -18,25 +18,28 @@ class JeuController extends Controller{
             ->getRepository('MafiaPartieBundle:UserPartie');
 
         $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => 1));
+        if ($user != null) {
+            $partie = $user->getPartie();
+            $usersPartie = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true));
 
-        $partie = $user->getPartie();
-        $usersPartie = $repositoryUser->findBy(array("partie"=> $partie, "vivant" => true));
+            $enVieId = array();
+            $enViePseudo = array();
+            foreach ($usersPartie as $userEnVie) {
+                array_push($enVieId, $userEnVie->getId());
+                array_push($enViePseudo, $userEnVie->getNom());
+            }
 
-        $enVieId = array();
-        $enViePseudo = array();
-        foreach($usersPartie as $userEnVie)
-        {
-            array_push($enVieId,$userEnVie->getId());
-            array_push($enViePseudo,$userEnVie->getNom());
+            return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
+                array(
+                    "partie" => $partie,
+                    "enVieId" => $enVieId,
+                    "enViePseudo" => $enViePseudo
+                )
+            );
         }
-
-        return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
-            array(
-                "partie" => $partie,
-                "enVieId" => $enVieId,
-                "enViePseudo" => $enViePseudo
-            )
-        );
+        else{
+            return $this->forward('MafiaUserBundle:Default:menu');
+        }
     }
 
     public function razVotes()
@@ -64,6 +67,7 @@ class JeuController extends Controller{
 
             $results = $query->getResult();
         }
+
 
     }
 
