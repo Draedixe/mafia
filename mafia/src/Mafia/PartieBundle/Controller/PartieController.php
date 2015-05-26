@@ -17,13 +17,23 @@ class PartieController extends Controller{
     }
 
     //Un utilisateur rejoint / crée une partie
+    public function jouerTestAction(){
+        return PartieController::jouerPartie("test");
+    }
+
     public function jouerClassiqueAction(){
+        return PartieController::jouerPartie("classique");
+    }
+
+    //Un utilisateur rejoint / crée une partie
+    public function jouerPartie($type){
         if($this->getUser() != null) {
             $repository = $this->getDoctrine()
                 ->getManager()
                 ->getRepository('MafiaPartieBundle:Partie');
             $em = $this->getDoctrine()->getManager();
-            $partiesEnAttentes = $repository->findBy(array("commencee" => false));
+            //On repère les parties existantes (tri en fonction du type)
+            $partiesEnAttentes = $repository->findBy(array("commencee" => false, "typePartie" => $type));
 
             $repositoryUserPartie = $this->getDoctrine()
                 ->getManager()
@@ -32,14 +42,16 @@ class PartieController extends Controller{
             $repositoryParam = $this->getDoctrine()
                 ->getManager()
                 ->getRepository('MafiaPartieBundle:Parametres');
-
+            //On enlève les parties qui sont pleines
             foreach($partiesEnAttentes as $key => $p){
                 $nbJoueurs = count($repositoryUserPartie->findBy(array("partie" => $p)));
                 if($nbJoueurs >= $p->getNombreJoueursMax()){
                     unset($partiesEnAttentes[$key]);
                 }
             }
+            //On compte les parties qui sont joignables
             $nombreParties = count($partiesEnAttentes);
+            //Si il n'existe pas de partie joignable on la crée
             if ($nombreParties <= 0) {
                 $partieChoisie = new Partie();
                 $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
@@ -50,6 +62,11 @@ class PartieController extends Controller{
                 $partieChoisie->setCommencee(false);
                 $partieChoisie->setTerminee(false);
                 $partieChoisie->setMaireAnnonce(false);
+                $partieChoisie->setTypePartie($type);
+                //3 joueurs pour la compo de test
+                if(strcmp($type,"test") == 0){
+                    $partieChoisie->setNombreJoueursMax(3);
+                }
 
 
 
@@ -69,10 +86,19 @@ class PartieController extends Controller{
                 $repositoryRoles = $this->getDoctrine()
                     ->getManager()
                     ->getRepository('MafiaRolesBundle:Composition');
-                $compo = $repositoryRoles->findOneBy(array("nomCompo" => "Officielle"));
+                //Compo spéciale pour les tests
+                $compo = null;
+                if(strcmp($type,"test") == 0){
+                    $compo = $repositoryRoles->findOneBy(array("nomCompo" => "TEST"));
+
+                }
+                else{
+                    $compo = $repositoryRoles->findOneBy(array("nomCompo" => "Officielle"));
+                }
+
                 $partieChoisie->setComposition($compo);
                 $partieChoisie->setPhaseEnCours(0);
-
+                //Création du chat
                 $chat = new Chat();
                 $em->persist($chat);
                 $em->flush();
@@ -82,7 +108,9 @@ class PartieController extends Controller{
                 $em->persist($partieChoisie);
                 $em->flush();
 
-            } else {
+            }
+            //Il existe au moins une partie joignable donc on la rejoint
+            else {
                 $partieChoisie = $partiesEnAttentes[0];
             }
 

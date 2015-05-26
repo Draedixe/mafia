@@ -113,6 +113,13 @@ class Partie
      */
     private $createur;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="typePartie", type="string", length=255)
+     */
+    private $typePartie;
+
     function __construct()
     {
         $this->nombreJoueursMax = 15;
@@ -120,6 +127,23 @@ class Partie
         $this->dureePhase=0.2;
         $this->tempsJourRestant=0;
     }
+
+    /**
+     * @return string
+     */
+    public function getTypePartie()
+    {
+        return $this->typePartie;
+    }
+
+    /**
+     * @param string $typePartie
+     */
+    public function setTypePartie($typePartie)
+    {
+        $this->typePartie = $typePartie;
+    }
+
 
     /**
      * @return mixed
