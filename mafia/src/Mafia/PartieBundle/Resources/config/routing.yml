@@ -22,6 +22,10 @@ jouer_classique:
     path: /jouer/classique
     defaults: { _controller: MafiaPartieBundle:Partie:jouerClassique }
 
+jouer_test:
+    path: /jouer/test
+    defaults: { _controller: MafiaPartieBundle:Partie:jouerTest }
+
 chat_message:
     path: /chat/message
     defaults: { _controller: MafiaPartieBundle:Chat:envoyerMessage }

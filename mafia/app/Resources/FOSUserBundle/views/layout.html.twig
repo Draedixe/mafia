@@ -1,55 +1,54 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8" />
-    {% stylesheets 'css/*'  %}
-    <link rel="stylesheet" href="{{ asset_url }}" type="text/css" />
-    {% endstylesheets %}
-    {% javascripts 'js/*' %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-    <title>Mafia</title>
-</head>
-<body>
-<section>
-    {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
-        {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
-        <a href="{{ path('fos_user_security_logout') }}">
-            {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
-        </a>
+    <head>
+        <meta charset="UTF-8" />
+        {% stylesheets 'css/*'  %}
+        <link rel="stylesheet" href="{{ asset_url }}" type="text/css" />
+        {% endstylesheets %}
+        {% javascripts 'js/*' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+        <title>Mafia</title>
+    </head>
+    <body>
+        <section>
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
+                <a href="{{ path('fos_user_security_logout') }}">
+                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                </a>
 
-        <nav><h2>Menu:</h2>
-            <a href="{{ path('fos_user_profile_show') }}">Profil</a>
-            <a href="{{ path('menu_principal') }}">Menu Principal</a>
-            <a href="{{ path('liste_roles') }}">Les rôles</a>
-            <a href="{{ path('liste_compositions') }}">Les compositions</a>
-            <a href="{{ path('liste_parametres') }}">Paramètres</a>
-            <a href="{{ path('creation_famille') }}">Famille</a>
-            <a href="{{ path('choix_type_partie') }}">Jouer</a>
-            <a href="{{ path('liste_proposition') }}">Propositions</a>
-            <a href="http://fr.french-mafia.wikia.com/wiki/Accueil">Lien vers le wiki</a>
-        </nav>
+                <nav><h2>Menu:</h2>
+                    <a href="{{ path('fos_user_profile_show') }}">Profil</a>
+                    <a href="{{ path('menu_principal') }}">Menu Principal</a>
+                    <a href="{{ path('liste_roles') }}">Rôles</a>
+                    <a href="{{ path('liste_compositions') }}">Compositions</a>
+                    <a href="{{ path('liste_parametres') }}">Paramètres</a>
+                    <a href="{{ path('creation_famille') }}">Famille</a>
+                    <a href="{{ path('choix_type_partie') }}">Jouer</a>
+                    <a href="{{ path('liste_proposition') }}">Propositions</a>
+                    <a href="http://fr.french-mafia.wikia.com/wiki/Accueil">Lien vers le wiki</a>
+                </nav>
 
-        {% block fos_user_content %}
-        {% endblock fos_user_content %}
-    {% else %}
-        <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a><br/>
-        <a href="{{ path('fos_user_registration_register') }}">{{ 'layout.register'|trans({}, 'FOSUserBundle') }}</a>
+                {% block fos_user_content %}
+                {% endblock fos_user_content %}
+            {% else %}
+                <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a><br/>
+                <a href="{{ path('fos_user_registration_register') }}">{{ 'layout.register'|trans({}, 'FOSUserBundle') }}</a>
 
-        {% block offline_content %}
-        {% endblock offline_content %}
-    {% endif %}
+                {% block offline_content %}
+                {% endblock offline_content %}
+            {% endif %}
 
 
-{% for type, messages in app.session.flashbag.all() %}
-    {% for message in messages %}
-        <div class="flash-{{ type }}">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endfor %}
-</section>
-
-</body>
+        {% for type, messages in app.session.flashbag.all() %}
+            {% for message in messages %}
+                <div class="flash-{{ type }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        </section>
+    </body>
 </html>
