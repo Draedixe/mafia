@@ -149,11 +149,12 @@ class JeuController extends Controller{
             if($partie->getPhaseEnCours() == PhaseJeuEnum::JOUR)
             {
                 $votes = array();
+
                 foreach($usersPartie as $joueur)
                 {
                     if($joueur->getVotePour() != null)
                     {
-                        if($votes[$joueur->getVotePour()->getId()] == null)
+                        if(!isset($votes[$joueur->getVotePour()->getId()]))
                         {
                             $votes[$joueur->getVotePour()->getId()] = 0;
                         }

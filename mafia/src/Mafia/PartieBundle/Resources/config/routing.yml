@@ -2,6 +2,12 @@ creation_parametres:
     path:     /parametres/creation
     defaults: { _controller: MafiaPartieBundle:Default:creationParametres }
 
+voter_pour:
+    path: /jeu/vote
+    defaults: { _controller: MafiaPartieBundle:Jour:voterPour }
+    requirements:
+      _method: POST
+
 vue_parametres:
     path: /parametres/afficher/{id}
     defaults: { _controller: MafiaPartieBundle:Default:affichageParametres, id:1 }

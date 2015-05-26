@@ -151,9 +151,9 @@ class UserPartie
     }
 
     /**
-     * @param UserPartie $votePour
+     * @param $votePour
      */
-    public function setVotePour(UserPartie $votePour)
+    public function setVotePour($votePour)
     {
         $this->votePour = $votePour;
     }

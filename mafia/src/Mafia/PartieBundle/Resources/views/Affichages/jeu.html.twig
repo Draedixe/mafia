@@ -20,13 +20,30 @@
             }, 4000);
         }
 
+        function votePourTellePersonne(id)
+        {
+            $.post('{{ path('voter_pour')}}',{id: id}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert("fail");
+                }
+                else
+                {
+                    if(data['action'] == "Annuler"){
+                        if(data['ancien'] != ""){
+                            $('#votePour'+data['ancien']).html("Voter");
+                        }
+                    }
+                    $('#votePour'+id).html(data['action']);
+                }
+            });
+        }
 
         function chargerVivants()
         {
             var listeEnVie = $("#joueursEnVie");
             var li;
-            if(document.getElementsByClassName("joueurEnVie") != undefined) {
-                if (document.getElementsByClassName("joueurEnVie").length != enVieId.length) {
+            if(document.getElementsByClassName("colonne_nom_joueur") != undefined) {
+                if (document.getElementsByClassName("colonne_nom_joueur").length != enVieId.length) {
                     listeEnVie.empty();
                     for (var i in enViePseudo) {
                         li = document.createElement("li");
@@ -36,6 +53,13 @@
                     }
                 }
             }
+        }
+
+        function cacherBoutonsVotes()
+        {
+            $(".colonne_bouton_vote").each(function(){
+                $(this).hide();
+            });
         }
 
         function demanderInfo(){
@@ -49,6 +73,7 @@
                         }
                         else
                         {
+                            cacherBoutonsVotes();
                             phase = data["phase"];
                             $('#phaseEnCours').text("Aube");
                         }
@@ -65,7 +90,12 @@
                     {
                         enVieId = data['enVieId'];
                         enViePseudo = data['enViePseudo'];
-                        chargerVivants();
+                        //chargerVivants();
+
+                        $(".colonne_bouton_vote").each(function(){
+                            $(this).show();
+                        });
+
                         phase = data["phase"];
                         $('#phaseEnCours').text("Jour");
                     }
@@ -80,6 +110,7 @@
                     }
                     else
                     {
+                        cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Discussion");
                     }
@@ -94,6 +125,7 @@
                     }
                     else
                     {
+                        cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Nuit");
                     }
@@ -108,6 +140,7 @@
                     }
                     else
                     {
+                        cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Tribunal: Défense");
                     }
@@ -122,6 +155,7 @@
                     }
                     else
                     {
+                        cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Tribunal: Vote");
                     }
@@ -136,6 +170,7 @@
                     }
                     else
                     {
+                        cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Résultat des votes");
                     }
@@ -150,6 +185,7 @@
                     }
                     else
                     {
+                        cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Execution");
                     }
@@ -159,7 +195,7 @@
         }
 
         charger();
-        chargerVivants();
+        //chargerVivants();
 
     </script>
     <div>
@@ -262,21 +298,9 @@
             </div>
             <div id="votes">
                 <table>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote votepour">Annuler</button></td></tr>
-                    <tr><td class="colonne_nom_joueur"><b>Joueur 1</b> </td><td class="colonne_bouton_vote"><button type="button" class="colonne_bouton_vote">Voter</button></td></tr>
+                    {% for key, p in enViePseudo %}
+                        <tr><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" class="colonne_bouton_vote"/>Voter</td></tr>
+                    {% endfor %}
 
 
                 </table>
