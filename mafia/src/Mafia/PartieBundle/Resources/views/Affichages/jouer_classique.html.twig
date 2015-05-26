@@ -98,10 +98,14 @@
                 url: "{{ path('get_composition')}}",
                 cache: false,
                 success: function (data) {
+
                     $("#liste_roles").html("");
+                    var nbRoles = 0;
                     for (var i in data.roles) {
                         $("#liste_roles").append(data.roles[i] + "<br/>");
+                        nbRoles++;
                     }
+                    $("#indic_nb_roles").html(nbRoles);
                 }
             });
         }
@@ -125,10 +129,13 @@
 
                         }
                         var listeUsers = "";
+                        var nbUsers = 0;
                         for (var j in data.users) {
                             listeUsers = listeUsers + data.users[j] + "<br/>";
+                            nbUsers++;
                         }
 
+                        $('#indic_nb_joueurs').html(nbUsers);
                         $('#liste_user').html(listeUsers);
                         var mydiv = $('.jouer_chat');
                         mydiv.scrollTop(mydiv.prop('scrollHeight'));
@@ -183,23 +190,27 @@
 
     <div class="table">
         <div class="jouer_chat">
-            <h2>Chat</h2>
+            <h2>Chat - {{ partie.nomPartie }}</h2>
             {% for msg in messages %}
                 <div id="{{ msg.id }}">{{ msg.pseudo }}: {{ msg.message }}
                 </div>
             {% endfor %}
         </div>
-        <div class="jouer_user_connectes"><h4>Liste des joueurs connectés</h4>
+        <div class="jouer_user_connectes"><h4 >Joueurs connectés (<span id="indic_nb_joueurs">{{ users|length }}</span>)</h4>
+            <b>Nombres joueurs max: {{ partie.nombreJoueursMax }}</b>
             <div id="liste_user">
                 {% for us in users %}
                     {{ us }}<br/>
                 {% endfor %}
             </div>
         </div>
-        <div id="liste_roles">
-            {% for r in roles %}
-                {{ r }}<br/>
-            {% endfor %}
+        <div id="cadre_liste_roles">
+            <h4>Rôles (<span id="indic_nb_roles">{{ roles|length }}</span>)</h4>
+            <div id="liste_roles">
+                {% for r in roles %}
+                    {{ r }}<br/>
+                {% endfor %}
+            </div>
         </div>
     </div>
     <form id="form_chat"  method="post" onsubmit = "envoyer(); return false;">

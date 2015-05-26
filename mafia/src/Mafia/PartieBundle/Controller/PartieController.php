@@ -252,8 +252,6 @@ class PartieController extends Controller{
             }
 
             //ROLES
-            $compo = $partie->getComposition();
-            $roles = $compo->getRolesCompo();
             $rolesData = PartieController::recuperationComposition($user);
 
             return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig', array(
