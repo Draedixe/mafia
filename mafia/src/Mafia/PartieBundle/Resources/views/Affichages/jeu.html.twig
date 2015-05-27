@@ -26,6 +26,9 @@
                 if(data['statut'] == "FAIL"){
                     alert("fail");
                 }
+                else if(data['statut'] == "BADVOTE"){
+                    alert("Ceci n'est pas un vote valide");
+                }
                 else
                 {
                     if(data['action'] == "Annuler"){
@@ -299,7 +302,7 @@
             <div id="votes">
                 <table>
                     {% for key, p in enViePseudo %}
-                        <tr><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" class="colonne_bouton_vote"/>Voter</td></tr>
+                        <tr><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
                     {% endfor %}
 
 

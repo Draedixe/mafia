@@ -8,7 +8,6 @@
 
 namespace Mafia\PartieBundle\Controller;
 
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -27,30 +26,72 @@ class JourController extends Controller{
         $userVote = $repositoryUser->find($id);
 
         //TODO verifs
-
-        $ancien = $user->getVotePour();
-
-        if ($ancien == $userVote) {
-            $ancien = $user->getVotePour();
-            $user->setVotePour(null);
-            $em->persist($user);
-            $em->flush();
-            return new JsonResponse(array("statut" => "SUCCESS", 'action' => "Voter", "ancien" => $ancien));
-        }
-        else
+        if($user != null)
         {
-            $user->setVotePour($userVote);
-            $em->persist($user);
-            $em->flush();
-            if($ancien != null)
+            if($userVote != null)
             {
-                return new JsonResponse(array("statut" => "SUCCESS",'action' => "Annuler", "ancien" => $ancien->getId()));
+                if($user->getPartie()->getId() == $userVote->getPartie()->getId())
+                {
+                    if($user->getId() != $userVote->getId())
+                    {
+                        if($user->getUser()->getId() != $userVote->getUser()->getId())
+                        {
+                            if($userVote->getVivant())
+                            {
+                                $ancien = $user->getVotePour();
+
+                                if ($ancien == $userVote) {
+                                    $ancien = $user->getVotePour();
+                                    $user->setVotePour(null);
+                                    $em->persist($user);
+                                    $em->flush();
+                                    return new JsonResponse(array("statut" => "SUCCESS", 'action' => "Voter", "ancien" => $ancien));
+                                }
+                                else
+                                {
+                                    $user->setVotePour($userVote);
+                                    $em->persist($user);
+                                    $em->flush();
+                                    if($ancien != null)
+                                    {
+                                        return new JsonResponse(array("statut" => "SUCCESS",'action' => "Annuler", "ancien" => $ancien->getId()));
+                                    }
+                                    else
+                                    {
+                                        return new JsonResponse(array("statut" => "SUCCESS",'action' => "Annuler", "ancien" => ""));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                return new JsonResponse(array("statut" => "BADVOTE"));
+                            }
+                        }
+                        else
+                        {
+                            return new JsonResponse(array("statut" => "BADVOTE"));
+                        }
+                    }
+                    else
+                    {
+                        return new JsonResponse(array("statut" => "BADVOTE"));
+                    }
+                }
+                else
+                {
+                    return new JsonResponse(array("statut" => "BADVOTE"));
+                }
             }
             else
             {
-                return new JsonResponse(array("statut" => "SUCCESS",'action' => "Annuler", "ancien" => ""));
+                return new JsonResponse(array("statut" => "BADVOTE"));
             }
         }
+        else
+        {
+            return new JsonResponse(array("statut" => "BADVOTE"));
+        }
+
 
 
     }
