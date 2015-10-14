@@ -185,6 +185,26 @@ class JeuController extends Controller{
         return -1;
     }
 
+    public function recevoirDureeAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+
+        if($user != null) {
+            $partie = $user->getPartie();
+            return new JsonResponse(array("statut" => "SUCCESS",'dureePhase' => $partie->getDureePhase()));
+        }
+        else
+        {
+            return new JsonResponse(array("statut" => "FAIL"));
+        }
+    }
+
     public function recevoirInformationsNuitAction()
     {
         $repositoryUser = $this->getDoctrine()

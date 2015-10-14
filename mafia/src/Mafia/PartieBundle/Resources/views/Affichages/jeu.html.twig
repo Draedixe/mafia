@@ -66,6 +66,7 @@
         }
 
         function demanderInfo(){
+            var exPhase = phase;
 
             if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }})
             {
@@ -195,6 +196,20 @@
                 });
             }
 
+            if(exPhase != phase)
+            {
+                $.post('{{ path('demande_duree')}}', {
+                }, function (data) {
+                    if(data['statut'] == "FAIL"){
+                        alert("L'utilisateur n'existe pas");
+                    }
+                    else
+                    {
+                        alert(data['dureePhase']);
+                        $('#timer').text(data['dureePhase']);
+                    }
+                });
+            }
         }
 
         charger();
@@ -277,8 +292,8 @@
 
                 <br/><br/><b>Capacité de jour: </b> Aucune
             </div>
-            <div id="timer">
-                3:54 - Phase:
+            <div id="timerDiv">
+                <div id="timer"></div> - Phase:
                 <span id="phaseEnCours">
                     {% if partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') %}
                         Discussion

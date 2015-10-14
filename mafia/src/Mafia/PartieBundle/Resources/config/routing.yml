@@ -96,6 +96,12 @@ demande_info_execution:
     requirements:
       _method: POST
 
+demande_duree:
+    path: /jeu/duree
+    defaults: { _controller: MafiaPartieBundle:Jeu:recevoirDuree }
+    requirements:
+      _method: POST
+
 changer_param:
     path: /jouer/changer_parametres
     defaults: { _controller: MafiaPartieBundle:Partie:changerParametres }
