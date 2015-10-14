@@ -121,3 +121,15 @@ quitter_partie:
 suicide:
     path: /jouer/suicide
     defaults: { _controller: MafiaPartieBundle:Jeu:suicide }
+
+last_word:
+    path: /jeu/lastWord
+    defaults: { _controller: MafiaPartieBundle:Jeu:lastWord }
+    requirements:
+      _method: POST
+
+death_note:
+    path: /jeu/deathNote
+    defaults: { _controller: MafiaPartieBundle:Jeu:deathNote }
+    requirements:
+      _method: POST

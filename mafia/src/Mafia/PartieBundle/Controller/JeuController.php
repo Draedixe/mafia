@@ -409,4 +409,38 @@ class JeuController extends Controller{
         }
         return $this->forward('MafiaUserBundle:Default:menu');
     }
+
+    public function lastWordAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $request = $this->get('request');
+        $lastWord = $request->get("lastWord");
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+
+        $user->setLastWord($lastWord);
+        $em->persist($user);
+        $em->flush();
+        return new JsonResponse(array("statut" => "SUCCESS"));
+    }
+
+    public function deathNoteAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $request = $this->get('request');
+        $deathNote = $request->get("deathNote");
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+
+        $user->setDeathNote($deathNote);
+        $em->persist($user);
+        $em->flush();
+        return new JsonResponse(array("statut" => "SUCCESS"));
+    }
 }

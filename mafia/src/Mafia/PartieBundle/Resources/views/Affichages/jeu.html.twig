@@ -250,6 +250,34 @@
             $('#timerDiv').text(tempsRestant);
         }
 
+        function lastWord()
+        {
+            var lastWord = prompt("Entrez vos derniers mots","Je veux tout léguer aux créateurs de ce site");
+            $.post('{{ path('last_word')}}',{lastWord: lastWord}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert("L'utilisateur n'existe pas");
+                }
+                else
+                {
+
+                }
+            });
+        }
+
+        function deathNote()
+        {
+            var deathNote = prompt("Entrez votre death note","I will be back");
+            $.post('{{ path('death_note')}}',{deathNote: deathNote}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert("L'utilisateur n'existe pas");
+                }
+                else
+                {
+
+                }
+            });
+        }
+
         charger();
         //chargerVivants();
 
@@ -285,7 +313,7 @@
                     Joueur 1 Mort
                 </div>
             </div>
-            <button type="button" title="Death Note: un petit message attaché avec le corps de vos victimes">DN</button><button type="button" title="Derniere Volontés: un message qui sera révélé à tout le monde quand vous mourrez">Derniere Volontés</button>
+            <button onclick="deathNote();" type="button" title="Death Note: un petit message attaché avec le corps de vos victimes">DN</button><button onclick="lastWord();" type="button" title="Derniere Volontés: un message qui sera révélé à tout le monde quand vous mourrez">Derniers Mots</button>
             <div id="composition">
                 <b>Composition</b>
                 <div id="liste_composition">
