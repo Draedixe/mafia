@@ -43,3 +43,7 @@ creation_proposition:
     defaults: { _controller: MafiaFamilleBundle:Famille:creationProposition }
     requirements:
       _method: POST
+
+liste_familles:
+    path: /famille/liste
+    defaults: { _controller: MafiaFamilleBundle:Famille:affichageFamilles }

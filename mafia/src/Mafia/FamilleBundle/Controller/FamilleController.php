@@ -348,4 +348,16 @@ class FamilleController extends Controller{
         }
         return $this->redirect($this->generateUrl('mafia_user_homepage'));
     }
+
+    public function affichageFamillesAction()
+    {
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaFamilleBundle:Famille');
+
+        $familles = $repository->findAll();
+        return $this->render('MafiaFamilleBundle:Affichages:liste_familles.html.twig', array(
+            'familles' => $familles
+        ));
+    }
 } 

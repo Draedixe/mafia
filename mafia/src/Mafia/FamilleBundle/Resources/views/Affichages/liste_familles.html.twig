@@ -1,0 +1,14 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block title %}Mafia - Familles{% endblock %}
+
+{% block fos_user_content %}
+
+    {% for famille in familles %}
+            <div class="well">
+                <a href="{{ path('vue_famille',{id:famille.id}) }}">{{ famille.nom }}</br></a>
+                Chef : {{ famille.chef }}
+            </div>
+    {% endfor %}
+
+{% endblock %}
