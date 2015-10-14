@@ -5,6 +5,11 @@
 {% block fos_user_content %}
     <script>
         var phase = {{ partie.phaseEnCours }};
+        var tempsRestant = {{ partie.dureePhase }}*60;
+
+        setInterval( function(){
+            timer();
+        }, 1000);
 
         var enVieId = [];
         var enViePseudo = [];
@@ -80,6 +85,7 @@
                             cacherBoutonsVotes();
                             phase = data["phase"];
                             $('#phaseEnCours').text("Aube");
+                            recupDuree(exPhase);
                         }
                 });
             }
@@ -102,6 +108,7 @@
 
                         phase = data["phase"];
                         $('#phaseEnCours').text("Jour");
+                        recupDuree(exPhase);
                     }
                 });
             }
@@ -117,6 +124,7 @@
                         cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Discussion");
+                        recupDuree(exPhase);
                     }
                 });
             }
@@ -132,6 +140,7 @@
                         cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Nuit");
+                        recupDuree(exPhase);
                     }
                 });
             }
@@ -147,6 +156,7 @@
                         cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Tribunal: Défense");
+                        recupDuree(exPhase);
                     }
                 });
             }
@@ -162,6 +172,7 @@
                         cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Tribunal: Vote");
+                        recupDuree(exPhase);
                     }
                 });
             }
@@ -177,6 +188,7 @@
                         cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Résultat des votes");
+                        recupDuree(exPhase);
                     }
                 });
             }
@@ -192,10 +204,16 @@
                         cacherBoutonsVotes();
                         phase = data["phase"];
                         $('#phaseEnCours').text("Execution");
+                        recupDuree(exPhase);
                     }
                 });
             }
 
+
+        }
+
+        function recupDuree(exPhase)
+        {
             if(exPhase != phase)
             {
                 $.post('{{ path('demande_duree')}}', {
@@ -205,11 +223,17 @@
                     }
                     else
                     {
-                        alert(data['dureePhase']);
-                        $('#timer').text(data['dureePhase']);
+                        tempsRestant = data['dureePhase'] * 60;
+
                     }
                 });
             }
+        }
+
+        function timer()
+        {
+            tempsRestant--;
+            $('#timerDiv').text(tempsRestant);
         }
 
         charger();
@@ -292,8 +316,8 @@
 
                 <br/><br/><b>Capacité de jour: </b> Aucune
             </div>
-            <div id="timerDiv">
-                <div id="timer"></div> - Phase:
+            <div id="timer">
+                <span id="timerDiv"></span> - Phase:
                 <span id="phaseEnCours">
                     {% if partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') %}
                         Discussion
