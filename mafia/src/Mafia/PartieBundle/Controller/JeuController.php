@@ -197,7 +197,7 @@ class JeuController extends Controller{
 
         if($user != null) {
             $partie = $user->getPartie();
-            return new JsonResponse(array("statut" => "SUCCESS",'dureePhase' => $partie->getDureePhase()));
+            return new JsonResponse(array("statut" => "SUCCESS",'dureePhase' => ($partie->getDureePhase()*60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())));
         }
         else
         {

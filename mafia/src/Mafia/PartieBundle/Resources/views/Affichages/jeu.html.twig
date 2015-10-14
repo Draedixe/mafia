@@ -5,7 +5,7 @@
 {% block fos_user_content %}
     <script>
         var phase = {{ partie.phaseEnCours }};
-        var tempsRestant = {{ partie.dureePhase }}*60;
+        var tempsRestant;/*= {{  (partie.dureePhase*60) - ("now"|date("m/d/Y") - partie.debutPhase|date("m/d/Y"))}};*/
 
         setInterval( function(){
             timer();
@@ -223,7 +223,7 @@
                     }
                     else
                     {
-                        tempsRestant = data['dureePhase'] * 60;
+                        tempsRestant = data['dureePhase'];
 
                     }
                 });
@@ -232,6 +232,20 @@
 
         function timer()
         {
+            if(isNaN(tempsRestant))
+            {
+                $.post('{{ path('demande_duree')}}', {
+                }, function (data) {
+                    if(data['statut'] == "FAIL"){
+                        alert("L'utilisateur n'existe pas");
+                    }
+                    else
+                    {
+                        tempsRestant = data['dureePhase'];
+
+                    }
+                });
+            }
             tempsRestant--;
             $('#timerDiv').text(tempsRestant);
         }
