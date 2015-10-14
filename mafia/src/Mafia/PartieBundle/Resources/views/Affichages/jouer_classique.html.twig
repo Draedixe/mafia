@@ -70,7 +70,7 @@
                 cache: false,
                 success: function (data) {
                    if(data.lancer){
-                       $('.jouer_chat').append("<div >Lancement de la partie...</div>");
+                       $('.jouer_chat').append("<div id='"+ $('.jouer_chat div:last').attr('id') +"' >Lancement de la partie...</div>");
 
                    }
                     else{

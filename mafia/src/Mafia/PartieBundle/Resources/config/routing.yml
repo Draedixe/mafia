@@ -111,3 +111,7 @@ get_composition:
 quitter_partie:
     path: /jouer/quitter_partie
     defaults: { _controller: MafiaPartieBundle:Partie:quitterPartie }
+
+suicide:
+    path: /jouer/suicide
+    defaults: { _controller: MafiaPartieBundle:Jeu:suicide }

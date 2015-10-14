@@ -371,4 +371,22 @@ class JeuController extends Controller{
         }
         return new JsonResponse(array("statut" => "FAIL"));
     }
+
+    public function suicideAction(){
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
+
+        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        if($user != null) {
+            $em = $this->getDoctrine()->getManager();
+            $userPartie = $repositoryUser->findOneBy(array("partie" => $user->getPartie(), "vivant" => true));
+            if ($userPartie != null) {
+                $userPartie->setVivant(false);
+                $em->persist($userPartie);
+                $em->flush();
+            }
+        }
+        return $this->forward('MafiaUserBundle:Default:menu');
+    }
 }
