@@ -17,9 +17,18 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => 1));
+        $em = $this->getDoctrine()->getManager();
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if ($user != null) {
             $partie = $user->getPartie();
+            //Si la partie est déja terminée
+            if($partie->isTerminee()) {
+                $userGlobal->setUserCourant(NULL);
+                $em->persist($userGlobal);
+                return $this->forward('MafiaUserBundle:Default:menu');
+            }
+
             $usersPartie = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true));
 
             $enVieId = array();
@@ -50,7 +59,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $partie = $user->getPartie();
             $qB = $this->getDoctrine()->getManager()->createQueryBuilder();
@@ -80,8 +91,9 @@ class JeuController extends Controller{
         ->getManager()
         ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
-
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $partie = $user->getPartie();
             $parametres = $partie->getParametres();
@@ -194,8 +206,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
-
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $partie = $user->getPartie();
             return new JsonResponse(array("statut" => "SUCCESS",'dureePhase' => ($partie->getDureePhase()*60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())));
@@ -212,7 +225,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::NUIT)
@@ -234,7 +249,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::EXECUTION)
@@ -256,7 +273,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::AUBE)
@@ -278,7 +297,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::DISCUSSION)
@@ -300,7 +321,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
 
         $usersPartie = $repositoryUser->findBy(array("partie"=> $user->getPartie(), "vivant" => true));
 
@@ -333,7 +356,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::TRIBUNAL_DEFENSE)
@@ -355,7 +380,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::TRIBUNAL_VOTE)
@@ -377,7 +404,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $phase = $this->verifPhase();
             if($phase == PhaseJeuEnum::RESULTAT_VOTE)
@@ -398,7 +427,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user != null) {
             $em = $this->getDoctrine()->getManager();
             $userPartie = $repositoryUser->findOneBy(array("partie" => $user->getPartie(), "vivant" => true));
@@ -420,7 +451,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
 
         $user->setLastWord($lastWord);
         $em->persist($user);
@@ -437,7 +470,9 @@ class JeuController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
 
         $user->setDeathNote($deathNote);
         $em->persist($user);

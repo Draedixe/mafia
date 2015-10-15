@@ -17,8 +17,8 @@ class ChatController extends Controller{
                 ->getRepository('MafiaPartieBundle:UserPartie');
             $em = $this->getDoctrine()->getManager();
 
-
-            $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+            $userGlobal = $this->getUser();
+            $user = $userGlobal->getUserCourant();
             if ($user == null) {
                 return new JsonResponse(array('messages' => array(), 'users' => array()));
             }
@@ -42,7 +42,8 @@ class ChatController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         if($user == null){
             return new JsonResponse(array('messages' => array(), 'users' => array()));
         }
@@ -84,6 +85,8 @@ class ChatController extends Controller{
                     $partie->setCreateur(NULL);
                     $createur_supprime = true;
                 }
+                $ul->getUser()->setUserCourant(NULL);
+                $em->persist($userGlobal);
                 $em->remove($ul);
                 $em->flush();
             }
