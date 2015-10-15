@@ -1,0 +1,3 @@
+envoyer_message:
+    path: /messages/creer/{id}
+    defaults: { _controller: MafiaMessageBundle:Message:creationMessage, id:1 }
