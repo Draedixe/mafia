@@ -35,6 +35,30 @@ class User extends BaseUser
      */
     private $propositions;
 
+
+    /**
+     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     */
+    private $userCourant;
+
+    /**
+     * @return mixed
+     */
+    public function getUserCourant()
+    {
+        return $this->userCourant;
+    }
+
+    /**
+     * @param mixed $userCourant
+     */
+    public function setUserCourant($userCourant)
+    {
+        $this->userCourant = $userCourant;
+    }
+
+
+
     /**
      * @param Proposition $proposition
      */

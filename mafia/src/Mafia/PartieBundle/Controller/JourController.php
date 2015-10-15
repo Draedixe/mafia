@@ -22,7 +22,9 @@ class JourController extends Controller{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
-        $user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
+        $userGlobal = $this->getUser();
+        $user = $userGlobal->getUserCourant();
         $userVote = $repositoryUser->find($id);
 
         //TODO verifs
