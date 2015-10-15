@@ -9,7 +9,7 @@
         {% if user.id != app.user.id %}
             <a href="{{ path('envoyer_message',{id:user.id}) }}">Envoyer un message privé</a>
         {% else %}
-            <a>Consulter ses messages</a>
+            <a href="{{ path('liste_messages') }}">Consulter ses messages</a>
         {% endif %}
     </div>
 {% endblock fos_user_content %}

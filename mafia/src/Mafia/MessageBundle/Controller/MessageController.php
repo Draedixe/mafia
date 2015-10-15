@@ -48,4 +48,19 @@ class MessageController extends Controller{
         ));
     }
 
+    function affichageMessagesAction()
+    {
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaMessageBundle:MessagePrive');
+
+        $envoyes = $repositoryUser->findBy(array("expediteur" => $this->getUser()));
+        $recus = $repositoryUser->findBy(array("recepteur" => $this->getUser()));
+
+        return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
+            'envoyes' => $envoyes,
+            'recus' => $recus
+        ));
+    }
+
 } 

@@ -1,0 +1,21 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block title %}Mafia - Vos messages{% endblock %}
+
+{% block fos_user_content %}
+
+    {% for envoye in envoyes %}
+        <fieldset>
+            <label>{{ envoye.recepteur.username }}</label>
+            {{ envoye.texte }} - le {{ envoye.dateEnvoi | date }}
+        </fieldset>
+    {% endfor %}
+
+    {% for recu in recus %}
+        <fieldset>
+            <label>{{ recu.expediteur.username }}</label>
+            {{ recu.texte }} - le {{ recu.dateEnvoi | date }}
+        </fieldset>
+    {% endfor %}
+
+{% endblock fos_user_content %}
