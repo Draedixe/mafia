@@ -33,7 +33,8 @@ class JeuController extends Controller{
                 array(
                     "partie" => $partie,
                     "enVieId" => $enVieId,
-                    "enViePseudo" => $enViePseudo
+                    "enViePseudo" => $enViePseudo,
+                    "tempsRestant" => ($partie->getDureePhase()*60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())
                 )
             );
         }

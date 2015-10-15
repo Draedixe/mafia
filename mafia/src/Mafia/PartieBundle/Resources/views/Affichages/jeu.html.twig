@@ -5,7 +5,7 @@
 {% block fos_user_content %}
     <script>
         var phase = {{ partie.phaseEnCours }};
-        var tempsRestant;/*= {{  (partie.dureePhase*60) - ("now"|date("m/d/Y") - partie.debutPhase|date("m/d/Y"))}};*/
+        var tempsRestant = {{ tempsRestant }};
 
         setInterval( function(){
             timer();
