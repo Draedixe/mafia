@@ -1,3 +1,7 @@
+mafia_message:
+    resource: "@MafiaMessageBundle/Resources/config/routing.yml"
+    prefix:   /
+
 mafia_famille:
     resource: "@MafiaFamilleBundle/Resources/config/routing.yml"
     prefix:   /

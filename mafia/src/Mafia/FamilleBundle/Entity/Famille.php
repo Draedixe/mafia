@@ -62,6 +62,7 @@ class Famille
      * @ORM\OneToMany(targetEntity="Mafia\UserBundle\Entity\User",mappedBy="famille")
      */
     private $membres;
+
     /**
      * @param User $membre
      */
