@@ -70,15 +70,15 @@
                 cache: false,
                 success: function (data) {
                    if(data.lancer){
-                       $('.jouer_chat').append("<div id='"+ $('.jouer_chat div:last').attr('id') +"' >Lancement de la partie...</div>");
+                       $('.jouer_chat').append("<div id='"+ $('.jouer_chat div:last').attr('id') +"' ><b>Lancement de la partie...</b></div>");
 
                    }
                     else{
                        if(data.compo){
-                           alert("Pas assez/trop de roles dans la composition");
+                           $('.jouer_chat').append("<div id='"+ $('.jouer_chat div:last').attr('id') +"' ><b>Pas assez/trop de roles dans la composition</b></div>");
                        }
                        else {
-                           alert("Pas assez de joueurs");
+                           $('.jouer_chat').append("<div id='"+ $('.jouer_chat div:last').attr('id') +"' ><b>Pas assez de joueurs</b></div>");
                        }
                    }
                 }
