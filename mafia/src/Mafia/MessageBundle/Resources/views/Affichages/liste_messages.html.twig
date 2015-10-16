@@ -4,18 +4,13 @@
 
 {% block fos_user_content %}
 
-    {% for envoye in envoyes %}
-        <fieldset>
-            <label>{{ envoye.recepteur.username }}</label>
-            {{ envoye.texte }} - le {{ envoye.dateEnvoi | date }}
-        </fieldset>
-    {% endfor %}
-
-    {% for recu in recus %}
-        <fieldset>
-            <label>{{ recu.expediteur.username }}</label>
-            {{ recu.texte }} - le {{ recu.dateEnvoi | date }}
-        </fieldset>
+    {% for key, messagesContact in messages %}
+        <h2>{{ key }}</h2>
+        {% for message in messagesContact %}
+            <fieldset>
+                {% if message.recepteur == app.user %}->{% else %}<-{% endif %} {{ message.texte }} - le {{ message.dateEnvoi | date }}
+            </fieldset>
+        {% endfor %}
     {% endfor %}
 
 {% endblock fos_user_content %}

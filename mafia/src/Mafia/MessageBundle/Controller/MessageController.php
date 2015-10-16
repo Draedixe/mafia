@@ -9,6 +9,7 @@
 namespace Mafia\MessageBundle\Controller;
 
 use Mafia\MessageBundle\Entity\MessagePrive;
+use Mafia\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -50,16 +51,36 @@ class MessageController extends Controller{
 
     function affichageMessagesAction()
     {
-        $repositoryUser = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaMessageBundle:MessagePrive');
+        $em = $this->getDoctrine()->getManager();
 
-        $envoyes = $repositoryUser->findBy(array("expediteur" => $this->getUser()));
-        $recus = $repositoryUser->findBy(array("recepteur" => $this->getUser()));
+        $query = $em->createQuery('SELECT DISTINCT u FROM Mafia\UserBundle\Entity\User u, Mafia\MessageBundle\Entity\MessagePrive m WHERE m.recepteur = :idRecepteur AND m.expediteur = u OR m.recepteur = u AND m.expediteur = :idExpediteur2');
+        $query->setParameters(array(
+            'idRecepteur' => $this->getUser(),
+            'idExpediteur2' => $this->getUser(),
+        ));
+        $liste_contacts = $query->getResult();
+
+        $messages = array();
+        foreach($liste_contacts as $contact)
+        {
+            $query = $em->createQuery('SELECT m FROM Mafia\MessageBundle\Entity\MessagePrive m WHERE m.recepteur = :idRecepteur AND m.expediteur = :idExpediteur OR m.recepteur = :idRecepteur2 AND m.expediteur = :idExpediteur2');
+            $query->setParameters(array(
+                'idRecepteur' => $this->getUser(),
+                'idExpediteur' => $contact,
+                'idRecepteur2' => $contact,
+                'idExpediteur2' => $this->getUser(),
+            ));
+
+            $messages[$contact->getUsername()] = $query->getResult();
+        }
+
+
 
         return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
-            'envoyes' => $envoyes,
-            'recus' => $recus
+            /*'envoyes' => $envoyes,
+            'recus' => $recus,
+            'liste_contacts' => $liste_contacts*/
+            'messages' => $messages
         ));
     }
 
