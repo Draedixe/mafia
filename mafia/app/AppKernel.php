@@ -22,6 +22,7 @@ class AppKernel extends Kernel
             new Mafia\RolesBundle\MafiaRolesBundle(),
             new Mafia\PartieBundle\MafiaPartieBundle(),
             new Mafia\FamilleBundle\MafiaFamilleBundle(),
+            new Mafia\MessageBundle\MafiaMessageBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

@@ -5,3 +5,7 @@ mafia_user_homepage:
 menu_principal:
     path: /menu
     defaults: { _controller: MafiaUserBundle:Default:Menu}
+
+profil:
+    path: /profil/{id}
+    defaults: { _controller: MafiaUserBundle:Default:profil, id:1  }

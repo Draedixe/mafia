@@ -1,0 +1,15 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block title %}Mafia - Profil de {{ user.username }}{% endblock %}
+
+{% block fos_user_content %}
+    <div>
+        {{ user.username }}
+
+        {% if user.id != app.user.id %}
+            <a href="{{ path('envoyer_message',{id:user.id}) }}">Envoyer un message privé</a>
+        {% else %}
+            <a href="{{ path('liste_messages') }}">Consulter ses messages</a>
+        {% endif %}
+    </div>
+{% endblock fos_user_content %}
