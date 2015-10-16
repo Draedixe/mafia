@@ -33,56 +33,44 @@ class PartieController extends Controller{
             ->getRepository('MafiaPartieBundle:UserPartie');
         $em = $this->getDoctrine()->getManager();
         $userGlobal = $this->getUser();
-        $userResponse = $repositoryUser->findBy(array("user" => $userGlobal));
-        //On cherche si le joueur est déja dans une partie lancée (dans ce cas il ne peut pas quitter comme ça!)
-        //foreach($userResponse as $ur){
-            //Si le user est dans une partie commencee et qu'il est encore vivant
-            //if($ur->getPartie()->isCommencee() && $ur->getVivant()){
-            //    return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
-          //  }
-            //Si le user est déjà dans une partie pas commencée (il peut la quitter)
-           // if(!($ur->getPartie()->isCommencee())){
-           //     $userDansAutrePartie = $ur;
-            //}
-        //}
+        if($userGlobal != null) {
+            //On récupère le userCourant
+            $userDansAutrePartie = $userGlobal->getUserCourant();
+            //Si on récupère quelquechose (si on ne trouve rien on renvoie le user sur le menu)
+            if ($userDansAutrePartie != null) {
+                //On trouve le user dans une partie deja terminée, on met a jour le user
+                if ($userDansAutrePartie->getPartie()->isTerminee()) {
+                    $userGlobal->setUserCourant(NULL);
+                    $userDansAutrePartie = null;
+                    return $this->forward('MafiaUserBundle:Default:menu');
+                }
+                //Si le user est dans une partie commencee et qu'il est encore vivant, il y retourne
+                if ($userDansAutrePartie->getPartie()->isCommencee() && $userDansAutrePartie->getVivant()) {
+                    return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
+                }
 
-        //On récupère le userCourant
-        $userDansAutrePartie = $userGlobal->getUserCourant();
-        //Si on récupère quelquechose (si on ne trouve rien on renvoie le user sur le menu)
-        if($userDansAutrePartie != null){
-            //On trouve le user dans une partie deja terminée, on met a jour le user
-            if($userDansAutrePartie->getPartie()->isTerminee()){
-                $userGlobal->setUserCourant(NULL);
-                $userDansAutrePartie = null;
-                return $this->forward('MafiaUserBundle:Default:menu');
-            }
-            //Si le user est dans une partie commencee et qu'il est encore vivant, il y retourne
-            if($userDansAutrePartie->getPartie()->isCommencee() && $userDansAutrePartie->getVivant()){
-                return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
-            }
-
-            $partie = $userDansAutrePartie->getPartie();
-            //Si le user est la createur de la partie
-            if ($partie->getCreateur() == $userDansAutrePartie) {
-                //Le user n'est plus créateur
-                $partie->setCreateur(NULL);
-                //On supprime le user
-                $userGlobal->setUserCourant(NULL);
-                $em->persist($userGlobal);
-                $em->remove($userDansAutrePartie);
-                $em->persist($partie);
-                $em->flush();
-                //Remplacement du createur par un joueur au hasard
-                $userCreateur = $repositoryUser->findOneBy(array("partie"=>$partie));
-                $partie->setCreateur($userCreateur);
-                $em->persist($partie);
-                $em->flush();
-            }
-            else{
-                $userGlobal->setUserCourant(NULL);
-                $em->persist($userGlobal);
-                $em->remove($userDansAutrePartie);
-                $em->flush();
+                $partie = $userDansAutrePartie->getPartie();
+                //Si le user est la createur de la partie
+                if ($partie->getCreateur() == $userDansAutrePartie) {
+                    //Le user n'est plus créateur
+                    $partie->setCreateur(NULL);
+                    //On supprime le user
+                    $userGlobal->setUserCourant(NULL);
+                    $em->persist($userGlobal);
+                    $em->remove($userDansAutrePartie);
+                    $em->persist($partie);
+                    $em->flush();
+                    //Remplacement du createur par un joueur au hasard
+                    $userCreateur = $repositoryUser->findOneBy(array("partie" => $partie));
+                    $partie->setCreateur($userCreateur);
+                    $em->persist($partie);
+                    $em->flush();
+                } else {
+                    $userGlobal->setUserCourant(NULL);
+                    $em->persist($userGlobal);
+                    $em->remove($userDansAutrePartie);
+                    $em->flush();
+                }
             }
         }
         return $this->forward('MafiaUserBundle:Default:menu');
@@ -96,7 +84,7 @@ class PartieController extends Controller{
             $repositoryUser = $this->getDoctrine()
                 ->getManager()
                 ->getRepository('MafiaPartieBundle:UserPartie');
-            $userResponse = $repositoryUser->findBy(array("user" => $this->getUser()));
+            //$userResponse = $repositoryUser->findBy(array("user" => $this->getUser()));
 
             $repository = $this->getDoctrine()
                 ->getManager()
@@ -131,7 +119,7 @@ class PartieController extends Controller{
             //Si on récupère quelquechose (si on ne trouve rien on crée un userPartie)
             if($userDansAutrePartie != null) {
                 //On trouve le user dans une partie deja terminée, on met a jour le user
-                if ($userDansAutrePartie->getPartie()->isTerminee()) {
+                if ($userDansAutrePartie->getPartie()->isTerminee() || !$userDansAutrePartie->getVivant()) {
                     $userGlobal->setUserCourant(NULL);
                     $userDansAutrePartie = null;
                 }
@@ -357,36 +345,37 @@ class PartieController extends Controller{
 
         //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         $userGlobal = $this->getUser();
-        $user = $userGlobal->getUserCourant();
-        $partie = $user->getPartie();
+        if($userGlobal != null) {
+            $user = $userGlobal->getUserCourant();
+            $partie = $user->getPartie();
 
-        $userList = $repositoryUser->findBy(array("partie"=>$partie));
+            $userList = $repositoryUser->findBy(array("partie" => $partie));
 
-        if($user != null) {
-            if ($user == $partie->getCreateur()) {
-                //On vérifie que la partie est bien pleine
-                $nbJoueurs = count($userList);
-                if ($nbJoueurs == $partie->getNombreJoueursMax()) {
-                    $compo = $partie->getComposition();
-                    $roles = $compo->getRolesCompo();
-                    $cat = $compo->getCategoriesCompo();
-                    $nbRoles = 0;
-                    foreach($roles as $r){
-                       $nbRoles = $nbRoles + $r->getQuantite();
-                    }
-                    foreach($cat as $r){
-                        $nbRoles = $nbRoles + $r->getQuantite();
-                    }
-                    //On vérifie qu'il y a autant de roles que de joueurs
-                    if($nbJoueurs == $nbRoles) {
-                        $em = $this->getDoctrine()->getManager();
-                        $partie->setCommencee(true);
-                        $em->persist($partie);
-                        $em->flush();
-                        return new JsonResponse(array('lancer' => true));
-                    }
-                    else{
-                        return new JsonResponse(array('lancer' => false, 'compo' => true));
+            if ($user != null) {
+                if ($user == $partie->getCreateur()) {
+                    //On vérifie que la partie est bien pleine
+                    $nbJoueurs = count($userList);
+                    if ($nbJoueurs == $partie->getNombreJoueursMax()) {
+                        $compo = $partie->getComposition();
+                        $roles = $compo->getRolesCompo();
+                        $cat = $compo->getCategoriesCompo();
+                        $nbRoles = 0;
+                        foreach ($roles as $r) {
+                            $nbRoles = $nbRoles + $r->getQuantite();
+                        }
+                        foreach ($cat as $r) {
+                            $nbRoles = $nbRoles + $r->getQuantite();
+                        }
+                        //On vérifie qu'il y a autant de roles que de joueurs
+                        if ($nbJoueurs == $nbRoles) {
+                            $em = $this->getDoctrine()->getManager();
+                            $partie->setCommencee(true);
+                            $em->persist($partie);
+                            $em->flush();
+                            return new JsonResponse(array('lancer' => true));
+                        } else {
+                            return new JsonResponse(array('lancer' => false, 'compo' => true));
+                        }
                     }
                 }
             }
@@ -401,24 +390,26 @@ class PartieController extends Controller{
         $em = $this->getDoctrine()->getManager();
         //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         $userGlobal = $this->getUser();
-        $user = $userGlobal->getUserCourant();
-        if($user != null) {
-            $partie = $user->getPartie();
-            //On vérifie que le joueur est le créateur
-            if ($user == $partie->getCreateur()) {
-                $request = $this->container->get('request');
-                $paramId = $request->get('param');
-                //On vérifie s'il a bien envoyé le parametre
-                if ($paramId != null) {
-                    $repositoryParametres = $this->getDoctrine()
-                        ->getManager()
-                        ->getRepository('MafiaPartieBundle:Parametres');
-                    $param = $repositoryParametres->find($paramId);
-                    if ($param != null) {
-                        if ($param->getOfficiel()) {
-                            $partie->setParametres($param);
-                            $em->persist($partie);
-                            $em->flush();
+        if($userGlobal != null) {
+            $user = $userGlobal->getUserCourant();
+            if ($user != null) {
+                $partie = $user->getPartie();
+                //On vérifie que le joueur est le créateur
+                if ($user == $partie->getCreateur()) {
+                    $request = $this->container->get('request');
+                    $paramId = $request->get('param');
+                    //On vérifie s'il a bien envoyé le parametre
+                    if ($paramId != null) {
+                        $repositoryParametres = $this->getDoctrine()
+                            ->getManager()
+                            ->getRepository('MafiaPartieBundle:Parametres');
+                        $param = $repositoryParametres->find($paramId);
+                        if ($param != null) {
+                            if ($param->getOfficiel()) {
+                                $partie->setParametres($param);
+                                $em->persist($partie);
+                                $em->flush();
+                            }
                         }
                     }
                 }
@@ -434,24 +425,26 @@ class PartieController extends Controller{
         $em = $this->getDoctrine()->getManager();
         //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         $userGlobal = $this->getUser();
-        $user = $userGlobal->getUserCourant();
-        if($user != null) {
-            $partie = $user->getPartie();
-            //On vérifie que le joueur est le créateur
-            if ($user == $partie->getCreateur()) {
-                $request = $this->container->get('request');
-                $compoId = $request->get('compo');
-                //On vérifie s'il a bien envoyé le parametre
-                if ($compoId != null) {
-                    $repositoryComposition = $this->getDoctrine()
-                        ->getManager()
-                        ->getRepository('MafiaRolesBundle:Composition');
-                    $compo = $repositoryComposition->find($compoId);
-                    if ($compo != null) {
-                        if ($compo->getOfficielle()) {
-                            $partie->setComposition($compo);
-                            $em->persist($partie);
-                            $em->flush();
+        if($userGlobal != null) {
+            $user = $userGlobal->getUserCourant();
+            if ($user != null) {
+                $partie = $user->getPartie();
+                //On vérifie que le joueur est le créateur
+                if ($user == $partie->getCreateur()) {
+                    $request = $this->container->get('request');
+                    $compoId = $request->get('compo');
+                    //On vérifie s'il a bien envoyé le parametre
+                    if ($compoId != null) {
+                        $repositoryComposition = $this->getDoctrine()
+                            ->getManager()
+                            ->getRepository('MafiaRolesBundle:Composition');
+                        $compo = $repositoryComposition->find($compoId);
+                        if ($compo != null) {
+                            if ($compo->getOfficielle()) {
+                                $partie->setComposition($compo);
+                                $em->persist($partie);
+                                $em->flush();
+                            }
                         }
                     }
                 }
@@ -467,10 +460,12 @@ class PartieController extends Controller{
 
         //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         $userGlobal = $this->getUser();
-        $user = $userGlobal->getUserCourant();
-        if($user != null) {
-            $rolesData = PartieController::recuperationComposition($user);
-            return new JsonResponse(array('roles' => $rolesData));
+        if($userGlobal != null) {
+            $user = $userGlobal->getUserCourant();
+            if ($user != null) {
+                $rolesData = PartieController::recuperationComposition($user);
+                return new JsonResponse(array('roles' => $rolesData));
+            }
         }
         return new JsonResponse();
     }
