@@ -28,6 +28,10 @@ jouer_classique:
     path: /jouer/classique
     defaults: { _controller: MafiaPartieBundle:Partie:jouerClassique }
 
+jouer_perso:
+    path: /jouer/perso
+    defaults: { _controller: MafiaPartieBundle:PartiePerso:preparationPartie }
+
 jouer_test:
     path: /jouer/test
     defaults: { _controller: MafiaPartieBundle:Partie:jouerTest }
@@ -137,3 +141,9 @@ death_note:
 message_ig:
     path: /chat/message_ig
     defaults: { _controller: MafiaPartieBundle:Jeu:envoyerMessageIG }
+
+ajout_compo_perso:
+    path: /composition/perso/ajout
+    defaults: { _controller: MafiaPartieBundle:PartiePerso:ajoutComposition }
+    requirements:
+      _method: POST

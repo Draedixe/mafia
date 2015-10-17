@@ -374,7 +374,7 @@
                 </ul>
             </div>
             <div style="display:table-cell">
-                <h4>Neutre</h4>
+                <h4>Catégorie</h4>
                 <ul>
                     {% for categorie in categories %}
                         <li id="{{ "categorie" ~ categorie.id }}" onclick="boutonAjout({{ categorie.id }},'{{ categorie.nomCategorie }}',0,-1);">{{ categorie.nomCategorie }}  </li>

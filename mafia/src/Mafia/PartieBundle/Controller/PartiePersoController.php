@@ -2,41 +2,93 @@
 /**
  * Created by PhpStorm.
  * User: Utilisateur
- * Date: 18/01/2015
- * Time: 19:11
+ * Date: 17/10/2015
+ * Time: 17:18
  */
 
-namespace Mafia\RolesBundle\Controller;
-
-
+namespace Mafia\PartieBundle\Controller;
+use Mafia\PartieBundle\Entity\Chat;
+use Mafia\PartieBundle\Entity\Parametres;
+use Mafia\PartieBundle\Entity\Partie;
+use Mafia\PartieBundle\Entity\PhaseJeuEnum;
 use Mafia\RolesBundle\Entity\CategorieCompo;
-use Mafia\RolesBundle\Entity\Composition;
 use Mafia\RolesBundle\Entity\Importance;
 use Mafia\RolesBundle\Entity\OptionRole;
 use Mafia\RolesBundle\Entity\OptionsRoles;
-use Mafia\RolesBundle\Entity\OptionsRolesEnum;
-use Mafia\RolesBundle\Entity\Role;
 use Mafia\RolesBundle\Entity\RolesCompos;
+use Proxies\__CG__\Mafia\RolesBundle\Entity\Composition;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompositionController extends Controller{
 
-    function nombreOccurences($array, $idRole)
-    {
-        $res = 0;
-        foreach($array as $valeur)
-        {
-            if ($valeur == $idRole) {
-                $res++;
+class PartiePersoController extends Controller{
+
+    public function preparationPartieAction(){
+        $userGlobal = $this->getUser();
+
+        $em = $this->getDoctrine()->getManager();
+
+        $repositoryParam = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Parametres');
+        $userDansAutrePartie = $userGlobal->getUserCourant();
+
+        //Si on récupère quelquechose (si on ne trouve rien on crée un userPartie)
+        if($userDansAutrePartie != null) {
+            //On trouve le user dans une partie deja terminée, on met a jour le user
+            if ($userDansAutrePartie->getPartie()->isTerminee() || !$userDansAutrePartie->getVivant()) {
+                $this->getUser()->setUserCourant(NULL);
+                $userDansAutrePartie = null;
+            }
+            //Si le user est dans une partie commencee et qu'il est encore vivant, il y retourne
+            else if ($userDansAutrePartie->getPartie()->isCommencee() && $userDansAutrePartie->getVivant()) {
+                return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
             }
         }
-        return $res;
-    }
 
-    public function creationCompositionAction()
-    {
+        $partie = new Partie();
+        $partie->setNomPartie("Partie de " . $userGlobal->getUsername());
+        $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
+        $partie->setDureePhase(1);
+        $partie->setTempsJourRestant(1);
+        $partie->setDebutPhase(new \DateTime());
+        $partie->setCommencee(false);
+        $partie->setTerminee(false);
+        $partie->setMaireAnnonce(false);
+        $partie->setTypePartie("perso");
+
+        $allParam = $repositoryParam->findAll();
+        if (count($allParam) == 0) {
+            $param = new Parametres();
+            $param->setNomParametres("Par Défaut");
+            $param->setOfficiel(true);
+            $em->persist($param);
+            $em->flush();
+        } else {
+            $param = $allParam[0];
+        }
+
+        $partie->setParametres($param);
+
+        $repositoryRoles = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Composition');
+        //Compo spéciale pour les tests
+        $compo = $repositoryRoles->findOneBy(array("nomCompo" => "Officielle"));
+
+        $partie->setComposition($compo);
+
+        //Création du chat
+        $chat = new Chat();
+        $em->persist($chat);
+        $em->flush();
+
+        $partie->setChat($chat);
+
+        $em->persist($partie);
+        $em->flush();
+
         $repository = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaRolesBundle:Role');
@@ -48,40 +100,65 @@ class CompositionController extends Controller{
             ->getRepository('MafiaRolesBundle:Categorie');
 
         $categories = $repository->findAll();
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
 
-        return $this->render('MafiaRolesBundle:Formulaires:creer_composition.html.twig', array(
+        $user = $userGlobal->getUserCourant();
+        $partie = $user->getPartie();
+        $chat = $partie->getChat();
+
+        $repositoryMessage = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Message');
+
+
+        $pid = 0;
+
+        $messages = $repositoryMessage->myFind($chat, $pid);
+
+        $data = array();
+        $id = 0;
+        foreach ($messages as $message) {
+            $data[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte());
+            $id++;
+        }
+
+        $userList = $repositoryUser->findBy(array("partie" => $partie));
+        //LISTE DES UTILISATEURS
+        $userData = array();
+        $id = 0;
+        foreach ($userList as $ul) {
+            if ($ul == $partie->getCreateur()) {
+                $userData[$id] = $ul->getUser()->getUsername() . " - Créateur";
+            } else {
+                $userData[$id] = $ul->getUser()->getUsername();
+            }
+            $id++;
+        }
+        $formBuilder = $this->get('form.factory')->create();
+        $formBuilder
+            ->add('message', 'text', array('label' => 'Message'));
+        return $this->render('MafiaPartieBundle:Affichages:preparation_perso.html.twig', array(
             'roles' => $roles,
-            'categories' => $categories
+            'categories' => $categories,
+            'partie' => $partie,
+            'messages' => $data,
+            'users' => $userData,
+            'form' => $formBuilder->createView()
         ));
     }
 
-    public function affichageCompositionAction($id)
+    function nombreOccurences($array, $idRole)
     {
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:Composition');
-        $compo = $repository->find($id);
-
-        $options = $compo->getOptionsRoles();
-        $optionsRes = array();
-        foreach($options as $option)
+        $res = 0;
+        foreach($array as $valeur)
         {
-            $role = $option->getRole();
-            $optionsRes[$option->getEnumOption()] = OptionsRoles::getName($role->getEnumRole())[$option->getEnumOption()];
+            if ($valeur == $idRole) {
+                $res++;
+            }
         }
-
-        $importancesArr = array();
-        foreach($compo->getImportances() as $importance)
-        {
-            $importancesArr[$importance->getRole()->getId()] = $importance->getValeur();
-        }
-
-        return $this->render('MafiaRolesBundle:Affichages:vue_composition.html.twig', array(
-            'composition' => $compo,
-            'options' => $optionsRes,
-            'importances' => $importancesArr
-        ));
-
+        return $res;
     }
 
     public function ajoutCompositionAction()
@@ -232,12 +309,13 @@ class CompositionController extends Controller{
         {
             return new JsonResponse(array('type' => "Role", 'erreur' => "Merci d'ajouter des rôles à la composition"));
         }
-
         $em->persist($newComposition);
         $em->flush();
-
-        return new Response($this->generateUrl('vue_composition', array('id'=>$newComposition->getId())));
-
+        $partie = $this->getUser()->getUserCourant()->getPartie();
+        $partie->setComposition($newComposition);
+        $em->persist($partie);
+        $em->flush();
+        return new JsonResponse(array('SUCCESS'));
     }
 
     public function recupererNomOptionsAction()
@@ -260,19 +338,4 @@ class CompositionController extends Controller{
         }
         else return new Response(null);
     }
-
-    public function affichageListeCompositionsAction()
-    {
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:Composition');
-        $compositions = $repository->findAll();
-
-
-
-        return $this->render('MafiaRolesBundle:Affichages:liste_compositions.html.twig', array(
-            'compositions' => $compositions
-        ));
-
-    }
-}
+} 
