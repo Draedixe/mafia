@@ -26,7 +26,12 @@
                     <a href="{{ path('liste_roles') }}">Rôles</a>
                     <a href="{{ path('liste_compositions') }}">Compositions</a>
                     <a href="{{ path('liste_parametres') }}">Paramètres</a>
-                    <a href="{{ path('liste_familles') }}">Famille</a>
+                    {% if app.user.famille is null %}
+                        <a href="{{ path('creation_famille') }}">Créer famille</a>
+                    {% else %}
+                        <a href="{{ path('vue_famille',{id:app.user.famille.id}) }}">{{ app.user.famille.nom }}</a>
+                    {% endif %}
+                    <a href="{{ path('liste_familles') }}">Familles</a>
                     <a href="{{ path('choix_type_partie') }}">Jouer</a>
                     <a href="{{ path('liste_proposition') }}">Propositions</a>
                     <a href="{{ path('liste_messages') }}">Messages ({{ app.user.nbMessagesNonLus }})</a>
