@@ -42,6 +42,13 @@ class User extends BaseUser
     private $userCourant;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="nbMessagesNonLus", type="integer")
+     */
+    private $nbMessagesNonLus;
+
+    /**
      * @return mixed
      */
     public function getUserCourant()
@@ -90,6 +97,7 @@ class User extends BaseUser
         parent::__construct();
         $this->propositions = new ArrayCollection();
         $this->points = 0;
+        $this->nbMessagesNonLus = 0;
     }
 
     /**
@@ -150,4 +158,27 @@ class User extends BaseUser
     {
         return $this->points;
     }
+
+    /**
+     * @return int
+     */
+    public function getNbMessagesNonLus()
+    {
+        return $this->nbMessagesNonLus;
+    }
+
+    public function ajoutMessageNonLu()
+    {
+        $this->nbMessagesNonLus++;
+    }
+
+    /**
+     * @param int $nbMessagesNonLus
+     */
+    public function setNbMessagesNonLus($nbMessagesNonLus)
+    {
+        $this->nbMessagesNonLus = $nbMessagesNonLus;
+    }
+
+
 }

@@ -38,6 +38,7 @@ class MessageController extends Controller{
             $em = $this->getDoctrine()->getManager();
             $message->setExpediteur($this->getUser());
             $message->setRecepteur($recepteur);
+            $recepteur->ajoutMessageNonLu();
             $message->setDateEnvoi(new \DateTime());
             $message->setVu(false);
             $em->persist($message);
@@ -60,7 +61,7 @@ class MessageController extends Controller{
             'idExpediteur2' => $this->getUser(),
         ));
         $liste_contacts = $query->getResult();
-
+        $this->getUser()->setNbMessagesNonLus(0);
         $messages = array();
         foreach($liste_contacts as $contact)
         {
@@ -96,6 +97,7 @@ class MessageController extends Controller{
         $message->setTexte($request->get("message"));
         $message->setExpediteur($this->getUser());
         $message->setRecepteur($recepteur);
+        $recepteur->ajoutMessageNonLu();
         $message->setDateEnvoi(new \DateTime());
         $message->setVu(false);
         $em->persist($message);
