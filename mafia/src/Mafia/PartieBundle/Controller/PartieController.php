@@ -3,6 +3,7 @@
 namespace Mafia\PartieBundle\Controller;
 
 use Mafia\PartieBundle\Entity\Chat;
+use Mafia\PartieBundle\Entity\Message;
 use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
 use Mafia\PartieBundle\Entity\PhaseJeuEnum;
@@ -241,7 +242,6 @@ class PartieController extends Controller{
                 ->getManager()
                 ->getRepository('MafiaPartieBundle:UserPartie');
 
-            //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "partie" => $partieChoisie));
             $user = $userGlobal->getUserCourant();
             $partie = $user->getPartie();
             $chat = $partie->getChat();
@@ -370,6 +370,18 @@ class PartieController extends Controller{
                         if ($nbJoueurs == $nbRoles) {
                             $em = $this->getDoctrine()->getManager();
                             $partie->setCommencee(true);
+                            $chat = new Chat();
+                            $partie->setChat($chat);
+
+                            $newMessage = new Message();
+                            $newMessage->setType(0);
+                            $newMessage->setChat($chat);
+                            $newMessage->setDate(new \DateTime());
+                            $newMessage->setTexte("Debut de la partie");
+                            $newMessage->setUser($this->getUser());
+
+                            $em->persist($newMessage);
+                            $em->persist($chat);
                             $em->persist($partie);
                             $em->flush();
                             return new JsonResponse(array('lancer' => true));

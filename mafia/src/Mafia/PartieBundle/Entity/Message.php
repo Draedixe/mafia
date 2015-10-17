@@ -46,6 +46,54 @@ class Message
      */
     private $chat;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="type", type="integer")
+     */
+    private $type;
+
+    /**
+     *  @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
+     *  @ORM\JoinColumn(nullable=true)
+     */
+    private $recepteur;
+
+    /**
+     * @return mixed
+     */
+    public function getRecepteur()
+    {
+        return $this->recepteur;
+    }
+
+    /**
+     * @param mixed $recepteur
+     */
+    public function setRecepteur($recepteur)
+    {
+        $this->recepteur = $recepteur;
+    }
+
+
+
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+
 
 
     /**

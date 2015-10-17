@@ -8,6 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
+use Mafia\PartieBundle\Entity\Message;
+use Mafia\PartieBundle\Entity\Chat;
 
 class JeuController extends Controller{
 
@@ -39,12 +41,40 @@ class JeuController extends Controller{
                     array_push($enViePseudo, $userEnVie->getNom());
                 }
 
+                //Formulaire pour le chat
+                $formBuilder = $this->get('form.factory')->create();
+                $formBuilder
+                    ->add('message', 'text', array('label' => 'Message'));
+
+
+
+
+                $chat = $partie->getChat();
+
+                $repositoryMessage = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaPartieBundle:Message');
+
+
+                $pid = 0;
+
+                $messages = $repositoryMessage->myFind($chat, $pid);
+
+                $dataMessage = array();
+                $id = 0;
+                foreach ($messages as $message) {
+                    $dataMessage[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte(), "date" => $message->getDate());
+                    $id++;
+                }
+
                 return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
                     array(
                         "partie" => $partie,
                         "enVieId" => $enVieId,
                         "enViePseudo" => $enViePseudo,
-                        "tempsRestant" => ($partie->getDureePhase() * 60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())
+                        "tempsRestant" => ($partie->getDureePhase() * 60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp()),
+                        'form' => $formBuilder->createView(),
+                        "messages" => $dataMessage
                     )
                 );
             } else {
@@ -298,7 +328,9 @@ class JeuController extends Controller{
         $userGlobal = $this->getUser();
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
-
+            $request = $this->container->get('request');
+            $id = $request->get('premierid');
+            $messages = $this->recevoirTousMessages($user,$id);
             $usersPartie = $repositoryUser->findBy(array("partie" => $user->getPartie(), "vivant" => true));
 
             if ($user != null) {
@@ -311,9 +343,9 @@ class JeuController extends Controller{
                         $enVieId[] = $userEnVie->getId();
                         $enViePseudo[] = $userEnVie->getNom();
                     }
-                    return new JsonResponse(array("statut" => "SUCCESS", 'phase' => $phase, "enVieId" => $enVieId, "enViePseudo" => $enViePseudo));
+                    return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase, "enVieId" => $enVieId, "enViePseudo" => $enViePseudo));
                 } else {
-                    return new JsonResponse(array("statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
@@ -321,10 +353,29 @@ class JeuController extends Controller{
         return new JsonResponse(array("statut" => "FAIL"));
     }
 
+    private function recevoirTousMessages($user,$id){
+        $repositoryMessage = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Message');
+
+
+        $chat = $user->getPartie()->getChat();
+        $messages = $repositoryMessage->myFind($chat, $id);
+
+        $data = array();
+        $id = 0;
+        foreach ($messages as $message) {
+            $data[$id] = array("id" => $message->getId(), "date" => $message->getDate(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte());
+            $id++;
+        }
+
+        return $data;
+    }
+
     public function recevoirInformationsTribunalDefenseAction()
     {
         $userGlobal = $this->getUser();
-        if($userGlobal != null) {
+        if ($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
                 $phase = $this->verifPhase();
@@ -338,6 +389,7 @@ class JeuController extends Controller{
         }
         return new JsonResponse(array("statut" => "FAIL"));
     }
+
 
     public function recevoirInformationsTribunalVoteAction()
     {
@@ -376,21 +428,15 @@ class JeuController extends Controller{
     }
 
     public function suicideAction(){
-        $repositoryUser = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaPartieBundle:UserPartie');
 
         $userGlobal = $this->getUser();
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
                 $em = $this->getDoctrine()->getManager();
-                $userPartie = $repositoryUser->findOneBy(array("partie" => $user->getPartie(), "vivant" => true));
-                if ($userPartie != null) {
-                    $userPartie->setVivant(false);
-                    $em->persist($userPartie);
-                    $em->flush();
-                }
+                $user->setVivant(false);
+                $em->persist($user);
+                $em->flush();
             }
         }
         return $this->forward('MafiaUserBundle:Default:menu');
@@ -428,5 +474,34 @@ class JeuController extends Controller{
             $em->flush();
         }
         return new JsonResponse(array("statut" => "SUCCESS"));
+    }
+
+    public function envoyerMessageIGAction(){
+        $request = $this->container->get('request');
+        $message = $request->get('message');
+        if($message != null) {
+            $em = $this->getDoctrine()->getManager();
+
+            $userGlobal = $this->getUser();
+            if($userGlobal != null) {
+                $user = $userGlobal->getUserCourant();
+                if ($user == null) {
+                    return new JsonResponse(array('messages' => array(), 'users' => array()));
+                }
+                $partie = $user->getPartie();
+                $chat = $partie->getChat();
+
+                $newMessage = new Message();
+                $newMessage->setType(0);
+                $newMessage->setChat($chat);
+                $newMessage->setDate(new \DateTime());
+                $newMessage->setTexte(strip_tags($message));
+                $newMessage->setUser($this->getUser());
+
+                $em->persist($newMessage);
+                $em->flush();
+            }
+        }
+        return new JsonResponse();
     }
 }

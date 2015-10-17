@@ -133,3 +133,7 @@ death_note:
     defaults: { _controller: MafiaPartieBundle:Jeu:deathNote }
     requirements:
       _method: POST
+
+message_ig:
+    path: /chat/message_ig
+    defaults: { _controller: MafiaPartieBundle:Jeu:envoyerMessageIG }

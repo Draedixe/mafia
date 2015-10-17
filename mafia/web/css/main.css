@@ -100,11 +100,24 @@ nav a{
 
 }
 
-#chat{
+
+#colonne_gauche{
     display: table-cell;
     max-width: 100%;
-    border: solid 1px blueviolet;
     padding: 5px;
+
+}
+
+
+#chat_ig{
+    height: 650px;
+    border: solid 1px blueviolet;
+    border-radius: 5px;
+    overflow: auto;
+}
+
+#form_msg{
+    border: solid 1px orange;
     border-radius: 5px;
 }
 

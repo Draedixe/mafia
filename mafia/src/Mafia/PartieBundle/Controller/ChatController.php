@@ -12,9 +12,6 @@ class ChatController extends Controller{
         $request = $this->container->get('request');
         $message = $request->get('message');
         if($message != null) {
-            $repositoryUser = $this->getDoctrine()
-                ->getManager()
-                ->getRepository('MafiaPartieBundle:UserPartie');
             $em = $this->getDoctrine()->getManager();
 
             $userGlobal = $this->getUser();
@@ -27,6 +24,7 @@ class ChatController extends Controller{
                 $chat = $partie->getChat();
 
                 $newMessage = new Message();
+                $newMessage->setType(0);
                 $newMessage->setChat($chat);
                 $newMessage->setDate(new \DateTime());
                 $newMessage->setTexte(strip_tags($message));
@@ -130,4 +128,8 @@ class ChatController extends Controller{
         }
         return new JsonResponse();
     }
+
+
+
+
 }
