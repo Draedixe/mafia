@@ -11,6 +11,7 @@ namespace Mafia\MessageBundle\Controller;
 use Mafia\MessageBundle\Entity\MessagePrive;
 use Mafia\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 class MessageController extends Controller{
@@ -74,14 +75,32 @@ class MessageController extends Controller{
             $messages[$contact->getUsername()] = $query->getResult();
         }
 
-
-
         return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
-            /*'envoyes' => $envoyes,
-            'recus' => $recus,
-            'liste_contacts' => $liste_contacts*/
             'messages' => $messages
         ));
+    }
+
+    function repondreMessageAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $request = $this->get('request');
+        $id = $request->get("id");
+
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaUserBundle:User');
+
+        $recepteur = $repositoryUser->find($id);
+
+        $message = new MessagePrive();
+        $message->setTexte($request->get("message"));
+        $message->setExpediteur($this->getUser());
+        $message->setRecepteur($recepteur);
+        $message->setDateEnvoi(new \DateTime());
+        $message->setVu(false);
+        $em->persist($message);
+        $em->flush();
+        return new JsonResponse(array("statut" => "SUCCESS"));
     }
 
 } 

@@ -5,3 +5,9 @@ envoyer_message:
 liste_messages:
     path: /messages/liste
     defaults: { _controller: MafiaMessageBundle:Message:affichageMessages }
+
+repondre_message:
+    path: /messages/repondre
+    defaults: { _controller: MafiaMessageBundle:Message:repondreMessage }
+    requirements:
+      _method: POST
