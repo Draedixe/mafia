@@ -4,12 +4,20 @@
 
 {% block fos_user_content %}
     <div>
-        {{ user.username }}
+        <h2>{{ user.username }}</h2>
+        <p>
+            Fait partie de la famille <a href="{{ path('vue_famille',{id:user.famille.id}) }}">{{ user.famille.nom }} - [{{ user.famille.tag }}]</a><br/>
+        </p>
+        <p>
+            {{ user.points }} points
+        </p>
+        <p>
+            {% if user.id != app.user.id %}
+                <a href="{{ path('envoyer_message',{id:user.id}) }}">Envoyer un message privé</a>
+            {% else %}
+                <a href="{{ path('liste_messages') }}">Consulter ses messages</a>
+            {% endif %}
+        </p>
 
-        {% if user.id != app.user.id %}
-            <a href="{{ path('envoyer_message',{id:user.id}) }}">Envoyer un message privé</a>
-        {% else %}
-            <a href="{{ path('liste_messages') }}">Consulter ses messages</a>
-        {% endif %}
     </div>
 {% endblock fos_user_content %}

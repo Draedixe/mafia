@@ -6,8 +6,16 @@
 
     {% for famille in familles %}
             <div class="well">
-                <a href="{{ path('vue_famille',{id:famille.id}) }}">{{ famille.nom }}</br></a>
-                Chef : {{ famille.chef }}
+                <table>
+                    <tr>
+                        <td><img class="imgFamille" src="{{ famille.image }}"/></td>
+                        <td>
+                            <a href="{{ path('vue_famille',{id:famille.id}) }}">{{ famille.nom }} - [{{ famille.tag }}]</a><br/>
+                            Chef : {{ famille.chef }}<br/>
+                            {{ famille.pointsFamille }} points
+                        </td>
+                    </tr>
+                </table>
             </div>
     {% endfor %}
 

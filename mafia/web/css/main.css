@@ -240,3 +240,11 @@ html #fade {
 html .popup_block {
     position: absolute;
 }
+
+.imgFamille {
+     width: 100px; height: 100px;
+}
+
+.imgFamilleVue {
+    width: 50%; height: 50%;
+}

@@ -39,6 +39,20 @@ class Famille
     private $description;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="image", type="string", length=255)
+     */
+    private $image;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="tag", type="string", length=5)
+     */
+    private $tag;
+
+    /**
      * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\Chat")
      */
     private $chat;
@@ -62,6 +76,15 @@ class Famille
      * @ORM\OneToMany(targetEntity="Mafia\UserBundle\Entity\User",mappedBy="famille")
      */
     private $membres;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="pointsFamille", type="integer")
+     */
+    private $pointsFamille;
+
+
 
     /**
      * @param User $membre
@@ -145,6 +168,7 @@ class Famille
     {
         $this->demandes = new ArrayCollection();
         $this->propositions = new ArrayCollection();
+        $this->pointsFamille = 0;
     }
 
     /**
@@ -233,5 +257,61 @@ class Famille
     public function setChef($chef)
     {
         $this->chef = $chef;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTag()
+    {
+        return $this->tag;
+    }
+
+    /**
+     * @param string $tag
+     */
+    public function setTag($tag)
+    {
+        $this->tag = $tag;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPointsFamille()
+    {
+        return $this->pointsFamille;
+    }
+
+    /**
+     * @param int $pointsFamille
+     */
+    public function setPointsFamille($pointsFamille)
+    {
+        $this->pointsFamille = $pointsFamille;
+    }
+
+    /**
+     * @param int $points
+     */
+    public function addPointsFamille($points)
+    {
+        $this->pointsFamille += $points;
     }
 }

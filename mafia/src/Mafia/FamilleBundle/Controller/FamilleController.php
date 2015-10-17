@@ -26,6 +26,8 @@ class FamilleController extends Controller{
             $formBuilder = $this->createFormBuilder($famille);
             $formBuilder
                 ->add('nom', 'text',array('label'=>'Nom de la famille : '))
+                ->add('tag', 'text',array('label'=>'Tag de la famille : '))
+                ->add('image', 'text',array('label'=>'Url de l\'image de la famille : '))
                 ->add('description', 'textarea',array('label'=>'Description de la famille : '));
             $form = $formBuilder->getForm();
             $request = $this->get('request');
@@ -360,4 +362,6 @@ class FamilleController extends Controller{
             'familles' => $familles
         ));
     }
+
+
 } 

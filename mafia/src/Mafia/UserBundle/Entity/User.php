@@ -31,6 +31,13 @@ class User extends BaseUser
     private $famille;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="points", type="integer")
+     */
+    private $points;
+
+    /**
      * @ORM\OneToMany(targetEntity="Mafia\FamilleBundle\Entity\Proposition",mappedBy="userPropose")
      */
     private $propositions;
@@ -99,13 +106,6 @@ class User extends BaseUser
         $this->points = 0;
         $this->nbMessagesNonLus = 0;
     }
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="points", type="integer")
-     */
-    private $points;
 
     /**
      * @return Famille
