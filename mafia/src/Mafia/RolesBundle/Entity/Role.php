@@ -60,7 +60,7 @@ class Role
 
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\Categorie", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\Categorie", inversedBy="roles", cascade={"persist"})
      * @ORM\JoinTable(name="categories_role")
      */
     private $categoriesRole;

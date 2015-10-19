@@ -74,7 +74,7 @@ class UserPartie
     private $derniereActivite;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\RolesBundle\Entity\Role", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Mafia\RolesBundle\Entity\Role", cascade={"persist"})
      */
     private $role;
 

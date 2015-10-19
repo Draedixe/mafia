@@ -33,10 +33,11 @@
         {
             $.post('{{ path('voter_pour')}}',{id: id}, function (data) {
                 if(data['statut'] == "FAIL"){
-                    alert("fail");
+                    $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                 }
                 else if(data['statut'] == "BADVOTE"){
-                    alert("Ceci n'est pas un vote valide");
+
+                    $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Ceci n'est pas un vote valide</b></div>");
                 }
                 else
                 {
@@ -75,13 +76,14 @@
         }
 
         function demanderInfo(){
+
             var exPhase = phase;
             if(!lock) {
                 lock = true;
                 if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }}) {
                     $.post('{{ path('demande_info_aube')}}', {}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             cacherBoutonsVotes();
@@ -100,7 +102,7 @@
 
                     $.post('{{ path('demande_info_jour')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             enVieId = data['enVieId'];
@@ -130,7 +132,7 @@
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
                     $.post('{{ path('demande_info_discussion')}}', {}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             cacherBoutonsVotes();
@@ -144,7 +146,8 @@
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
                     $.post('{{ path('demande_info_nuit')}}', {}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            //alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             cacherBoutonsVotes();
@@ -158,7 +161,7 @@
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
                     $.post('{{ path('demande_info_tribunal_defense')}}', {}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             cacherBoutonsVotes();
@@ -172,7 +175,7 @@
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') }}) {
                     $.post('{{ path('demande_info_tribunal_vote')}}', {}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             cacherBoutonsVotes();
@@ -186,7 +189,7 @@
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') }}) {
                     $.post('{{ path('demande_info_vote_resultat')}}', {}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             cacherBoutonsVotes();
@@ -200,7 +203,7 @@
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') }}) {
                     $.post('{{ path('demande_info_execution')}}', {}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            alert("fail");
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             cacherBoutonsVotes();
@@ -223,7 +226,7 @@
                 $.post('{{ path('demande_duree')}}', {
                 }, function (data) {
                     if(data['statut'] == "FAIL"){
-                        alert("L'utilisateur n'existe pas");
+                        $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>L'utilisateur n'existe pas</b></div>");
                     }
                     else
                     {
@@ -241,7 +244,7 @@
                 $.post('{{ path('demande_duree')}}', {
                 }, function (data) {
                     if(data['statut'] == "FAIL"){
-                        alert("L'utilisateur n'existe pas");
+                        $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>L'utilisateur n'existe pas</b></div>");
                     }
                     else
                     {
@@ -259,7 +262,7 @@
             var lastWord = prompt("Entrez vos derniers mots","Je veux tout léguer aux créateurs de ce site");
             $.post('{{ path('last_word')}}',{lastWord: lastWord}, function (data) {
                 if(data['statut'] == "FAIL"){
-                    alert("L'utilisateur n'existe pas");
+                    $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>L'utilisateur n'existe pas</b></div>");
                 }
                 else
                 {
@@ -273,7 +276,7 @@
             var deathNote = prompt("Entrez votre death note","I will be back");
             $.post('{{ path('death_note')}}',{deathNote: deathNote}, function (data) {
                 if(data['statut'] == "FAIL"){
-                    alert("L'utilisateur n'existe pas");
+                    $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>L'utilisateur n'existe pas</b></div>");
                 }
                 else
                 {
@@ -296,6 +299,13 @@
                 data: DATA,
                 cache: false,
                 success: function (data) {
+                    if(data.error){
+                        if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}){
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Vous ne pouvez pas parler la nuit</b></div>");
+                        }else{
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>le message n'a pas été envoyé</b></div>");
+                        }
+                    }
                     demanderInfo();
                 }
             });
@@ -344,21 +354,9 @@
             <div id="composition">
                 <b>Composition</b>
                 <div id="liste_composition">
-                    Sheriff<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Inspecteur<br/>
-                    Mafioso<br/>
-                    Mafioso<br/>
-                    Parrain
+                    {% for r in roles %}
+                        {{ r }}<br/>
+                    {% endfor %}
                 </div>
             </div>
         </div>

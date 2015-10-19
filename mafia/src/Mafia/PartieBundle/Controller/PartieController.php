@@ -101,19 +101,6 @@ class PartieController extends Controller{
                 ->getRepository('MafiaPartieBundle:Parametres');
             ////FIN ON FAIT LE PLEIN DE REPOSITORY
 
-//            $userDansAutrePartie = null;
-//            //On cherche si le joueur est déja dans une partie (dans ce cas on ne change rien et on réaffiche la partie)
-//            foreach($userResponse as $ur){
-//                //Si le user est dans une partie commencee et qu'il est encore vivant
-//                if($ur->getPartie()->isCommencee() && $ur->getVivant() ){
-//                    return $this->forward('MafiaPartieBundle:Jeu:debutPartie');
-//                }
-//                //Si le user est déjà dans une partie pas commencée
-//                if(!($ur->getPartie()->isCommencee())){
-//                    $userDansAutrePartie = $ur;
-//                }
-//            }
-
 
             //On récupère le userCourant
             $userDansAutrePartie = $userGlobal->getUserCourant();
@@ -324,7 +311,7 @@ class PartieController extends Controller{
             }
 
             //ROLES
-            $rolesData = PartieController::recuperationComposition($user);
+            $rolesData = $this->get('recuperation_composition')->recupCompo($user);
 
             return $this->render('MafiaPartieBundle:Affichages:jouer_classique.html.twig', array(
                 'partie' => $partieChoisie, 'form' => $formBuilder->createView(), 'messages' => $data, 'users' => $userData,
@@ -357,10 +344,10 @@ class PartieController extends Controller{
                     $nbJoueurs = count($userList);
                     if ($nbJoueurs == $partie->getNombreJoueursMax()) {
                         $compo = $partie->getComposition();
-                        $roles = $compo->getRolesCompo();
+                        $rolesCompo = $compo->getRolesCompo();
                         $cat = $compo->getCategoriesCompo();
                         $nbRoles = 0;
-                        foreach ($roles as $r) {
+                        foreach ($rolesCompo as $r) {
                             $nbRoles = $nbRoles + $r->getQuantite();
                         }
                         foreach ($cat as $r) {
@@ -380,11 +367,73 @@ class PartieController extends Controller{
                             $newMessage->setTexte("Debut de la partie");
                             $newMessage->setUser($this->getUser());
 
+                            //Liste des roles à affecter aux joueurs
+                            $rolesAffecter = array();
+                            $importances = $compo->getImportances();
+                            //Transformation des categories en roles
+                            $imp_temp = array();
+
+                            //Pour toutes les CategoriesCompo contenues dans la composition
+                            foreach ($cat as $c) {
+                                $roles = $c->getCategorie()->getRoles();
+                                //Pour chaque role
+                                foreach($roles as $r){
+                                    $trouve = false;
+                                    //On regarde s'il y a une importance qui correspond
+                                    foreach($importances as $i){
+                                        if($r == $i->getRole()){
+                                            array_push($imp_temp,array($r,$i->getValeur()));
+                                            $trouve = true;
+                                            break;
+                                        }
+                                    }
+                                    //Si on n'en trouve pas on la met à 100
+                                    if(!$trouve){
+                                        array_push($imp_temp,array($r,100));
+                                    }
+                                }
+
+                                $totalImportance = 0;
+                                foreach($imp_temp as $imp){
+                                    $totalImportance = $totalImportance + $imp[1];
+                                }
+
+                                $random = rand(0, $totalImportance-1);
+
+                                $temp_min = 0;
+                                $temp_max = 0;
+                                //On choisit le rôle au hasard avec l'importance du rôle
+                                foreach($imp_temp as $imp){
+                                    $temp_min = $temp_max;
+                                    $temp_max = $temp_max + $imp[1];
+                                    if($random >= $temp_min && $random < $temp_max){
+                                        array_push($rolesAffecter, $imp[0]);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            //Pour les roles compo
+                            foreach($rolesCompo as $rc){
+                                for($i = 0; $i < $rc->getQuantite(); $i++){
+                                    array_push($rolesAffecter, $rc->getRole());
+                                }
+                            }
+
+                            //Affectation des roles
+                            $cpt = 0;
+                            foreach($rolesAffecter as $ra){
+                                $random2 = rand(0, count($rolesAffecter)-1-$cpt);
+                                $userList[$cpt]->setRole($ra);
+                                $em->persist($userList[$cpt]);
+                                ++$cpt;
+                            }
+
                             $em->persist($newMessage);
                             $em->persist($chat);
                             $em->persist($partie);
                             $em->flush();
-                            return new JsonResponse(array('lancer' => true));
+                            return new JsonResponse(array('lancer' => true, 'test' => count($rolesAffecter)));
                         } else {
                             return new JsonResponse(array('lancer' => false, 'compo' => true));
                         }
@@ -475,31 +524,12 @@ class PartieController extends Controller{
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
-                $rolesData = PartieController::recuperationComposition($user);
+                $rolesData = $this->get('recuperation_composition')->recupCompo($user);
                 return new JsonResponse(array('roles' => $rolesData));
             }
         }
         return new JsonResponse();
     }
 
-    public function recuperationComposition($user){
-        $partie = $user->getPartie();
-        $compo = $partie->getComposition();
-        $roles = $compo->getRolesCompo();
-        $rolesData = array();
-        //récupération ROLES FIXES
-        foreach($roles as $r){
-            for($i = 0; $i<$r->getQuantite();$i++) {
-                array_push($rolesData, $r->getRole()->getNomRole());
-            }
-        }
-        //récupération ROLES ALEATOIRES (CATOGIRES)
-        $categories = $compo->getCategoriesCompo();
-        foreach($categories as $r){
-            for($i = 0; $i<$r->getQuantite();$i++) {
-                array_push($rolesData, $r->getCategorie()->getNomCategorie());
-            }
-        }
-        return $rolesData;
-    }
+
 }

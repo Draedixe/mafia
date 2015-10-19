@@ -6,10 +6,8 @@ use Mafia\PartieBundle\Entity\PhaseJeuEnum;
 use Proxies\__CG__\Mafia\PartieBundle\Entity\UserPartie;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Validator\Constraints\Date;
-use Symfony\Component\Validator\Constraints\DateTime;
 use Mafia\PartieBundle\Entity\Message;
-use Mafia\PartieBundle\Entity\Chat;
+use Mafia\PartieBundle\Service\recuperation_composition;
 
 class JeuController extends Controller{
 
@@ -67,6 +65,13 @@ class JeuController extends Controller{
                     $id++;
                 }
 
+                //RECUPERATION DE LA COMPOSITION
+
+                $rolesData = $this->get('recuperation_composition')->recupCompo($user);
+
+                //TODO
+                $monRole = null;
+
                 return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
                     array(
                         "partie" => $partie,
@@ -74,7 +79,9 @@ class JeuController extends Controller{
                         "enViePseudo" => $enViePseudo,
                         "tempsRestant" => ($partie->getDureePhase() * 60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp()),
                         'form' => $formBuilder->createView(),
-                        "messages" => $dataMessage
+                        "messages" => $dataMessage,
+                        "roles" => $rolesData,
+                        "monRole" => $monRole
                     )
                 );
             } else {
@@ -486,22 +493,31 @@ class JeuController extends Controller{
             if($userGlobal != null) {
                 $user = $userGlobal->getUserCourant();
                 if ($user == null) {
-                    return new JsonResponse(array('messages' => array(), 'users' => array()));
+                    return new JsonResponse(array("error" => true));
                 }
-                $partie = $user->getPartie();
-                $chat = $partie->getChat();
+                else {
+                    $partie = $user->getPartie();
+                    $phase = $partie->getPhaseEnCours();
+                    if ($phase == PhaseJeuEnum::JOUR || $phase == PhaseJeuEnum::DISCUSSION || $phase == PhaseJeuEnum::TRIBUNAL_VOTE) {
+                        $chat = $partie->getChat();
 
-                $newMessage = new Message();
-                $newMessage->setType(0);
-                $newMessage->setChat($chat);
-                $newMessage->setDate(new \DateTime());
-                $newMessage->setTexte(strip_tags($message));
-                $newMessage->setUser($this->getUser());
+                        $newMessage = new Message();
+                        $newMessage->setType(0);
+                        $newMessage->setChat($chat);
+                        $newMessage->setDate(new \DateTime());
+                        $newMessage->setTexte(strip_tags($message));
+                        $newMessage->setUser($this->getUser());
 
-                $em->persist($newMessage);
-                $em->flush();
+                        $em->persist($newMessage);
+                        $em->flush();
+                        return new JsonResponse(array("error" => false));
+                    }
+                    else if($phase == PhaseJeuEnum::NUIT){
+                        return new JsonResponse(array("error" => true));
+                    }
+                }
             }
         }
-        return new JsonResponse();
+        return new JsonResponse(array("error" => true));
     }
 }

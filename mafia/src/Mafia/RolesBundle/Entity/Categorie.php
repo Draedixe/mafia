@@ -30,6 +30,32 @@ class Categorie
 
 
     /**
+     * @ORM\ManyToMany(targetEntity="Mafia\RolesBundle\Entity\Role", mappedBy="categoriesRole", cascade={"persist"})
+     *
+     */
+    private $roles;
+
+    /**
+     * @return mixed
+     */
+    public function getRoles()
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param mixed $roles
+     */
+    public function setRoles($roles)
+    {
+        $this->roles = $roles;
+    }
+
+
+
+
+
+    /**
      * Get id
      *
      * @return integer 

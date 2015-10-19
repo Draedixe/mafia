@@ -103,7 +103,7 @@ nav a{
 
 #colonne_gauche{
     display: table-cell;
-    max-width: 100%;
+    max-width: 200px;
     padding: 5px;
 
 }
@@ -113,7 +113,9 @@ nav a{
     height: 650px;
     border: solid 1px blueviolet;
     border-radius: 5px;
-    overflow: auto;
+    width: 555px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #form_msg{
