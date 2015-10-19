@@ -70,7 +70,12 @@ class JeuController extends Controller{
                 $rolesData = $this->get('recuperation_composition')->recupCompo($user);
 
                 //TODO
-                $monRole = null;
+
+                $monRoleData = null;
+                $monRole = $user->getRole();
+                if($monRole != null) {
+                    $monRoleData = array("faction" => $monRole->getEnumFaction(), "nom" => $monRole->getNomRole(), "description" => $monRole->getDescription(), "descriptionPrincipale" => $monRole->getDescriptionPrincipale(), "capacite" => $monRole->getCapacite());
+                }
 
                 return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
                     array(
@@ -81,7 +86,7 @@ class JeuController extends Controller{
                         'form' => $formBuilder->createView(),
                         "messages" => $dataMessage,
                         "roles" => $rolesData,
-                        "monRole" => $monRole
+                        "monRole" => $monRoleData
                     )
                 );
             } else {

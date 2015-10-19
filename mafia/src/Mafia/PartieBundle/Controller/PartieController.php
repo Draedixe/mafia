@@ -421,12 +421,13 @@ class PartieController extends Controller{
                             }
 
                             //Affectation des roles
-                            $cpt = 0;
-                            foreach($rolesAffecter as $ra){
+                            $nbR = count($rolesAffecter);
+                            for($cpt = 0; $cpt<$nbR; ++$cpt){
                                 $random2 = rand(0, count($rolesAffecter)-1-$cpt);
-                                $userList[$cpt]->setRole($ra);
+                                $userList[$cpt]->setRole($rolesAffecter[$random2]);
+                                unset($rolesAffecter[$random2]);
+                                $rolesAffecter = array_values($rolesAffecter);
                                 $em->persist($userList[$cpt]);
-                                ++$cpt;
                             }
 
                             $em->persist($newMessage);

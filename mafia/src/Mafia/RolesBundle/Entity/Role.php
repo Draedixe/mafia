@@ -38,6 +38,20 @@ class Role
     private $description;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="descriptionPrincipale", type="text")
+     */
+    private $descrPrincipale;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="capacite", type="text")
+     */
+    private $capacite;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="enumRole", type="integer")
@@ -77,6 +91,40 @@ class Role
         $this->categoriesRole = new \Doctrine\Common\Collections\ArrayCollection();
         $this->crimesRole = new \Doctrine\Common\Collections\ArrayCollection();
     }
+
+    /**
+     * @return string
+     */
+    public function getDescriptionPrincipale()
+    {
+        return $this->descrPrincipale;
+    }
+
+    /**
+     * @param string $descriptionPrincipale
+     */
+    public function setDescriptionPrincipale($descriptionPrincipale)
+    {
+        $this->descrPrincipale = $descriptionPrincipale;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCapacite()
+    {
+        return $this->capacite;
+    }
+
+    /**
+     * @param string $capacite
+     */
+    public function setCapacite($capacite)
+    {
+        $this->capacite = $capacite;
+    }
+
+
 
     /**
      * Get id

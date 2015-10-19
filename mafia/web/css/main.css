@@ -250,3 +250,26 @@ html .popup_block {
 .imgFamilleVue {
     width: 50%; height: 50%;
 }
+
+.descriptionSec{
+    font-style: italic;
+    font-size: 12px;
+}
+
+.ville{
+    font-weight: bold;
+    color: green;
+}
+
+.mafia{
+    font-weight: bold;
+    color: red;
+}
+.triade{
+    font-weight: bold;
+    color: blue;
+}
+.neutre{
+    font-weight: bold;
+    color: gray;
+}

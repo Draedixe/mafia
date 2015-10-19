@@ -387,15 +387,26 @@
         </div>
         <div id="colonne_droite">
             <div id="role">
-                <b>Parrain:</b><br/>
-                Vous dirigez la mafia. Ca envoie du paté.<br/>
-                Vous pouvez tuer des gens, c'est trop génial.<br/><br/>
-                <b>Equipe:</b><br/>
+                <b>{{ monRole.nom }}</b>
+                {% if monRole.faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
+                    <span class="ville">(Ville)</span>
+                {% elseif monRole.faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
+                <span class="mafia">(Mafia)</span>
+                {% elseif monRole.faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::TRIADE') %}
+                    <span class="triade">(Triade)</span>
+                {% elseif monRole.faction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
+                        <span class="neutre">(Neutre)</span>
+                {% endif %}
+                <br/>
+                {{ monRole.descriptionPrincipale }}<br/><br/>
+                <b>{-endur- % Equipe:</b><br/>
                 Raph55 <b>(Parrain)</b><br/>
                 Drae <b>(Mafioso)</b><br/>
-                Pascal <b>(Mafioso)</b> - <i>Mort</i>
+                Pascal <b>(Mafioso)</b> - <i>Mort</i>}
 
-                <br/><br/><b>Capacité de jour: </b> Aucune
+                <br/><br/><b>Capacité de jour: </b> {{ monRole.capacite }}<br/><br/>
+
+                <span class="descriptionSec">{{ monRole.description }}</span><br/>
             </div>
             <div id="timer">
                 <span id="timerDiv"></span> - Phase:
