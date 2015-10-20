@@ -80,7 +80,7 @@ class UserPartie
 
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\Partie", inversedBy="UserPartie")
+     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\Partie", inversedBy="userPartie")
      * @ORM\JoinColumn(nullable=false)
      */
 

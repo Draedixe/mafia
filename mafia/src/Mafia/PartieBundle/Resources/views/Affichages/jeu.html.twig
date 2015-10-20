@@ -81,14 +81,20 @@
             if(!lock) {
                 lock = true;
                 if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }}) {
-                    $.post('{{ path('demande_info_aube')}}', {}, function (data) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_aube')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            afficherMessage(data['messages']);
+
                             cacherBoutonsVotes();
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Aube");
+
                             recupDuree(exPhase);
                         }
                         lock = false;
@@ -109,13 +115,7 @@
                             enViePseudo = data['enViePseudo'];
                             //chargerVivants();
 
-                            for (var i in data['messages']) {
-                                var d = data['messages'][i]['date']['date'].split(" ");
-                                $('#chat_ig').append("<div id='" + data['messages'][i]['id'] + "'> [" + d[1] + "] <b>" + data['messages'][i]['pseudo'] + "</b>: " + data['messages'][i]['message'] + "</div>");
-                            }
-
-                            var mydiv = $('#chat_ig');
-                            mydiv.scrollTop(mydiv.prop('scrollHeight'));
+                            afficherMessage(data['messages']);
 
 
                             $(".colonne_bouton_vote").each(function () {
@@ -123,92 +123,121 @@
                             });
 
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Jour");
                             recupDuree(exPhase);
                         }
                         lock = false;
                     });
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
-                    $.post('{{ path('demande_info_discussion')}}', {}, function (data) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_discussion')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            afficherMessage(data['messages']);
+
                             cacherBoutonsVotes();
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Discussion");
                             recupDuree(exPhase);
                         }
                         lock = false;
                     });
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
-                    $.post('{{ path('demande_info_nuit')}}', {}, function (data) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_nuit')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
                             //alert("fail");
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            afficherMessage(data['messages']);
+
                             cacherBoutonsVotes();
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Nuit");
                             recupDuree(exPhase);
                         }
                         lock = false;
                     });
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
-                    $.post('{{ path('demande_info_tribunal_defense')}}', {}, function (data) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_tribunal_defense')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            afficherMessage(data['messages']);
+
                             cacherBoutonsVotes();
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Tribunal: Défense");
                             recupDuree(exPhase);
                         }
                         lock = false;
                     });
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') }}) {
-                    $.post('{{ path('demande_info_tribunal_vote')}}', {}, function (data) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_tribunal_vote')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            afficherMessage(data['messages']);
+
                             cacherBoutonsVotes();
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Tribunal: Vote");
                             recupDuree(exPhase);
                         }
                         lock = false;
                     });
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') }}) {
-                    $.post('{{ path('demande_info_vote_resultat')}}', {}, function (data) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_vote_resultat')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            afficherMessage(data['messages']);
+
                             cacherBoutonsVotes();
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Résultat des votes");
                             recupDuree(exPhase);
                         }
                         lock = false;
                     });
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') }}) {
-                    $.post('{{ path('demande_info_execution')}}', {}, function (data) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_execution')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            afficherMessage(data['messages']);
+
                             cacherBoutonsVotes();
                             phase = data["phase"];
-                            $('#phaseEnCours').text("Execution");
                             recupDuree(exPhase);
                         }
                         lock = false;
@@ -219,10 +248,51 @@
 
         }
 
+        function afficherMessage(messages){
+            for (var i in messages) {
+                var d = messages[i]['date']['date'].split(" ");
+                if(messages[i]['systeme']){
+                    $('#chat_ig').append("<div class='msgSysteme' id='" + messages[i]['id'] + "'> [" + d[1] + "] <b>" + messages[i]['pseudo'] + "</b>: " + messages[i]['message'] + "</div>");
+                }
+                else{
+                    $('#chat_ig').append("<div id='" + messages[i]['id'] + "'> [" + d[1] + "] <b>" + messages[i]['pseudo'] + "</b>: " + messages[i]['message'] + "</div>");
+                }
+
+            }
+
+            var mydiv = $('#chat_ig');
+            mydiv.scrollTop(mydiv.prop('scrollHeight'));
+        }
+
         function recupDuree(exPhase)
         {
             if(exPhase != phase)
             {
+                if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }}) {
+                    $('#phaseEnCours').text("Aube");
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') }}) {
+                    $('#phaseEnCours').text("Jour");
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
+                    $('#phaseEnCours').text("Discussion");
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
+                    $('#phaseEnCours').text("Nuit");
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
+                    $('#phaseEnCours').text("Tribunal: Défense");
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') }}) {
+                    $('#phaseEnCours').text("Tribunal: Vote");
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') }}) {
+                    $('#phaseEnCours').text("Résultat des votes");
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') }}) {
+                    $('#phaseEnCours').text("Execution");
+                }
+
                 $.post('{{ path('demande_duree')}}', {
                 }, function (data) {
                     if(data['statut'] == "FAIL"){
@@ -253,7 +323,9 @@
                     }
                 });
             }
-            tempsRestant--;
+            if(tempsRestant > 0) {
+                tempsRestant--;
+            }
             $('#timerDiv').text(tempsRestant);
         }
 
@@ -364,14 +436,13 @@
             <div id="chat_ig">
                 <b>Chat</b>
                 <div>
-                    <b>J9:</b> Message 1<br/>
-                    <b>J4:</b> Message 2<br/>
-                    <b>J2:</b> Message 3<br/>
-                    <b>C'est la nuit</b><br/>
-                    <b>C'est le jour</b>
 
                     {% for msg in messages %}
-                        <div id="{{ msg.id }}">[{{ msg.date|date("H:i:s") }}] <b>{{ msg.pseudo }}</b>: {{ msg.message }}</div>
+                        {% if msg.systeme %}
+                            <div id="{{ msg.id }}" class="msgSysteme">[{{ msg.date|date("H:i:s") }}] <b>{{ msg.pseudo }}</b>: {{ msg.message }}</div>
+                        {% else %}
+                            <div id="{{ msg.id }}">[{{ msg.date|date("H:i:s") }}] <b>{{ msg.pseudo }}</b>: {{ msg.message }}</div>
+                        {% endif %}
                     {% endfor %}
 
 

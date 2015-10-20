@@ -42,7 +42,7 @@ class DemandeEntree
     private $demandeur;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille")
+     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille", inversedBy="demandes")
      */
     private $familleDemandee;
 

@@ -37,12 +37,12 @@ class Proposition
     private $dateProposition;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User", inversedBy="propositions")
      */
     private $userPropose;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille")
+     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille", inversedBy="propositions")
      */
     private $familleProposante;
 

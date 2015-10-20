@@ -57,7 +57,7 @@ class Partie
     private $debutPhase;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mafia\PartieBundle\Entity\UserPartie", mappedBy="Partie")
+     * @ORM\OneToMany(targetEntity="Mafia\PartieBundle\Entity\UserPartie", mappedBy="partie")
      */
     private $userPartie;
 

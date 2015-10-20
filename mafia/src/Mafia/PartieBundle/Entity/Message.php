@@ -37,12 +37,12 @@ class Message
 
     /**
      *  @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
+     *  @ORM\JoinColumn(nullable=true)
      */
     private $user;
 
-
     /**
-     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\Chat")
+     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\Chat", inversedBy="messages")
      */
     private $chat;
 

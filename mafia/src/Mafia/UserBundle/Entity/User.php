@@ -26,7 +26,7 @@ class User extends BaseUser
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille")
+     * @ORM\ManyToOne(targetEntity="Mafia\FamilleBundle\Entity\Famille", inversedBy="membres")
      */
     private $famille;
 

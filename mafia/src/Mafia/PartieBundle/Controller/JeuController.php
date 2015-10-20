@@ -56,14 +56,15 @@ class JeuController extends Controller{
 
                 $pid = 0;
 
-                $messages = $repositoryMessage->myFind($chat, $pid);
+                //$messages = $repositoryMessage->myFind($chat, $pid);
 
-                $dataMessage = array();
+                //$dataMessage = array();
                 $id = 0;
-                foreach ($messages as $message) {
+               /* foreach ($messages as $message) {
                     $dataMessage[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte(), "date" => $message->getDate());
                     $id++;
-                }
+                }*/
+                $dataMessage = $this->recevoirTousMessages($user, $id);
 
                 //RECUPERATION DE LA COMPOSITION
 
@@ -123,6 +124,18 @@ class JeuController extends Controller{
 
     }
 
+    private function messageSysteme($em,$chat,$message){
+        $newMessage = new Message();
+        $newMessage->setType(0);
+        $newMessage->setChat($chat);
+        $newMessage->setDate(new \DateTime());
+        $newMessage->setTexte($message);
+        $newMessage->setUser(null);
+
+        $em->persist($newMessage);
+        $em->flush();
+    }
+
     public function verifPhase()
     {
         $em = $this->getDoctrine()->getManager();
@@ -137,6 +150,7 @@ class JeuController extends Controller{
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
                 $partie = $user->getPartie();
+                $chat = $partie->getChat();
                 $parametres = $partie->getParametres();
 
                 $usersPartie = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true));
@@ -146,26 +160,31 @@ class JeuController extends Controller{
                         case PhaseJeuEnum::AUBE :
                             $partie->setPhaseEnCours(PhaseJeuEnum::DISCUSSION);
                             $partie->setDureePhase($parametres->getTempsDeDiscussion());
+                            $this->messageSysteme($em,$chat,"C'est l'heure de discuter");
                             break;
                         case PhaseJeuEnum::NUIT :
                             $partie->setPhaseEnCours(PhaseJeuEnum::AUBE);
                             $partie->setDureePhase(0.2);
+                            $this->messageSysteme($em,$chat,"C'est l'aube");
                             break;
                         case PhaseJeuEnum::DISCUSSION :
                             $this->razVotes();
                             $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
                             $partie->setDureePhase($parametres->getDureeDuJour());
+                            $this->messageSysteme($em,$chat,"C'est le jour");
                             break;
                         case PhaseJeuEnum::EXECUTION :
                             $this->razVotes();
                             $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
                             $partie->setDureePhase($parametres->getDureeDeLaNuit());
+                            $this->messageSysteme($em,$chat,"C'est la nuit");
                             break;
                         case PhaseJeuEnum::JOUR :
                             $this->razVotes();
 
                             $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
                             $partie->setDureePhase($parametres->getDureeDeLaNuit());
+                            $this->messageSysteme($em,$chat,"C'est la nuit");
                             break;
                         case PhaseJeuEnum::RESULTAT_VOTE :
                             $usersPartieNon = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true, "voteTribunal" => 0));
@@ -178,20 +197,24 @@ class JeuController extends Controller{
                                     $this->razVotes();
                                     $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
                                     $partie->setDureePhase($partie->getTempsJourRestant());
+                                    $this->messageSysteme($em,$chat,"C'est le jour");
                                 } else {
                                     $this->razVotes();
                                     $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
                                     $partie->setDureePhase($parametres->getDureeDeLaNuit());
+                                    $this->messageSysteme($em,$chat,"C'est la nuit");
                                 }
                             }
                             break;
                         case PhaseJeuEnum::TRIBUNAL_DEFENSE :
                             $partie->setPhaseEnCours(PhaseJeuEnum::TRIBUNAL_VOTE);
                             $partie->setDureePhase($parametres->getTempsTribunal());
+                            $this->messageSysteme($em,$chat,"C'est l'heure du vote");
                             break;
                         case PhaseJeuEnum::TRIBUNAL_VOTE :
                             $partie->setPhaseEnCours(PhaseJeuEnum::RESULTAT_VOTE);
                             $partie->setDureePhase(0.25);
+                            $this->messageSysteme($em,$chat,"Voici les résultats du vote");
                             break;
 
                     }
@@ -215,7 +238,7 @@ class JeuController extends Controller{
                             $partie->setPhaseEnCours(PhaseJeuEnum::TRIBUNAL_DEFENSE);
                             $partie->setTempsJourRestant($parametres->getDureeDuJour() - (((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())));
                             $partie->setDureePhase($parametres->getTempsTribunal());
-
+                            $this->messageSysteme($em,$chat,"C'est l'heure de se défendre");
                         }
                     }
 
@@ -301,11 +324,14 @@ class JeuController extends Controller{
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
+                $request = $this->container->get('request');
+                $id = $request->get('premierid');
+                $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
                 if ($phase == PhaseJeuEnum::AUBE) {
-                    return new JsonResponse(array("statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
@@ -319,11 +345,14 @@ class JeuController extends Controller{
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
+                $request = $this->container->get('request');
+                $id = $request->get('premierid');
+                $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
                 if ($phase == PhaseJeuEnum::DISCUSSION) {
-                    return new JsonResponse(array("statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
@@ -342,10 +371,10 @@ class JeuController extends Controller{
             $user = $userGlobal->getUserCourant();
             $request = $this->container->get('request');
             $id = $request->get('premierid');
-            $messages = $this->recevoirTousMessages($user,$id);
-            $usersPartie = $repositoryUser->findBy(array("partie" => $user->getPartie(), "vivant" => true));
 
             if ($user != null) {
+                $messages = $this->recevoirTousMessages($user,$id);
+                $usersPartie = $repositoryUser->findBy(array("partie" => $user->getPartie(), "vivant" => true));
                 $phase = $this->verifPhase();
                 if ($phase == PhaseJeuEnum::JOUR) {
 
@@ -377,8 +406,14 @@ class JeuController extends Controller{
         $data = array();
         $id = 0;
         foreach ($messages as $message) {
-            $data[$id] = array("id" => $message->getId(), "date" => $message->getDate(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte());
-            $id++;
+            if($message->getType() == 0 && $message->getRecepteur() == null) {
+                if ($message->getUser() == null) {
+                    $data[$id] = array("id" => $message->getId(), "date" => $message->getDate(), "pseudo" => "SYSTEME", "message" => $message->getTexte(), "systeme" => true);
+                } else {
+                    $data[$id] = array("id" => $message->getId(), "date" => $message->getDate(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte(),"systeme" => false);
+                }
+                $id++;
+            }
         }
 
         return $data;
