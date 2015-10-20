@@ -5,9 +5,11 @@
 {% block fos_user_content %}
     <div>
         <h2>{{ user.username }}</h2>
+        {% if user.famille is not null %}
         <p>
             Fait partie de la famille <a href="{{ path('vue_famille',{id:user.famille.id}) }}">{{ user.famille.nom }} - [{{ user.famille.tag }}]</a><br/>
         </p>
+        {% endif %}
         <p>
             {{ user.points }} points
         </p>
@@ -20,4 +22,6 @@
         </p>
 
     </div>
+
+
 {% endblock fos_user_content %}

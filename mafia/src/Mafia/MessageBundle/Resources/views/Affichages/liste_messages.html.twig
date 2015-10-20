@@ -76,4 +76,24 @@
             <button onclick="repondre({{ contactId }});">Envoyer</button>
         </div>
     {% endfor %}
+
+    {% include 'MafiaFamilleBundle:Templates:pagination.html.twig' with {'pathMethode' : 'liste_messages', 'pageCourante':pageCourante, 'nbPages' : nbPages}  %}
+{#    <p>
+        {% if nbPages > 1 %}
+            {% if pageCourante > 1 %}
+                <a href="{{ path('liste_messages',{page:pageCourante-1}) }}"><</a>
+            {% endif %}
+        {% endif %}
+        <a href="{{ path('liste_messages') }}">{%   if pageCourante == 1 %}<b>{% endif %}1{% if pageCourante == 1 %}</b>{% endif %}</a>
+        {% if nbPages > 1 %}
+            {% if nbPages != pageCourante and pageCourante > 1 %}
+                <a href="{{ path('liste_messages', {page:pageCourante}) }}">.. <b>{{ pageCourante }}</b></a>
+            {% endif %}
+                <a href="{{ path('liste_messages', {page:nbPages}) }}">{% if pageCourante == nbPages %}<b>{% endif %}.. {{ nbPages }}{% if pageCourante == nbPages %}</b>{% endif %}</a>
+            {% if pageCourante < nbPages %}
+                <a href="{{ path('liste_messages',{page:pageCourante+1}) }}">></a>
+            {% endif %}
+        {% endif %}
+    </p>#}
+
 {% endblock fos_user_content %}

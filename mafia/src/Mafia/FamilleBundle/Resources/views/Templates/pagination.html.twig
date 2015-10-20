@@ -1,0 +1,21 @@
+{# Ce template prend en paramètre : pathMethode, qui correspond au nom de la route de chargement de la page #}
+{# pageCourante, la page où on est actuellement #}
+{# nbPages, le nombre de pages total #}
+
+<p {#class="pagination"#}>
+    {% if nbPages > 1 %}
+        {% if pageCourante > 1 %}
+            <a href="{{ path(pathMethode,{page:pageCourante-1}) }}"><</a>
+        {% endif %}
+    {% endif %}
+    <a href="{{ path(pathMethode) }}">{%   if pageCourante == 1 %}<b>{% endif %}1{% if pageCourante == 1 %}</b>{% endif %}</a>
+    {% if nbPages > 1 %}
+        {% if nbPages != pageCourante and pageCourante > 1 %}
+            <a href="{{ path(pathMethode, {page:pageCourante}) }}">.. <b>{{ pageCourante }}</b></a>
+        {% endif %}
+        <a href="{{ path(pathMethode, {page:nbPages}) }}">{% if pageCourante == nbPages %}<b>{% endif %}.. {{ nbPages }}{% if pageCourante == nbPages %}</b>{% endif %}</a>
+        {% if pageCourante < nbPages %}
+            <a href="{{ path(pathMethode,{page:pageCourante+1}) }}">></a>
+        {% endif %}
+    {% endif %}
+</p>

@@ -16,6 +16,8 @@ use Symfony\Component\Validator\Constraints\DateTime;
 
 class MessageController extends Controller{
 
+    private static $nbElemParPage = 1;
+
     function creationMessageAction($id)
     {
         $repositoryUser = $this->getDoctrine()
@@ -51,7 +53,8 @@ class MessageController extends Controller{
         ));
     }
 
-    function affichageMessagesAction()
+
+    function affichageMessagesAction($page)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -76,9 +79,29 @@ class MessageController extends Controller{
             $messages[$contact->getUsername()] = $query->getResult();
         }
 
-        return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
-            'messages' => $messages
-        ));
+        $nbContacts = count($liste_contacts);
+        if($nbContacts%self::$nbElemParPage > 0){
+            $nbPages = floor($nbContacts/self::$nbElemParPage) +1;
+        }
+        else{
+            $nbPages = $nbContacts/self::$nbElemParPage;
+        }
+        if($nbPages == 1){
+            return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
+                'messages' => $messages,
+                'pageCourante' => $page,
+                'nbPages' => $nbPages
+            ));
+        }
+        else{
+            $messagesSurPage = array_slice($messages,( self::$nbElemParPage * ($page-1)),self::$nbElemParPage);
+            return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
+                'messages' => $messagesSurPage,
+                'pageCourante' => $page,
+                'nbPages' => $nbPages
+            ));
+        }
+
     }
 
     function repondreMessageAction()
