@@ -280,11 +280,14 @@ class JeuController extends Controller{
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
+                $request = $this->container->get('request');
+                $id = $request->get('premierid');
+                $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
                 if ($phase == PhaseJeuEnum::NUIT) {
-                    return new JsonResponse(array("statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
