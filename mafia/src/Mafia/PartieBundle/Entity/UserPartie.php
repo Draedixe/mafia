@@ -100,7 +100,7 @@ class UserPartie
     private $voteTribunal;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
      * @ORM\JoinColumn(nullable=true)
      */
     private $votePour;

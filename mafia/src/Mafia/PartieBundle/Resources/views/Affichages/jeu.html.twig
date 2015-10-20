@@ -31,13 +31,21 @@
 
         function votePourTellePersonne(id)
         {
-            $.post('{{ path('voter_pour')}}',{id: id}, function (data) {
+            var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+            if (premierID == undefined) {
+                premierID = 0;
+            }
+            $.post('{{ path('voter_pour')}}',{id: id, premierid: premierID}, function (data) {
                 if(data['statut'] == "FAIL"){
                     $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
+                    var mydiv = $('#chat_ig');
+                    mydiv.scrollTop(mydiv.prop('scrollHeight'));
                 }
                 else if(data['statut'] == "BADVOTE"){
 
                     $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Ceci n'est pas un vote valide</b></div>");
+                    var mydiv = $('#chat_ig');
+                    mydiv.scrollTop(mydiv.prop('scrollHeight'));
                 }
                 else
                 {
@@ -47,6 +55,10 @@
                         }
                     }
                     $('#votePour'+id).html(data['action']);
+
+                    if(!lock) {
+                        afficherMessage(data['messages']);
+                    }
                 }
             });
         }
@@ -452,7 +464,7 @@
                 <form id="form_chat"  method="post" onsubmit = "envoyer(); return false;">
                     {{ form_widget(form) }}
 
-                    <button type="button" id="envoie_chat" title="Envoyer">Envoyer</button>
+                    <button type="button" id="envoie_chat" onclick="envoyer(); return false;" title="Envoyer">Envoyer</button>
                 </form>
             </div>
         </div>
@@ -503,8 +515,10 @@
             </div>
             <div id="votes">
                 <table>
+                    {% set cpt = 1 %}
                     {% for key, p in enViePseudo %}
-                        <tr><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
+                        <tr><td>{{ cpt }}</td><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
+                        {% set cpt = cpt+1 %}
                     {% endfor %}
 
 

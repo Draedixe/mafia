@@ -97,9 +97,7 @@ class JeuController extends Controller{
         return $this->forward('MafiaUserBundle:Default:menu');
     }
 
-    public function razVotes()
-    {
-
+    public function razVotes(){
         $userGlobal = $this->getUser();
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
@@ -118,10 +116,9 @@ class JeuController extends Controller{
 
                 $query = $qB->getQuery();
 
-                $results = $query->getResult();
+                $query->getResult();
             }
         }
-
     }
 
     private function messageSysteme($em,$chat,$message){
