@@ -40,6 +40,13 @@ class Statut
      */
     private $acteur;
 
+    public function __construct($enum, $victime, $acteur)
+    {
+        $this->enumStatut = $enum;
+        $this->victime = $victime;
+        $this->acteur = $acteur;
+    }
+
     /**
      * @return mixed
      */

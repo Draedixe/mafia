@@ -4,6 +4,7 @@
 
 {% block fos_user_content %}
 
+    {# Début du code pour la Popup #}
     <script>
         jQuery(function($){
 
@@ -56,44 +57,30 @@
             });
         }
     </script>
+    {# Fin du code pour la Popup #}
+
+
     {% set contactId = 1 %}
     {% for key, messagesContact in messages %}
-        <h2>{{ key }}</h2>
-        <table>
-        {% for message in messagesContact %}
-            <fieldset>
+        <fieldset>
+            <label>{{ key }}</label>
+            <table>
+                {% for message in messagesContact %}
                     <tr>
                         <td>{% if message.recepteur == app.user %}Reçu :{% set contactId = message.expediteur.id %}{% else %}Envoyé :{% set contactId = message.recepteur.id %}{% endif %}</td>
                         <td>{{ message.texte }} - le {{ message.dateEnvoi | date }}</td>
                     </tr>
-            </fieldset>
-        {% endfor %}
-        </table>
+                {% endfor %}
+            </table>
+        </fieldset>
+
         <a href="#" data-width="500" data-rel="{{ "popup_name"~contactId }}" class="poplight">Répondre</a>
         <div class="popup_block" id={{ "popup_name"~contactId }} >
-            {#{% render path('envoyer_message',{id:contactId}) %}#}
             <textarea id="{{ "text"~contactId }}"></textarea><label for="{{ "text"~contactId }}"></label>
             <button onclick="repondre({{ contactId }});">Envoyer</button>
         </div>
     {% endfor %}
 
     {% include 'MafiaFamilleBundle:Templates:pagination.html.twig' with {'pathMethode' : 'liste_messages', 'pageCourante':pageCourante, 'nbPages' : nbPages}  %}
-{#    <p>
-        {% if nbPages > 1 %}
-            {% if pageCourante > 1 %}
-                <a href="{{ path('liste_messages',{page:pageCourante-1}) }}"><</a>
-            {% endif %}
-        {% endif %}
-        <a href="{{ path('liste_messages') }}">{%   if pageCourante == 1 %}<b>{% endif %}1{% if pageCourante == 1 %}</b>{% endif %}</a>
-        {% if nbPages > 1 %}
-            {% if nbPages != pageCourante and pageCourante > 1 %}
-                <a href="{{ path('liste_messages', {page:pageCourante}) }}">.. <b>{{ pageCourante }}</b></a>
-            {% endif %}
-                <a href="{{ path('liste_messages', {page:nbPages}) }}">{% if pageCourante == nbPages %}<b>{% endif %}.. {{ nbPages }}{% if pageCourante == nbPages %}</b>{% endif %}</a>
-            {% if pageCourante < nbPages %}
-                <a href="{{ path('liste_messages',{page:pageCourante+1}) }}">></a>
-            {% endif %}
-        {% endif %}
-    </p>#}
 
 {% endblock fos_user_content %}
