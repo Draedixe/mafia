@@ -300,7 +300,7 @@ class NeutreController extends Controller {
 
                                 /* S'il lui reste des Gilets */
                                 if($userPartieCourant->getCapaciteRestante() > 0){
-                                    $statutProtege = new Statut(StatusEnum::SAUVE,$userPartieCourant,$userPartieCourant);
+                                    $statutProtege = new Statut(StatusEnum::GILET,$userPartieCourant,$userPartieCourant);
                                     $userPartieCourant->setCapaciteRestante($userPartieCourant->getCapaciteRestante()-1);
 
                                     $em = $this->getDoctrine()->getManager();
