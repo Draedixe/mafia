@@ -92,6 +92,12 @@ class Partie
      */
     private $terminee;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $traitementAubeEnCours;
 
     /**
      * @var boolean
@@ -126,6 +132,7 @@ class Partie
         $this->phaseEnCours=PhaseJeuEnum::SELECTION_DU_NOM;
         $this->dureePhase=0.2;
         $this->tempsJourRestant=0;
+        $this->traitementAubeEnCours = false;
     }
 
     /**
@@ -401,6 +408,22 @@ class Partie
     public function setTempsJourRestant($tempsJourRestant)
     {
         $this->tempsJourRestant = $tempsJourRestant;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isTraitementAubeEnCours()
+    {
+        return $this->traitementAubeEnCours;
+    }
+
+    /**
+     * @param boolean $traitementAubeEnCours
+     */
+    public function setTraitementAubeEnCours($traitementAubeEnCours)
+    {
+        $this->traitementAubeEnCours = $traitementAubeEnCours;
     }
 
 

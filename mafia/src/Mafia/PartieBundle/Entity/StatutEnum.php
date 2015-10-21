@@ -11,7 +11,7 @@ abstract class StatusEnum {
     const CONTROLE = 1;
     /* Pyromane */
     const ESSENCE = 2;
-    /* Survivant */
+    /*  */
     const SAUVE = 3;
     /* Conducteur de Bus */
     const ECHANGE = 4;
@@ -37,10 +37,12 @@ abstract class StatusEnum {
     const CONVERTIR = 14;
     /* Gourou */
     const SAUVE_CONVERTIR = 15;
+    /* Survivant */
+    const GILET = 16;
 
 
     private static $statutPartie = array('PROTEGE' => 0, 'CONTROLE' => 1, 'ESSENCE' => 2, 'SAUVE' => 3, 'ECHANGE' => 4, 'PIEGE' => 5, 'BLOQUE' => 6, 'EMPRISONNE' => 7, 'TUE' => 8,
-        'ROLE_CHANGE' => 9,'CIBLE_CONTROLE' => 10, 'CIBLE_MASSE' => 11, 'VOL_ROLE' => 12, 'FAIRE_CHIER' => 13, 'CONVERTIR' => 14, 'SAUVE_CONVERTIR' => 15
+        'ROLE_CHANGE' => 9,'CIBLE_CONTROLE' => 10, 'CIBLE_MASSE' => 11, 'VOL_ROLE' => 12, 'FAIRE_CHIER' => 13, 'CONVERTIR' => 14, 'SAUVE_CONVERTIR' => 15, 'GILET' => 16
     );
 
     public static function getStatusPartie()
