@@ -77,7 +77,7 @@ class JeuController extends FunctionsController{
                 if($monRole != null) {
                     $monRoleData = array("faction" => $monRole->getEnumFaction(), "nom" => $monRole->getNomRole(), "description" => $monRole->getDescription(), "descriptionPrincipale" => $monRole->getDescriptionPrincipale(), "capacite" => $monRole->getCapacite());
                 }
-
+                $monId = $user->getId();
                 return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
                     array(
                         "partie" => $partie,
@@ -87,7 +87,8 @@ class JeuController extends FunctionsController{
                         'form' => $formBuilder->createView(),
                         "messages" => $dataMessage,
                         "roles" => $rolesData,
-                        "monRole" => $monRoleData
+                        "monRole" => $monRoleData,
+                        "monId" => $monId
                     )
                 );
             } else {

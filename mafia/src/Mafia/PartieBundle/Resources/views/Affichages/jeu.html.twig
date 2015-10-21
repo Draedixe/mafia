@@ -82,9 +82,9 @@
 
         function cacherBoutonsVotes()
         {
-            $(".colonne_bouton_vote").each(function(){
-                $(this).hide();
-            });
+            {% for id in enVieId %}
+                $('#votePour'+{{ id }}).hide();
+            {% endfor %}
         }
 
         function demanderInfo(){
@@ -129,10 +129,11 @@
 
                             afficherMessage(data['messages']);
 
-
-                            $(".colonne_bouton_vote").each(function () {
-                                $(this).show();
-                            });
+                            {% for id in enVieId %}
+                                {% if id != monId %}
+                                    $('#votePour'+{{ id }}).show();
+                                {% endif %}
+                            {% endfor %}
 
                             phase = data["phase"];
                             recupDuree(exPhase);
@@ -521,7 +522,7 @@
                 <table>
                     {% set cpt = 1 %}
                     {% for key, p in enViePseudo %}
-                        <tr><td>{{ cpt }}</td><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
+                        <tr><td>{{ cpt }}</td><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
                         {% set cpt = cpt+1 %}
                     {% endfor %}
 
