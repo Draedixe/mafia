@@ -12,6 +12,7 @@ use Mafia\PartieBundle\Entity\Message;
 use Mafia\PartieBundle\Entity\PhaseJeuEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Mafia\PartieBundle\Controller\JeuController;
 
 class JourController extends Controller{
 
@@ -87,14 +88,16 @@ class JourController extends Controller{
                                                 $em->persist($user);
                                                 $em->flush();
 
-                                                $this->messageSysteme($em,$chat,$user->getNom() . " annule son vote");
+                                                $this->messageSysteme($em,$chat,utf8_encode($user->getNom() . " a annulé son vote"));
                                                 $messages = $this->recevoirTousMessages($user,$pid);
+                                                //$this->forward('JeuController:verifPhase');
                                                 return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'action' => "Voter", "ancien" => $ancien));
                                             } else {
                                                 $user->setVotePour($userVote);
                                                 $em->persist($user);
                                                 $em->flush();
-                                                $this->messageSysteme($em,$chat,$user->getNom() . " vote pour " . $userVote->getNom() );
+                                                $this->messageSysteme($em,$chat,utf8_encode($user->getNom() . " a voté pour " . $userVote->getNom()));
+
                                                 $messages = $this->recevoirTousMessages($user,$pid);
                                                 if ($ancien != null) {
                                                     return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'action' => "Annuler", "ancien" => $ancien->getId()));

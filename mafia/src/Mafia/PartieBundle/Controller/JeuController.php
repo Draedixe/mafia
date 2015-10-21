@@ -23,7 +23,7 @@ class JeuController extends Controller{
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
                 $partie = $user->getPartie();
-                //Si la partie est déja terminée
+                //Si la partie est dÃ©ja terminÃ©e
                 if ($partie->isTerminee()) {
                     $userGlobal->setUserCourant(NULL);
                     $em->persist($userGlobal);
@@ -211,7 +211,7 @@ class JeuController extends Controller{
                         case PhaseJeuEnum::TRIBUNAL_VOTE :
                             $partie->setPhaseEnCours(PhaseJeuEnum::RESULTAT_VOTE);
                             $partie->setDureePhase(0.25);
-                            $this->messageSysteme($em,$chat,"Voici les résultats du vote");
+                            $this->messageSysteme($em,$chat,"Voici les rÃ©sultats du vote");
                             break;
 
                     }
@@ -229,13 +229,13 @@ class JeuController extends Controller{
                             $votes[$joueur->getVotePour()->getId()]++;
                         }
                     }
-                    $majorite = count($usersPartie) + 1;
+                    $majorite = floor(count($usersPartie)/2) + 1;
                     foreach ($votes as $vote) {
-                        if ($vote > $majorite) {
+                        if ($vote >= $majorite) {
                             $partie->setPhaseEnCours(PhaseJeuEnum::TRIBUNAL_DEFENSE);
                             $partie->setTempsJourRestant($parametres->getDureeDuJour() - (((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())));
                             $partie->setDureePhase($parametres->getTempsTribunal());
-                            $this->messageSysteme($em,$chat,"C'est l'heure de se défendre");
+                            $this->messageSysteme($em,$chat,"C'est l'heure de se dÃ©fendre");
                         }
                     }
 

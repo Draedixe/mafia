@@ -263,6 +263,7 @@
         function afficherMessage(messages){
             for (var i in messages) {
                 var d = messages[i]['date']['date'].split(" ");
+
                 if(messages[i]['systeme']){
                     $('#chat_ig').append("<div class='msgSysteme' id='" + messages[i]['id'] + "'> [" + d[1] + "] <b>" + messages[i]['pseudo'] + "</b>: " + messages[i]['message'] + "</div>");
                 }
@@ -291,6 +292,9 @@
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
                     $('#phaseEnCours').text("Nuit");
+                    {% for id in enVieId %}
+                        $('#votePour'+{{ id }}).html("Voter");
+                    {% endfor %}
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
                     $('#phaseEnCours').text("Tribunal: Défense");
