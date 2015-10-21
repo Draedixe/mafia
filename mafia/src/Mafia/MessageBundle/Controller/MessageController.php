@@ -9,6 +9,7 @@
 namespace Mafia\MessageBundle\Controller;
 
 use Mafia\MessageBundle\Entity\MessagePrive;
+use Mafia\UserBundle\Entity\regroupementVariable;
 use Mafia\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +17,6 @@ use Symfony\Component\Validator\Constraints\DateTime;
 
 class MessageController extends Controller{
 
-    private static $nbElemParPage = 1;
 
     function creationMessageAction($id)
     {
@@ -80,11 +80,11 @@ class MessageController extends Controller{
         }
 
         $nbContacts = count($liste_contacts);
-        if($nbContacts%self::$nbElemParPage > 0){
-            $nbPages = floor($nbContacts/self::$nbElemParPage) +1;
+        if($nbContacts%regroupementVariable::NB_MP_PAR_PAGE > 0){
+            $nbPages = floor($nbContacts/regroupementVariable::NB_MP_PAR_PAGE) +1;
         }
         else{
-            $nbPages = $nbContacts/self::$nbElemParPage;
+            $nbPages = $nbContacts/regroupementVariable::NB_MP_PAR_PAGE;
         }
         if($nbPages == 1){
             return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
@@ -94,7 +94,7 @@ class MessageController extends Controller{
             ));
         }
         else{
-            $messagesSurPage = array_slice($messages,( self::$nbElemParPage * ($page-1)),self::$nbElemParPage);
+            $messagesSurPage = array_slice($messages,( regroupementVariable::NB_MP_PAR_PAGE * ($page-1)),regroupementVariable::NB_MP_PAR_PAGE);
             return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
                 'messages' => $messagesSurPage,
                 'pageCourante' => $page,
