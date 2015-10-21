@@ -1,32 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utilisateur
- * Date: 11/03/2015
- * Time: 22:58
- */
 
 namespace Mafia\PartieBundle\Controller;
 
-use Mafia\PartieBundle\Entity\Message;
 use Mafia\PartieBundle\Entity\PhaseJeuEnum;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Mafia\PartieBundle\Controller\JeuController;
 
-class JourController extends Controller{
 
-    private function messageSysteme($em,$chat,$message){
-        $newMessage = new Message();
-        $newMessage->setType(0);
-        $newMessage->setChat($chat);
-        $newMessage->setDate(new \DateTime());
-        $newMessage->setTexte($message);
-        $newMessage->setUser(null);
-
-        $em->persist($newMessage);
-        $em->flush();
-    }
+class JourController extends FunctionsController{
 
 
     private function recevoirTousMessages($user,$id){
@@ -90,14 +70,14 @@ class JourController extends Controller{
 
                                                 $this->messageSysteme($em,$chat,utf8_encode($user->getNom() . " a annulé son vote"));
                                                 $messages = $this->recevoirTousMessages($user,$pid);
-                                                //$this->forward('JeuController:verifPhase');
+                                                $this->verifPhase();
                                                 return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'action' => "Voter", "ancien" => $ancien));
                                             } else {
                                                 $user->setVotePour($userVote);
                                                 $em->persist($user);
                                                 $em->flush();
                                                 $this->messageSysteme($em,$chat,utf8_encode($user->getNom() . " a voté pour " . $userVote->getNom()));
-
+                                                $this->verifPhase();
                                                 $messages = $this->recevoirTousMessages($user,$pid);
                                                 if ($ancien != null) {
                                                     return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'action' => "Annuler", "ancien" => $ancien->getId()));

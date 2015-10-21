@@ -64,7 +64,11 @@ class ChatController extends Controller{
             $data = array();
             $id = 0;
             foreach ($messages as $message) {
-                $data[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte());
+                if ($message->getUser() == null) {
+                    $data[$id] = array("id" => $message->getId(), "date" => $message->getDate(), "pseudo" => "SYSTEME", "message" => $message->getTexte(), "systeme" => true);
+                } else {
+                    $data[$id] = array("id" => $message->getId(), "date" => $message->getDate(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte(),"systeme" => false);
+                }
                 $id++;
             }
 

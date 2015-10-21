@@ -364,8 +364,8 @@ class PartieController extends Controller{
                             $newMessage->setType(0);
                             $newMessage->setChat($chat);
                             $newMessage->setDate(new \DateTime());
-                            $newMessage->setTexte("Debut de la partie");
-                            $newMessage->setUser($this->getUser());
+                            $newMessage->setTexte("Début de la partie");
+                            $newMessage->setUser(null);
 
                             //Liste des roles à affecter aux joueurs
                             $rolesAffecter = array();
