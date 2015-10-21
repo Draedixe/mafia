@@ -61,7 +61,7 @@ abstract class RolesEnum{
     const TUEUR_EN_SERIE = 39;
     const SURVIVANT = 40;
     const MARIONETTISTE = 41;
-    const SORCIER = 42;
+    const GOUROU = 42;
 
     // TRIADE \\
     const ADMINISTRATEUR = 43;
@@ -80,7 +80,7 @@ abstract class RolesEnum{
                                     'MACON' => 10, 'MACON_CHEF' => 11, 'GARDIEN_DE_PRISON' => 12, 'VEILLEUR' => 13, 'CRIEUR' => 14, 'ESCORT' => 15, 'ESPION' => 16, 'JUSTICIER' => 17, 'MAIRE' => 18, 'VETERAN' => 19,
                                     'AGENT' => 20, 'PILLEUR' => 21, 'MAITRE_CHANTEUR' => 22, 'CONSEILLER' => 23, 'PROSTITUERR' => 24, 'MAITRE_DU_DEGUISEMENT' => 25, 'CONTREFACTEUR' => 26, 'PARRAIN' => 27, 'CONCIERGE' => 28,
                                     'KIDNAPPER' => 29, 'MAFIOSO' => 30, 'AMNESIQUE' => 31, 'PYROMANE' => 32, 'AUDITEUR' => 33, 'CULTISTE' => 34, 'BOURREAU' => 35, 'BOUFFON' => 36, 'JUGE' => 37,
-                                    'TUEUR_DE_MASSE' => 38, 'TUEUR_EN_SERIE' => 39, 'SURVIVANT' => 40,  'MARIONETTISTE' => 41, 'SORCIER' => 42, 'ADMINISTRATEUR' => 43, 'IMPOSTEUR' => 44,
+                                    'TUEUR_DE_MASSE' => 38, 'TUEUR_EN_SERIE' => 39, 'SURVIVANT' => 40,  'MARIONETTISTE' => 41, 'GOUROU' => 42, 'ADMINISTRATEUR' => 43, 'IMPOSTEUR' => 44,
                                     'DRAGON' => 45, 'TUEUR_A_GAGE' => 46, 'FAUSSAIRE' => 47, 'MAITRE_ENCENS' => 48, 'INFORMATEUR' => 49, 'INTERROGATEUR' => 50,
                                     'LIAISON' => 51, 'MAITRE_SILENCE' => 52, 'AVANT_GARDE' => 53);
 
