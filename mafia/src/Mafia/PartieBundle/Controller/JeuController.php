@@ -30,13 +30,26 @@ class JeuController extends FunctionsController{
                     return $this->forward('MafiaUserBundle:Default:menu');
                 }
 
-                $usersPartie = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true));
+                $usersPartie = $repositoryUser->findBy(array("partie" => $partie));
 
-                $enVieId = array();
-                $enViePseudo = array();
+                $usersPartieVivants = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true));
+                $votes = array();
+                foreach ($usersPartieVivants as $joueur) {
+                    $votes[$joueur->getId()] = 0;
+                }
+                foreach ($usersPartieVivants as $joueur) {
+                    if ($joueur->getVotePour() != null) {
+                        $votes[$joueur->getVotePour()->getId()]++;
+                    }
+                }
+
+                $joueurs = array();
                 foreach ($usersPartie as $userEnVie) {
-                    array_push($enVieId, $userEnVie->getId());
-                    array_push($enViePseudo, $userEnVie->getNom());
+                    if(isset($votes[$userEnVie->getId()])){
+                        array_push($joueurs, array("role"=> "???" ,"id" => $userEnVie->getId(), "nom" => $userEnVie->getNom(), "vivant" => $userEnVie->getVivant(), "nbVotes" => $votes[$userEnVie->getId()]));
+                    } else {
+                        array_push($joueurs, array("role"=>$userEnVie->getRole()->getNomRole() ,"id" => $userEnVie->getId(), "nom" => $userEnVie->getNom(), "vivant" => $userEnVie->getVivant(), "nbVotes" => 0));
+                    }
                 }
 
                 //Formulaire pour le chat
@@ -45,32 +58,13 @@ class JeuController extends FunctionsController{
                     ->add('message', 'text', array('label' => 'Message'));
 
 
-
-
-                $chat = $partie->getChat();
-
-                $repositoryMessage = $this->getDoctrine()
-                    ->getManager()
-                    ->getRepository('MafiaPartieBundle:Message');
-
-
-                $pid = 0;
-
-                //$messages = $repositoryMessage->myFind($chat, $pid);
-
-                //$dataMessage = array();
                 $id = 0;
-               /* foreach ($messages as $message) {
-                    $dataMessage[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte(), "date" => $message->getDate());
-                    $id++;
-                }*/
                 $dataMessage = $this->recevoirTousMessages($user, $id);
 
                 //RECUPERATION DE LA COMPOSITION
-
                 $rolesData = $this->get('recuperation_composition')->recupCompo($user);
 
-                //TODO
+
 
                 $monRoleData = null;
                 $monRole = $user->getRole();
@@ -78,17 +72,22 @@ class JeuController extends FunctionsController{
                     $monRoleData = array("faction" => $monRole->getEnumFaction(), "nom" => $monRole->getNomRole(), "description" => $monRole->getDescription(), "descriptionPrincipale" => $monRole->getDescriptionPrincipale(), "capacite" => $monRole->getCapacite());
                 }
                 $monId = $user->getId();
+                if($user->getVotePour() != null){
+                    $votePour = $user->getVotePour()->getId();
+                } else{
+                    $votePour = -1;
+                }
                 return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
                     array(
                         "partie" => $partie,
-                        "enVieId" => $enVieId,
-                        "enViePseudo" => $enViePseudo,
+                        "joueurs" => $joueurs,
                         "tempsRestant" => ($partie->getDureePhase() * 60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp()),
-                        'form' => $formBuilder->createView(),
+                        "form" => $formBuilder->createView(),
                         "messages" => $dataMessage,
                         "roles" => $rolesData,
                         "monRole" => $monRoleData,
-                        "monId" => $monId
+                        "monId" => $monId,
+                        "votePour" => $votePour
                     )
                 );
             } else {
@@ -242,14 +241,32 @@ class JeuController extends FunctionsController{
                 $usersPartie = $repositoryUser->findBy(array("partie" => $user->getPartie(), "vivant" => true));
                 $phase = $this->verifPhase();
                 if ($phase == PhaseJeuEnum::JOUR) {
+                    $votes = array();
+                    foreach ($usersPartie as $joueur) {
+                        $votes[$joueur->getId()] = 0;
+                    }
+                    foreach ($usersPartie as $joueur) {
+                        if ($joueur->getVotePour() != null) {
+                            $votes[$joueur->getVotePour()->getId()]++;
+                        }
+                    }
 
+                    $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
                     $enVieId = array();
                     $enViePseudo = array();
-                    foreach ($usersPartie as $userEnVie) {
+                    $joueursVivants = array();
+                    $joueursRoles = array();
+                    foreach ($usersPartieTous as $userEnVie) {
                         $enVieId[] = $userEnVie->getId();
                         $enViePseudo[] = $userEnVie->getNom();
+                        $joueursVivants[] = $userEnVie->getVivant();
+                        if($userEnVie->getVivant()){
+                            $joueursRoles[] = "???";
+                        } else{
+                            $joueursRoles[] = $userEnVie->getRole()->getNomRole();
+                        }
                     }
-                    return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase, "enVieId" => $enVieId, "enViePseudo" => $enViePseudo));
+                    return new JsonResponse(array("joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants, "votes"=>$votes, "messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase, "enVieId" => $enVieId, "enViePseudo" => $enViePseudo));
                 } else {
                     return new JsonResponse(array("messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
                 }

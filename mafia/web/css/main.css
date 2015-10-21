@@ -281,3 +281,13 @@ html .popup_block {
 p .pagination{
     display: block;
 }
+
+.mort{
+    color: gray;
+    text-decoration: line-through;
+    font-weight: bold;
+}
+
+.nbVotes{
+    padding-left: 15px;
+}

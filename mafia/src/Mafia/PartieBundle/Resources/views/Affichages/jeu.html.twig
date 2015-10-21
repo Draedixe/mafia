@@ -15,12 +15,18 @@
             timer();
         }, 1000);
 
+
         var enVieId = [];
         var enViePseudo = [];
-        {% for key, vivant in enVieId %}
-            enVieId[{{ key }}] = {{ vivant }};
-            enViePseudo[{{ key }}] = "{{ enViePseudo[key] }}";
-
+        var joueursVivant = [];
+        var joueursRoles = []
+        var votes = [];
+        var monId = {{ monId }};
+        {% for key, j in joueurs %}
+            enVieId[{{ key }}] = {{ j.id }};
+            enViePseudo[{{ key }}] = "{{ j.nom }}";
+            joueursVivant[{{ key }}] = "{{ j.vivant }}";
+            joueursRoles[{{ key }}] = "{{ j.role }}";
         {% endfor %}
 
         function charger(){
@@ -82,8 +88,9 @@
 
         function cacherBoutonsVotes()
         {
-            {% for id in enVieId %}
-                $('#votePour'+{{ id }}).hide();
+            {% for j in joueurs %}
+                $('#votePour'+{{ j.id }}).hide();
+                $('#nbVotes'+{{ j.id }}).hide();
             {% endfor %}
         }
 
@@ -125,17 +132,27 @@
                         else {
                             enVieId = data['enVieId'];
                             enViePseudo = data['enViePseudo'];
-                            //chargerVivants();
-
+                            joueursVivant = data['joueursVivants']
+                            votes = data['votes'];
                             afficherMessage(data['messages']);
-
-                            {% for id in enVieId %}
-                                {% if id != monId %}
-                                    $('#votePour'+{{ id }}).show();
-                                {% endif %}
-                            {% endfor %}
-
                             phase = data["phase"];
+
+                            if(phase != exPhase){
+                                for(var j in enVieId){
+                                    if(enVieId[j] != monId && joueursVivant[j]){
+                                        $('#votePour'+enVieId[j]).show();
+                                        $('#nbVotes'+enVieId[j]).show();
+                                    }
+                                }
+
+                                for(var i in votes){
+                                    $('#nbVotes'+ i).html(votes[i]);
+                                }
+
+                                //TODO
+                            }
+
+
                             recupDuree(exPhase);
                         }
                         lock = false;
@@ -293,8 +310,8 @@
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
                     $('#phaseEnCours').text("Nuit");
-                    {% for id in enVieId %}
-                        $('#votePour'+{{ id }}).html("Voter");
+                    {% for j in joueurs %}
+                        $('#votePour'+{{ j.id }}).html("Voter");
                     {% endfor %}
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
@@ -409,10 +426,10 @@
 
     </script>
     <div>
-        En Vie:
+        Joueurs:
         <ul id="joueursEnVie">
-            {% for p in enViePseudo %}
-                <li>{{ p }}</li>
+            {% for j in joueurs %}
+                <li>{{ j.nom }}</li>
             {% endfor %}
         </ul>
     </div>
@@ -422,21 +439,11 @@
             <div id="cimetiere">
                <b>Cimetiere</b>
                 <div id="liste_cimetiere">
-                    Joueur 1 Mort<br/>
-                    Joueur 2 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort<br/>
-                    Joueur 1 Mort
+                    {% for key, j in joueurs %}
+                        {% if not(j.vivant) %}
+                            {{ j.nom }} ({{ j.role }})
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
             <button onclick="deathNote();" type="button" title="Death Note: un petit message attaché avec le corps de vos victimes">DN</button><button onclick="lastWord();" type="button" title="Derniere Volontés: un message qui sera révélé à tout le monde quand vous mourrez">Derniers Mots</button>
@@ -519,10 +526,14 @@
                 </span>
             </div>
             <div id="votes">
-                <table>
+                <table class="panneauJoueurs">
                     {% set cpt = 1 %}
-                    {% for key, p in enViePseudo %}
-                        <tr><td>{{ cpt }}</td><td class="colonne_nom_joueur"><b>{{ p }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ enVieId[key] }}" onclick="votePourTellePersonne({{ enVieId[key] }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
+                    {% for key, j in joueurs %}
+                        {% if j.vivant %}
+                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}">{{ j.nbVotes }}</td><td class="colonne_nom_joueur"><b>{{ j.nom }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>{% if votePour == j.id %}Annuler{% else %}Voter{% endif %}</button></td></tr>
+                        {% else %}
+                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}"></td><td class="colonne_nom_joueur"><span class="mort">{{ j.nom }}</span> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
+                        {% endif %}
                         {% set cpt = cpt+1 %}
                     {% endfor %}
 
