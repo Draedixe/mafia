@@ -217,8 +217,9 @@ class NeutreController extends Controller {
     }
 
     /**
-     * Fonction appelée quand le Marionettiste veut contrôler quelqu'un
-     * @param $idCible int L'id de la cible de l'Auditeur et de la cible de sa cible
+     * Fonction du marionettiste
+     * @param $idCible int Id de la victime
+     * @param $idCibleDeCible int Id de la victime de la victime
      */
     public function marionettisteAction($idCible,$idCibleDeCible){
         /* Récupérons un max de repositories ! */
