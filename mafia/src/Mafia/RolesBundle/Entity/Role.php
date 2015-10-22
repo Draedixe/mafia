@@ -30,6 +30,7 @@ class Role
      */
     private $nomRole;
 
+
     /**
      * @var string
      *
@@ -293,4 +294,25 @@ class Role
     {
         return $this->crimesRole;
     }
+
+    /**
+     * Get descrPrincipale
+     *
+     * @return string
+     */
+    public function getDescrPrincipale()
+    {
+        return $this->descrPrincipale;
+    }
+
+    /**
+     * @param string $descrPrincipale
+     */
+    public function setDescrPrincipale($descrPrincipale)
+    {
+        $this->descrPrincipale = $descrPrincipale;
+    }
+
+
+
 }

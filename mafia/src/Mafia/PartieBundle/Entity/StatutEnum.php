@@ -39,10 +39,35 @@ abstract class StatusEnum {
     const SAUVE_CONVERTIR = 15;
     /* Survivant */
     const GILET = 16;
+    /* Détective */
+    const DETECTE = 17;
+    /* */
+    const TUE_ANTI_INVUL = 18;
+    /* Inspecteur */
+    const INSPECTE = 19;
+    /* Médecin Légiste */
+    const INSPECTE_MORT = 20;
+    /* Sheriff */
+    const VERIFIE = 21;
+    /* Veilleur */
+    const OBSERVE = 22;
+    /* Vétéran */
+    const ALERTE = 23;
+    /* Concierge */
+    const MASQUE = 24;
+    /* Pilleur */
+    const REDIRIGE = 25;
+    /* Maitre chanteur */
+    const FERME_LA = 26;
+    /* Maitre du déguisement */
+    const USURPE = 27;
+
 
 
     private static $statutPartie = array('PROTEGE' => 0, 'CONTROLE' => 1, 'ESSENCE' => 2, 'SAUVE' => 3, 'ECHANGE' => 4, 'PIEGE' => 5, 'BLOQUE' => 6, 'EMPRISONNE' => 7, 'TUE' => 8,
-        'ROLE_CHANGE' => 9,'CIBLE_CONTROLE' => 10, 'CIBLE_MASSE' => 11, 'VOL_ROLE' => 12, 'FAIRE_CHIER' => 13, 'CONVERTIR' => 14, 'SAUVE_CONVERTIR' => 15, 'GILET' => 16
+        'ROLE_CHANGE' => 9,'CIBLE_CONTROLE' => 10, 'CIBLE_MASSE' => 11, 'VOL_ROLE' => 12, 'FAIRE_CHIER' => 13, 'CONVERTIR' => 14, 'SAUVE_CONVERTIR' => 15, 'GILET' => 16, 'DETECTE' => 17,
+        'TUE_ANTI_INVUL' => 18, 'INSPECTE' => 19, 'INSPECTE_MORT' => 20, 'VERIFIE' => 21, 'OBSERVE' => 22, 'ALERTE' => 23, 'MASQUE' => 24, 'REDIRIGE' => 25, 'FERME_LA' => 26,
+        'USURPE' => 27
     );
 
     public static function getStatusPartie()
