@@ -126,6 +126,12 @@ class Partie
      */
     private $typePartie;
 
+    /**
+     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $accuse;
+
     function __construct()
     {
         $this->nombreJoueursMax = 15;
@@ -134,6 +140,24 @@ class Partie
         $this->tempsJourRestant=0;
         $this->traitementAubeEnCours = false;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAccuse()
+    {
+        return $this->accuse;
+    }
+
+    /**
+     * @param mixed $accuse
+     */
+    public function setAccuse($accuse)
+    {
+        $this->accuse = $accuse;
+    }
+
+
 
     /**
      * @return string

@@ -44,6 +44,12 @@ class FunctionsController extends Controller{
                             break;
                         case PhaseJeuEnum::EXECUTION :
                             $this->razVotes();
+                            $accuse = $partie->getAccuse();
+                            $accuse->setVivant(false);
+                            $this->messageSysteme($em,$chat,$accuse->getNom() . " a été exécuté");
+                            $partie->setAccuse(null);
+                            $em->persist($accuse);
+                            $em->flush();
                             $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
                             $partie->setDureePhase($parametres->getDureeDeLaNuit());
                             $this->messageSysteme($em,$chat,"C'est la nuit");
@@ -58,10 +64,14 @@ class FunctionsController extends Controller{
                         case PhaseJeuEnum::RESULTAT_VOTE :
                             $usersPartieNon = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true, "voteTribunal" => 0));
                             $usersPartieOui = $repositoryUser->findBy(array("partie" => $partie, "vivant" => true, "voteTribunal" => 1));
+                            $this->messageSysteme($em,$chat,"Résultat des votes: ".count($usersPartieOui)."-OUI ".count($usersPartieNon)."-NON");
                             if (count($usersPartieOui) > count($usersPartieNon)) {
                                 $partie->setPhaseEnCours(PhaseJeuEnum::EXECUTION);
                                 $partie->setDureePhase(0.2);
                             } else {
+                                $accuse = $partie->getAccuse();
+                                $this->messageSysteme($em,$chat,$accuse->getNom() . " a été libéré");
+                                $partie->setAccuse(null);
                                 if ($partie->getTempsJourRestant() > 0) {
                                     $this->razVotes();
                                     $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
@@ -83,7 +93,6 @@ class FunctionsController extends Controller{
                         case PhaseJeuEnum::TRIBUNAL_VOTE :
                             $partie->setPhaseEnCours(PhaseJeuEnum::RESULTAT_VOTE);
                             $partie->setDureePhase(0.25);
-                            $this->messageSysteme($em,$chat,"Voici les résultats du vote");
                             break;
 
                     }
@@ -102,12 +111,15 @@ class FunctionsController extends Controller{
                         }
                     }
                     $majorite = floor(count($usersPartie)/2) + 1;
-                    foreach ($votes as $vote) {
+                    foreach ($votes as $key=>$vote) {
                         if ($vote >= $majorite) {
                             $partie->setPhaseEnCours(PhaseJeuEnum::TRIBUNAL_DEFENSE);
                             $partie->setTempsJourRestant($parametres->getDureeDuJour() - (((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp())));
                             $partie->setDureePhase($parametres->getTempsTribunal());
-                            $this->messageSysteme($em,$chat,"C'est l'heure de se défendre");
+                            $userAccuse = $repositoryUser->findOneBy(array("id" => $key));
+                            $partie->setAccuse($userAccuse);
+                            $this->razVotes();
+                            $this->messageSysteme($em,$chat,"C'est l'heure de se défendre pour ".$userAccuse->getNom());
                         }
                     }
 
@@ -130,6 +142,30 @@ class FunctionsController extends Controller{
 
         $em->persist($newMessage);
         $em->flush();
+    }
+
+    protected function razVotes(){
+        $userGlobal = $this->getUser();
+        if($userGlobal != null) {
+            $user = $userGlobal->getUserCourant();
+            if ($user != null) {
+                $partie = $user->getPartie();
+                $qB = $this->getDoctrine()->getManager()->createQueryBuilder();
+                $qB->update('MafiaPartieBundle:UserPartie', 'j')
+                    ->set('j.votePour', '?1')
+                    ->set('j.voteTribunal', '?2')
+                    ->where('j.partie = ?3')
+                    ->andWhere('j.vivant = ?4')
+                    ->setParameter(1, null)
+                    ->setParameter(2, 2)
+                    ->setParameter(3, $partie)
+                    ->setParameter(4, true);
+
+                $query = $qB->getQuery();
+
+                $query->getResult();
+            }
+        }
     }
 
 }

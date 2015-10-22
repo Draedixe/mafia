@@ -74,8 +74,17 @@ class JeuController extends FunctionsController{
                 $monId = $user->getId();
                 if($user->getVotePour() != null){
                     $votePour = $user->getVotePour()->getId();
-                } else{
+                } else if($user->getVotePour() == $user->getId()){
                     $votePour = -1;
+                }
+                else{
+                    $votePour = -2;
+                }
+                $accuse = $partie->getAccuse();
+                if($accuse != null){
+                    $idAccuse = $accuse->getId();
+                } else {
+                    $idAccuse = 0;
                 }
                 return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
                     array(
@@ -87,7 +96,8 @@ class JeuController extends FunctionsController{
                         "roles" => $rolesData,
                         "monRole" => $monRoleData,
                         "monId" => $monId,
-                        "votePour" => $votePour
+                        "votePour" => $votePour,
+                        "idAccuse" => $idAccuse
                     )
                 );
             } else {
@@ -97,29 +107,7 @@ class JeuController extends FunctionsController{
         return $this->forward('MafiaUserBundle:Default:menu');
     }
 
-    public function razVotes(){
-        $userGlobal = $this->getUser();
-        if($userGlobal != null) {
-            $user = $userGlobal->getUserCourant();
-            if ($user != null) {
-                $partie = $user->getPartie();
-                $qB = $this->getDoctrine()->getManager()->createQueryBuilder();
-                $qB->update('MafiaPartieBundle:UserPartie', 'j')
-                    ->set('j.votePour', '?1')
-                    ->set('j.voteTribunal', '?2')
-                    ->where('j.partie = ?3')
-                    ->andWhere('j.vivant = ?4')
-                    ->setParameter(1, null)
-                    ->setParameter(2, 2)
-                    ->setParameter(3, $partie)
-                    ->setParameter(4, true);
 
-                $query = $qB->getQuery();
-
-                $query->getResult();
-            }
-        }
-    }
 
     public function recevoirDureeAction()
     {
@@ -150,10 +138,26 @@ class JeuController extends FunctionsController{
                 $id = $request->get('premierid');
                 $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
+
+                $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
+                $joueursVivants = array();
+                $joueursRoles = array();
+                $enVieId = array();
+                $enViePseudo = array();
+                foreach ($usersPartieTous as $userEnVie) {
+                    $enVieId[] = $userEnVie->getId();
+                    $enViePseudo[] = $userEnVie->getNom();
+                    $joueursVivants[] = $userEnVie->getVivant();
+                    if($userEnVie->getVivant()){
+                        $joueursRoles[] = "???";
+                    } else{
+                        $joueursRoles[] = $userEnVie->getRole()->getNomRole();
+                    }
+                }
                 if ($phase == PhaseJeuEnum::NUIT) {
-                    return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
@@ -183,6 +187,9 @@ class JeuController extends FunctionsController{
 
     public function recevoirInformationsAubeAction()
     {
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:UserPartie');
 
         $userGlobal = $this->getUser();
         if($userGlobal != null) {
@@ -192,10 +199,26 @@ class JeuController extends FunctionsController{
                 $id = $request->get('premierid');
                 $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
+
+                $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
+                $joueursVivants = array();
+                $joueursRoles = array();
+                $enVieId = array();
+                $enViePseudo = array();
+                foreach ($usersPartieTous as $userEnVie) {
+                    $enVieId[] = $userEnVie->getId();
+                    $enViePseudo[] = $userEnVie->getNom();
+                    $joueursVivants[] = $userEnVie->getVivant();
+                    if($userEnVie->getVivant()){
+                        $joueursRoles[] = "???";
+                    } else{
+                        $joueursRoles[] = $userEnVie->getRole()->getNomRole();
+                    }
+                }
                 if ($phase == PhaseJeuEnum::AUBE) {
-                    return new JsonResponse(array("messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
@@ -209,14 +232,23 @@ class JeuController extends FunctionsController{
         if($userGlobal != null) {
             $user = $userGlobal->getUserCourant();
             if ($user != null) {
+                $repositoryUser = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaPartieBundle:UserPartie');
+
                 $request = $this->container->get('request');
                 $id = $request->get('premierid');
                 $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
+                $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
+                $joueursVivants = array();
+                foreach ($usersPartieTous as $userEnVie) {
+                    $joueursVivants[] = $userEnVie->getVivant();
+                }
                 if ($phase == PhaseJeuEnum::DISCUSSION) {
-                    return new JsonResponse(array("messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
@@ -311,12 +343,15 @@ class JeuController extends FunctionsController{
                 $id = $request->get('premierid');
                 $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
-                if ($phase == PhaseJeuEnum::TRIBUNAL_DEFENSE) {
-                    return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
-                } else {
-                    return new JsonResponse(array("messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
+                $partie = $user->getPartie();
+                if($partie != null) {
+                    $idAccuse = $partie->getAccuse()->getId();
+                    if ($phase == PhaseJeuEnum::TRIBUNAL_DEFENSE) {
+                        return new JsonResponse(array("idAccuse"=>$idAccuse, "messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
+                    } else {
+                        return new JsonResponse(array("idAccuse"=>$idAccuse, "messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
+                    }
                 }
-
             }
         }
         return new JsonResponse(array("statut" => "FAIL"));
@@ -333,12 +368,19 @@ class JeuController extends FunctionsController{
                 $id = $request->get('premierid');
                 $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
-                if ($phase == PhaseJeuEnum::TRIBUNAL_VOTE) {
-                    return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
-                } else {
-                    return new JsonResponse(array("messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
-                }
+                $partie = $user->getPartie();
+                if($partie != null) {
+                    $accuse = $partie->getAccuse();
+                    if($accuse != null) {
+                        $accuseId = $accuse->getId();
 
+                        if ($phase == PhaseJeuEnum::TRIBUNAL_VOTE) {
+                            return new JsonResponse(array("accuse" => $accuseId, "messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
+                        } else {
+                            return new JsonResponse(array("accuse" => $accuseId, "messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
+                        }
+                    }
+                }
             }
         }
         return new JsonResponse(array("statut" => "FAIL"));
@@ -429,7 +471,8 @@ class JeuController extends FunctionsController{
                 else {
                     $partie = $user->getPartie();
                     $phase = $partie->getPhaseEnCours();
-                    if ($phase == PhaseJeuEnum::JOUR || $phase == PhaseJeuEnum::DISCUSSION || $phase == PhaseJeuEnum::TRIBUNAL_VOTE) {
+
+                    if ($phase == PhaseJeuEnum::JOUR || $phase == PhaseJeuEnum::DISCUSSION || $phase == PhaseJeuEnum::TRIBUNAL_VOTE ||$partie->getAccuse() == $user) {
                         $chat = $partie->getChat();
 
                         $newMessage = new Message();

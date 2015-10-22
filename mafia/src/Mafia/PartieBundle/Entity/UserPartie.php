@@ -97,6 +97,7 @@ class UserPartie
      *
      * @ORM\Column(name="voteTribunal", type="integer", nullable=true)
      */
+    //0 = non, 1 = oui, 2 rien
     private $voteTribunal;
 
     /**

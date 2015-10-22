@@ -68,7 +68,7 @@ class JourController extends FunctionsController{
                                                 $em->persist($user);
                                                 $em->flush();
 
-                                                $this->messageSysteme($em,$chat,utf8_encode($user->getNom() . " a annulé son vote"));
+                                                $this->messageSysteme($em,$chat,$user->getNom() . " a annulÃ© son vote");
                                                 $messages = $this->recevoirTousMessages($user,$pid);
                                                 $this->verifPhase();
                                                 return new JsonResponse(array("messages" => $messages, "statut" => "SUCCESS", 'action' => "Voter", "ancien" => $ancien));
@@ -76,7 +76,7 @@ class JourController extends FunctionsController{
                                                 $user->setVotePour($userVote);
                                                 $em->persist($user);
                                                 $em->flush();
-                                                $this->messageSysteme($em,$chat,utf8_encode($user->getNom() . " a voté pour " . $userVote->getNom()));
+                                                $this->messageSysteme($em,$chat,$user->getNom() . " a votÃ© pour " . $userVote->getNom());
                                                 $this->verifPhase();
                                                 $messages = $this->recevoirTousMessages($user,$pid);
                                                 if ($ancien != null) {

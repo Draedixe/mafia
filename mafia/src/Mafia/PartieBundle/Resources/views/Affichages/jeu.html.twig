@@ -21,6 +21,7 @@
         var joueursVivant = [];
         var joueursRoles = []
         var votes = [];
+        var idAccuse = {{ idAccuse }};
         var monId = {{ monId }};
         {% for key, j in joueurs %}
             enVieId[{{ key }}] = {{ j.id }};
@@ -69,6 +70,42 @@
             });
         }
 
+        function voteTribunal(oui)
+        {
+            $.post('{{ path('voter_tribunal')}}',{oui: oui}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
+                    var mydiv = $('#chat_ig');
+                    mydiv.scrollTop(mydiv.prop('scrollHeight'));
+                }
+                else if(data['statut'] == "BADVOTE"){
+
+                    $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Ceci n'est pas un vote valide</b></div>");
+                    var mydiv = $('#chat_ig');
+                    mydiv.scrollTop(mydiv.prop('scrollHeight'));
+                }
+                else
+                {
+                    if(data['action'] == "Annuler"){
+                        $('#voteOui'+idAccuse).html("Oui");
+                        $('#voteNon'+monId).html("Non");
+                        $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Vous avez annulé votre vote</b></div>");
+                    }
+                    else if(data['action'] == "Oui"){
+                        $('#voteOui'+idAccuse).html("Annuler");
+                        $('#voteNon'+monId).html("Non");
+                        $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Vous avez voté Oui</b></div>");
+                    }
+                    else{
+                        $('#voteOui'+idAccuse).html("Oui");
+                        $('#voteNon'+monId).html("Annuler");
+                        $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Vous avez voté Non</b></div>");
+                    }
+
+                }
+            });
+        }
+
         function chargerVivants()
         {
             var listeEnVie = $("#joueursEnVie");
@@ -91,6 +128,8 @@
             {% for j in joueurs %}
                 $('#votePour'+{{ j.id }}).hide();
                 $('#nbVotes'+{{ j.id }}).hide();
+                $('#voteNon'+{{ j.id }}).hide();
+                $('#voteOui'+{{ j.id }}).hide();
             {% endfor %}
         }
 
@@ -110,9 +149,21 @@
                         }
                         else {
                             afficherMessage(data['messages']);
+                            joueursRoles = data['joueursRoles'];
+                            joueursVivant = data['joueursVivants'];
+
 
                             cacherBoutonsVotes();
                             phase = data["phase"];
+
+
+                            $('#liste_cimetiere').html("");
+                            for (var j in enVieId) {
+                                if (!joueursVivant[j]) {
+                                    $('#nom' + enVieId[j]).addClass('mort');
+                                    $('#liste_cimetiere').append(enViePseudo[j] + "(" + joueursRoles[j] + ")<br/>");
+                                }
+                            }
 
                             recupDuree(exPhase);
                         }
@@ -132,24 +183,20 @@
                         else {
                             enVieId = data['enVieId'];
                             enViePseudo = data['enViePseudo'];
-                            joueursVivant = data['joueursVivants']
+                            joueursVivant = data['joueursVivants'];
                             votes = data['votes'];
                             afficherMessage(data['messages']);
                             phase = data["phase"];
 
-                            if(phase != exPhase){
-                                for(var j in enVieId){
-                                    if(enVieId[j] != monId && joueursVivant[j]){
-                                        $('#votePour'+enVieId[j]).show();
-                                        $('#nbVotes'+enVieId[j]).show();
-                                    }
+                            for(var j in enVieId){
+                                if(enVieId[j] != monId && joueursVivant[j]){
+                                    $('#votePour'+enVieId[j]).show();
+                                    $('#nbVotes'+enVieId[j]).show();
                                 }
-
-                                for(var i in votes){
-                                    $('#nbVotes'+ i).html(votes[i]);
-                                }
-
-                                //TODO
+                            }
+                            for(var i in votes){
+                                $('#nbVotes'+ i).show();
+                                $('#nbVotes'+ i).html(votes[i]);
                             }
 
 
@@ -168,6 +215,7 @@
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
+                            joueursVivant = data['joueursVivants'];
                             afficherMessage(data['messages']);
 
                             cacherBoutonsVotes();
@@ -184,14 +232,28 @@
                     }
                     $.post('{{ path('demande_info_nuit')}}', {premierid: premierID}, function (data) {
                         if (data['statut'] == "FAIL") {
-                            //alert("fail");
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
                         }
                         else {
                             afficherMessage(data['messages']);
+                            joueursRoles = data['joueursRoles'];
+                            joueursVivant = data['joueursVivants'];
+                            enVieId = data['enVieId'];
 
                             cacherBoutonsVotes();
                             phase = data["phase"];
+
+                           // if (phase != exPhase) {
+
+                                $('#liste_cimetiere').html("");
+                                for (var j in enVieId) {
+                                    if (!joueursVivant[j]) {
+                                        $('#nom' + enVieId[j]).addClass('mort');
+                                        $('#liste_cimetiere').append(enViePseudo[j] + "(" + joueursRoles[j] + ")<br/>");
+                                    }
+                                }
+                            //}
+
                             recupDuree(exPhase);
                         }
                         lock = false;
@@ -208,7 +270,7 @@
                         }
                         else {
                             afficherMessage(data['messages']);
-
+                            idAccuse = data['idAccuse'];
                             cacherBoutonsVotes();
                             phase = data["phase"];
                             recupDuree(exPhase);
@@ -228,7 +290,11 @@
                         else {
                             afficherMessage(data['messages']);
 
-                            cacherBoutonsVotes();
+                            if(idAccuse != monId) {
+                                $('#voteNon' + monId).show();
+                                $('#voteOui' + data['accuse']).show();
+                            }
+
                             phase = data["phase"];
                             recupDuree(exPhase);
                         }
@@ -307,12 +373,23 @@
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
                     $('#phaseEnCours').text("Discussion");
+
+                    for(var j in enVieId){
+                        if(!joueursVivant[j]){
+                            $('#votePour'+enVieId[j]).show();
+                            $('#nbVotes'+enVieId[j]).show();
+                        }
+                    }
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
+
                     $('#phaseEnCours').text("Nuit");
                     {% for j in joueurs %}
                         $('#votePour'+{{ j.id }}).html("Voter");
                     {% endfor %}
+
+
+
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
                     $('#phaseEnCours').text("Tribunal: Défense");
@@ -322,6 +399,12 @@
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') }}) {
                     $('#phaseEnCours').text("Résultat des votes");
+                    for(var i in enVieId){
+                        $('#voteNon' + enVieId[i]).html("Non");
+                        $('#voteOui' + enVieId[i]).html("Oui");
+                    }
+
+
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::EXECUTION') }}) {
                     $('#phaseEnCours').text("Execution");
@@ -408,8 +491,10 @@
                     if(data.error){
                         if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}){
                             $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Vous ne pouvez pas parler la nuit</b></div>");
-                        }else{
-                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>le message n'a pas été envoyé</b></div>");
+                        }else if(phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}){
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Vous ne pouvez pas parler pendant la défense de l'accusé</b></div>");
+                        } else{
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Le message n'a pas été envoyé</b></div>");
                         }
                     }
                     demanderInfo();
@@ -425,14 +510,6 @@
         //chargerVivants();
 
     </script>
-    <div>
-        Joueurs:
-        <ul id="joueursEnVie">
-            {% for j in joueurs %}
-                <li>{{ j.nom }}</li>
-            {% endfor %}
-        </ul>
-    </div>
 
     <div class="table">
         <div id="colonne_gauche">
@@ -441,7 +518,7 @@
                 <div id="liste_cimetiere">
                     {% for key, j in joueurs %}
                         {% if not(j.vivant) %}
-                            {{ j.nom }} ({{ j.role }})
+                            {{ j.nom }} ({{ j.role }})<br/>
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -530,9 +607,14 @@
                     {% set cpt = 1 %}
                     {% for key, j in joueurs %}
                         {% if j.vivant %}
-                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}">{{ j.nbVotes }}</td><td class="colonne_nom_joueur"><b>{{ j.nom }}</b> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>{% if votePour == j.id %}Annuler{% else %}Voter{% endif %}</button></td></tr>
+                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}" style="display:none">{{ j.nbVotes }}</td><td class="colonne_nom_joueur"><span style="font-weight: bold" id="{{ "nom" ~ j.id }}">{{ j.nom }}</span> </td>
+                            <td class="colonne_bouton_vote">
+                                <button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>{% if votePour == j.id %}Annuler{% else %}Voter{% endif %}</button>
+                                <button id="{{ "voteOui" ~ j.id }}" onclick="voteTribunal(true);" style="display:none" class="colonne_bouton_vote" >Oui</button>
+                                <button id="{{ "voteNon" ~ j.id }}" onclick="voteTribunal(false);" style="display:none" class="colonne_bouton_vote" >Non</button>
+                            </td></tr>
                         {% else %}
-                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}"></td><td class="colonne_nom_joueur"><span class="mort">{{ j.nom }}</span> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
+                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}"></td><td class="colonne_nom_joueur"><span class="mort" id="{{ "nom" ~ j.id }}">{{ j.nom }}</span> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
                         {% endif %}
                         {% set cpt = cpt+1 %}
                     {% endfor %}

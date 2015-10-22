@@ -15,7 +15,7 @@ abstract class PhaseJeuEnum {
     const DISCUSSION = 7;
     const SELECTION_DU_NOM = 8;
 
-    private static $phaseJeu = array('JOUR' => 0, 'PROCES' => 1, 'NUIT' => 2, 'EXECUTION' => 3, 'AUBE' => 4, 'DISCUSSION' => 5, 'SELECTION_DU_NOM' => 6);
+    private static $phaseJeu = array('JOUR' => 0, 'TRIBUNAL_DEFENSE' => 1, 'TRIBUNAL_VOTE' => 2, 'RESULTAT_VOTE' => 3, 'NUIT' => 4, 'EXECUTION' => 5, 'AUBE' => 6, 'DISCUSSION' => 7,'SELECTION_DU_NOM' => 8);
 
     public static function getPhaseJeu()
     {

@@ -8,6 +8,12 @@ voter_pour:
     requirements:
       _method: POST
 
+voter_tribunal:
+    path: /jeu/vote_tribunal
+    defaults: { _controller: MafiaPartieBundle:Tribunal:voterPour }
+    requirements:
+      _method: POST
+
 vue_parametres:
     path: /parametres/afficher/{id}
     defaults: { _controller: MafiaPartieBundle:Default:affichageParametres, id:1 }

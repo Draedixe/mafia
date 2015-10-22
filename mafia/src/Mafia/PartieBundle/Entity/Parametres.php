@@ -140,7 +140,7 @@ class Parametres
         $this->choisirNom = true;
         $this->phaseDiscussion = true;
         $this->officiel = false;
-        $this->tempsTribunal = 1.0;
+        $this->tempsTribunal = 0.5;
     }
 
     /**
