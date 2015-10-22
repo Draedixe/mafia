@@ -4,6 +4,8 @@ namespace Mafia\PartieBundle\Controller;
 
 use Mafia\PartieBundle\Entity\StatusEnum;
 use Mafia\PartieBundle\Entity\Statut;
+use Mafia\RolesBundle\Entity\OptionsRolesEnum;
+use Mafia\RolesBundle\Entity\RolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mafia\PartieBundle\Entity\UserPartie;
 
@@ -52,6 +54,39 @@ class AubeController extends Controller{
         return $res;
     }
 
+    function rechercheOptionParEnum($enum, $arrayOfOptions){
+
+        foreach($arrayOfOptions as $cle => $option)
+        {
+            if($option->getEnumOption() == $enum){
+                return $option;
+            }
+        }
+        return null;
+    }
+
+    function rechercheOptionsParRole($role, $arrayOfOptions){
+        $res = array();
+        foreach($arrayOfOptions as $cle => $option)
+        {
+            if($option->getRole() == $role){
+                $res[] = $option;
+            }
+        }
+        return $res;
+    }
+
+    function rechercheUsersParRole($role, $arrayOfUsers){
+        $res = array();
+        foreach($arrayOfUsers as $cle => $user)
+        {
+            if($user->getRole() == $role){
+                $res[] = $user;
+            }
+        }
+        return $res;
+    }
+
 
     function traitementAubeAction()
     {
@@ -84,7 +119,16 @@ class AubeController extends Controller{
                             ->getManager()
                             ->getRepository('MafiaPartieBundle:Statut');
 
+
                         $usersPartie = $repositoryUser->findBy(array('partie'=>$partie));
+                        $composition = $partie->getComposition();
+                        $rolesComposEnJeu = $composition->getRolesCompo();
+                        $rolesEnJeu = array();
+                        foreach($rolesComposEnJeu as $roleCompo){
+                            $rolesEnJeu[$roleCompo->getRole()->getEnumRole()] = $roleCompo()->getRole();
+                        }
+                        $optionsRoles = $composition->getOptionsRoles();
+
                         $statutsPartie = array();
                         foreach($usersPartie as $userPartie)
                         {
@@ -92,38 +136,98 @@ class AubeController extends Controller{
                             $query->setParameters(array(
                                 'idUser' => $userPartie->getId()
                             ));
-                            array_merge($statutsPartie,$query->getResult());
+                            $statutsPartie = array_merge($statutsPartie,$query->getResult());
                         }
-
+                        $saveStatuts = $statutsPartie;
 
                         /* Voila, on a pris des repositories et les users et les statuts */
 
                         /* Traitons les Statuts pour les mettre comme nécessaire */
 
-                        // LES GILETS
-                        $statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::GILET,$statutsPartie);
-                        foreach($statutsATraiter as $statutATraiter){
-                            $this->rechercheStatutParEnumEtVictime(StatusEnum::TUE,$statutATraiter->getActeur(),$statutsATraiter);
-                        }
+                        // MARIONETTE SUR BLOQUEUR
+                        // CONDUCTEUR
+                        // BLOQUEURS
+                        //$statutsATraiterMarionettes = $this->rechercheStatutParEnum(StatusEnum::CONTROLE,$statutsPartie);
                         // MARIONETTES
-                        $statutsATraiterMarionettes = $this->rechercheStatutParEnum(StatusEnum::CONTROLE,$statutsPartie);
+                        /*$statutsATraiterMarionettes = $this->rechercheStatutParEnum(StatusEnum::CONTROLE,$statutsPartie);
                         $statutsATraiterVictimes = $this->rechercheStatutParEnum(StatusEnum::CIBLE_CONTROLE,$statutsPartie);
                         foreach($statutsATraiterMarionettes as $statutATraiter){
                             $cibleConcernee = $this->rechercheStatutParActeur($statutATraiter->getActeur(),$statutsATraiterVictimes);
                             $controle = $this->rechercheStatutParActeur($statutATraiter->getVictime(),$statutsATraiterMarionettes);
                             $controle->setVictime($cibleConcernee);
                             $statutsPartie[] = $controle;
-                        }
+                        }*/
                         // CONDUCTEUR DE BUS
-                        //TODO LA SUITE
 
+                        // Tueur en série
+                        if(isset($rolesEnJeu[RolesEnum::TUEUR_EN_SERIE])){
+                            $optionInvul = $this->rechercheOptionParEnum(OptionsRolesEnum::TUEUR_SERIE_INVULNERABLE_NUIT,$optionsRoles);
+                            $optionAdBlock = $this->rechercheOptionParEnum(OptionsRolesEnum::TUEUR_SERIE_TUE_BLOQUEUR_ROLE,$optionsRoles);
+                            //$optionAdDetect = $this->rechercheOptionParEnum(OptionsRolesEnum::TUEUR_SERIE_IMMUNISER_DETECTION,$optionsRoles);
+                            $tueursEnSerieEnJeu = $this->rechercheUsersParRole($rolesEnJeu[RolesEnum::TUEUR_EN_SERIE],$usersPartie);
+
+                            foreach($tueursEnSerieEnJeu as $tueur){
+                                // Par défaut true, donc null => inchangé => true
+                                if($optionInvul == null or $optionInvul->getValeur()){
+                                    $statutsPartie[] = new Statut(StatusEnum::GILET,$tueur,$tueur);
+                                }
+                                // Par défaut false, donc null => inchangé => false
+                                if($optionAdBlock != null){
+                                    if($optionAdBlock->getValeur()){
+                                        $bloqueurs = $this->rechercheStatutParEnumEtVictime(StatusEnum::BLOQUE,$tueur,$statutsPartie);
+                                        foreach($bloqueurs as $bloqueur){
+                                            $statutsPartie[] = new Statut(StatusEnum::TUE,$bloqueur->getActeur(),$tueur);
+                                        }
+                                    }
+                                }
+                                /* BLOQUAGE DETECTION
+                                 if($optionAdBlock != null){
+                                    if($optionAdBlock->getValeur()){
+                                        $bloqueurs = $this->rechercheStatutParEnumEtVictime(StatusEnum::BLOQUE,$tueur,$statutsPartie);
+                                    }
+                                }*/
+                            }
+
+                        }
+
+
+
+
+
+
+
+                        // LES GILETS
+                        $statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::GILET,$statutsPartie);
+                        foreach($statutsATraiter as $statutATraiter){
+                            $this->rechercheStatutParEnumEtVictime(StatusEnum::TUE,$statutATraiter->getActeur(),$statutsPartie);
+                        }
 
                         /** Fin des traitements **/
 
+                        /* On envoie les infos */
+
+                        $statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::TUE,$statutsPartie);
+                        $statutsTues = array_merge($statutsATraiter,$this->rechercheStatutParEnum(StatusEnum::TUE_ANTI_INVUL,$statutsPartie));
+                        foreach($statutsTues as $statutTue){
+                            $statutTue->getVictime()->setVivant(false);
+                        }
+
+                        /* Les infos ont été envoyées */
 
                         $em = $this->getDoctrine()->getManager();
                         /* On libère le jeton du webaphore */
                         $partie->setTraitementAubeEnCours(false);
+                        foreach($usersPartie as $user)
+                        {
+                            $em->persist($user);
+                        }
+
+                        foreach($saveStatuts as $statut)
+                        {
+                            if($statut->getEnumStatut() != StatusEnum::ESSENCE){
+                                $em->remove($statut);
+                            }
+                        }
                         $em->persist($partie);
                         $em->flush();
                     }
