@@ -1,0 +1,4 @@
+tableau_moderation:
+    path:     /moderation/tableau
+    defaults: { _controller: MafiaModerationBundle:Moderation:tableauModeration }
+
