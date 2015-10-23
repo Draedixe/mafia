@@ -133,6 +133,29 @@
             {% endfor %}
         }
 
+        function majMorts(){
+            $('#liste_cimetiere').html("");
+            for (var j in enVieId) {
+                if (!joueursVivant[j]) {
+                    $('#nom' + enVieId[j]).addClass('mort');
+                    $('#liste_cimetiere').append(enViePseudo[j] + "(" + joueursRoles[j] + ")<br/>");
+                }
+            }
+        }
+
+        function afficherBoutonsVotes(){
+            for(var j in enVieId){
+                if(enVieId[j] != monId && joueursVivant[j]){
+                    $('#votePour'+enVieId[j]).show();
+                    $('#nbVotes'+enVieId[j]).show();
+                }
+            }
+            for(var i in votes){
+                $('#nbVotes'+ i).show();
+                $('#nbVotes'+ i).html(votes[i]);
+            }
+        }
+
         function demanderInfo(){
 
             var exPhase = phase;
@@ -156,14 +179,7 @@
                             cacherBoutonsVotes();
                             phase = data["phase"];
 
-
-                            $('#liste_cimetiere').html("");
-                            for (var j in enVieId) {
-                                if (!joueursVivant[j]) {
-                                    $('#nom' + enVieId[j]).addClass('mort');
-                                    $('#liste_cimetiere').append(enViePseudo[j] + "(" + joueursRoles[j] + ")<br/>");
-                                }
-                            }
+                            majMorts()
 
                             recupDuree(exPhase);
                         }
@@ -188,17 +204,7 @@
                             afficherMessage(data['messages']);
                             phase = data["phase"];
 
-                            for(var j in enVieId){
-                                if(enVieId[j] != monId && joueursVivant[j]){
-                                    $('#votePour'+enVieId[j]).show();
-                                    $('#nbVotes'+enVieId[j]).show();
-                                }
-                            }
-                            for(var i in votes){
-                                $('#nbVotes'+ i).show();
-                                $('#nbVotes'+ i).html(votes[i]);
-                            }
-
+                            afficherBoutonsVotes();
 
                             recupDuree(exPhase);
                         }
@@ -238,21 +244,13 @@
                             afficherMessage(data['messages']);
                             joueursRoles = data['joueursRoles'];
                             joueursVivant = data['joueursVivants'];
+                            enViePseudo = data['enViePseudo'];
                             enVieId = data['enVieId'];
 
                             cacherBoutonsVotes();
                             phase = data["phase"];
 
-                           // if (phase != exPhase) {
-
-                                $('#liste_cimetiere').html("");
-                                for (var j in enVieId) {
-                                    if (!joueursVivant[j]) {
-                                        $('#nom' + enVieId[j]).addClass('mort');
-                                        $('#liste_cimetiere').append(enViePseudo[j] + "(" + joueursRoles[j] + ")<br/>");
-                                    }
-                                }
-                            //}
+                            majMorts();
 
                             recupDuree(exPhase);
                         }
@@ -367,9 +365,13 @@
             {
                 if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }}) {
                     $('#phaseEnCours').text("Aube");
+
+                    majMorts();
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') }}) {
                     $('#phaseEnCours').text("Jour");
+
+                    afficherBoutonsVotes();
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
                     $('#phaseEnCours').text("Discussion");
@@ -380,6 +382,8 @@
                             $('#nbVotes'+enVieId[j]).show();
                         }
                     }
+
+                    majMorts();
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
 
@@ -388,8 +392,7 @@
                         $('#votePour'+{{ j.id }}).html("Voter");
                     {% endfor %}
 
-
-
+                    majMorts();
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
                     $('#phaseEnCours').text("Tribunal: Défense");
@@ -607,14 +610,14 @@
                     {% set cpt = 1 %}
                     {% for key, j in joueurs %}
                         {% if j.vivant %}
-                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}" style="display:none">{{ j.nbVotes }}</td><td class="colonne_nom_joueur"><span style="font-weight: bold" id="{{ "nom" ~ j.id }}">{{ j.nom }}</span> </td>
+                        <tr><td>{{ cpt }}</td><td><span class="nbVotes" id="{{ "nbVotes" ~ j.id }}" style="display:none">{{ j.nbVotes }}</span></td><td class="colonne_nom_joueur"><span style="font-weight: bold" id="{{ "nom" ~ j.id }}">{{ j.nom }}</span> </td>
                             <td class="colonne_bouton_vote">
                                 <button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>{% if votePour == j.id %}Annuler{% else %}Voter{% endif %}</button>
                                 <button id="{{ "voteOui" ~ j.id }}" onclick="voteTribunal(true);" style="display:none" class="colonne_bouton_vote" >Oui</button>
                                 <button id="{{ "voteNon" ~ j.id }}" onclick="voteTribunal(false);" style="display:none" class="colonne_bouton_vote" >Non</button>
                             </td></tr>
                         {% else %}
-                        <tr><td>{{ cpt }}</td><td class="nbVotes" id="{{ "nbVotes" ~ j.id }}"></td><td class="colonne_nom_joueur"><span class="mort" id="{{ "nom" ~ j.id }}">{{ j.nom }}</span> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
+                        <tr><td>{{ cpt }}</td><td><span class="nbVotes" id="{{ "nbVotes" ~ j.id }}"></span></td><td class="colonne_nom_joueur"><span class="mort" id="{{ "nom" ~ j.id }}">{{ j.nom }}</span> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>
                         {% endif %}
                         {% set cpt = cpt+1 %}
                     {% endfor %}

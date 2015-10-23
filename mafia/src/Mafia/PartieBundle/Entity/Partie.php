@@ -38,14 +38,14 @@ class Partie
     /**
      * @var integer
      *
-     * @ORM\Column(name="dureePhase", type="integer")
+     * @ORM\Column(name="dureePhase", type="float")
      */
     private $dureePhase;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tempsJourRestant", type="integer")
+     * @ORM\Column(name="tempsJourRestant", type="float")
      */
     private $tempsJourRestant;
 

@@ -203,7 +203,7 @@ class InitialisationRolesCommand extends ContainerAwareCommand
                     $newRoles[$i]->addCrimeRole($newCrimes[6]);
                     $newRoles[$i]->addCategorieRole($newCategories[2]);
                     break;
-                case RolesEnum::SORCIER:
+                case RolesEnum::GOUROU:
                     $newRoles[$i]->setNomRole("Gourou");
                     $newRoles[$i]->setDescription("Le Gourou d'un culte travaillant dans l'ombre... D'aucuns le surnomment Cruise, allez savoir pourquoi");
                     $newRoles[$i]->setDescriptionPrincipale("Membre du culte avec des pouvoirs de guérisseur. Chaque personne sauvée par le Gourou se convertira au Culte.");
