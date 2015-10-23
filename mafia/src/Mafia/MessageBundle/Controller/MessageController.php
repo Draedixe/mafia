@@ -56,6 +56,7 @@ class MessageController extends Controller{
 
     function affichageMessagesAction($page)
     {
+
         $em = $this->getDoctrine()->getManager();
 
         $query = $em->createQuery('SELECT DISTINCT u FROM Mafia\UserBundle\Entity\User u, Mafia\MessageBundle\Entity\MessagePrive m WHERE m.recepteur = :idRecepteur AND m.expediteur = u OR m.recepteur = u AND m.expediteur = :idExpediteur2');
@@ -65,6 +66,8 @@ class MessageController extends Controller{
         ));
         $liste_contacts = $query->getResult();
         $this->getUser()->setNbMessagesNonLus(0);
+        $em->persist($this->getUser());
+        $em->flush();
         $messages = array();
         foreach($liste_contacts as $contact)
         {

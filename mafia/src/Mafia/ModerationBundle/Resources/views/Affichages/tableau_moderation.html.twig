@@ -1,0 +1,16 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Modération{% endblock %}
+
+{% block fos_user_content %}
+    {% if is_granted("ROLE_MODERATEUR") %}
+        <h2>Tableau de modération</h2>
+
+        Bannir
+        Voir requêtes
+        Voir dénonciations
+
+
+    {% endif %}
+{% endblock %}
