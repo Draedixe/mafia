@@ -1,0 +1,28 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Requetes ouvertes{% endblock %}
+
+
+
+{% block fos_user_content %}
+    {% macro requetes(requete) %}
+        {% if requete.reponse is not null %}
+            {% import _self as fonc %}
+            {% include 'MafiaModerationBundle:Templates:requete.html.twig' with {'requete' : requete.reponse}  %}
+            {{ fonc.requetes(requete.reponse) }}
+        {% endif %}
+    {% endmacro %}
+    <h2>Vos requêtes</h2>
+    {% import _self as fonc %}
+    <ul>
+        {% for requete in requetes if not requete.estReponse %}
+
+            <h3>{{ requete.titreRequete }}</h3>
+            {% include 'MafiaModerationBundle:Templates:requete.html.twig' with {'requete' : requete}  %}
+            {{ fonc.requetes(requete) }}
+            
+        {% endfor %}
+    </ul>
+
+{% endblock %}
