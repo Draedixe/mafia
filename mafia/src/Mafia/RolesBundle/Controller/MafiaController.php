@@ -9,15 +9,18 @@
 namespace Mafia\RolesBundle\Controller;
 use Mafia\PartieBundle\Entity\PhaseJeuEnum;
 use Mafia\PartieBundle\Entity\StatusEnum;
+use Mafia\PartieBundle\Entity;
 use Mafia\PartieBundle\Entity\Statut;
 use Mafia\RolesBundle\Entity\FactionEnum;
 use Mafia\RolesBundle\Entity\RolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MafiaController extends Controller {
     /**
      * Fonction appelée lorsque la mafia veut tuer quelqu'un
      * @param $idCible int L'id de la cible des mafioso
+     * @return JsonResponse
      */
     public function mafiosoAction($idCible){
 
@@ -25,9 +28,12 @@ class MafiaController extends Controller {
         $repositoryUser = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
+        $repositoryStatut = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Statut');
 
         $ciblePartieCourant = $repositoryUser->find($idCible);
-
+        $em = $this->getDoctrine()->getManager();
         $userGlobal = $this->getUser();
         $userPartieCourant = $userGlobal->getUserCourant();
 
@@ -51,13 +57,34 @@ class MafiaController extends Controller {
                             /* Si le joueur a bien un rôle */
                             if ($userPartieCourant->getRole() != null) {
 
-                                /* Si le joueur est bien Cultiste */
+                                /* Si le joueur est bien Mafioso ou parrain */
                                 if ($userPartieCourant->getRole()->getEnumFaction() == FactionEnum::MAFIA) {
                                     if($ciblePartieCourant->getRole()->getEnumFaction() != FactionEnum::MAFIA){
-                                        $statutTue = new Statut(StatusEnum::TUE, $ciblePartieCourant, $userPartieCourant);
-                                        $em = $this->getDoctrine()->getManager();
-                                        $em->persist($statutTue);
-                                        $em->flush();
+
+                                        $statut = $repositoryStatut->findOneBy(array("acteur"=>$userPartieCourant));
+                                        if($statut == null) {
+                                            /*if(count($statuts) > 0){
+                                                foreach($statuts as $s){
+                                                    $em->remove($s);
+                                                }
+                                                $em->flush();
+                                                return new JsonResponse(array("ACTION" => "ANNULER"));*/
+
+                                            $statutTue = new Statut(StatusEnum::TUE, $ciblePartieCourant, $userPartieCourant);
+
+                                            $em->persist($statutTue);
+                                            $em->flush();
+                                            return new JsonResponse(array("ACTION" => "OK"));
+                                        } elseif ($statut->getVictime() == $ciblePartieCourant){
+                                            $em->remove($statut);
+                                            $em->flush();
+                                            return new JsonResponse(array("ACTION" => "ANNULER"));
+                                        } else {
+                                            $statut->setVictime($ciblePartieCourant);
+                                            $em->persist($statut);
+                                            $em->flush();
+                                            return new JsonResponse(array("ACTION" => "OK"));
+                                        }
                                     }
                                 }
                             }
@@ -66,6 +93,7 @@ class MafiaController extends Controller {
                 }
             }
         }
+        return new JsonResponse(array("ACTION" => "ERREUR"));
     }
 
     /**

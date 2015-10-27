@@ -130,6 +130,7 @@
                 $('#nbVotes'+{{ j.id }}).hide();
                 $('#voteNon'+{{ j.id }}).hide();
                 $('#voteOui'+{{ j.id }}).hide();
+                $('#actNuit1'+{{ j.id }}).hide();
             {% endfor %}
         }
 
@@ -154,6 +155,21 @@
                 $('#nbVotes'+ i).show();
                 $('#nbVotes'+ i).html(votes[i]);
             }
+        }
+
+        function afficherBoutonsActions(){
+            for(var j in enVieId){
+                if(enVieId[j] != monId && joueursVivant[j]){
+                    $('#actNuit1'+enVieId[j]).show();
+
+                }
+            }
+        }
+
+        function actNuit1(id){
+            $.post('{{ path('action_nuit_1')}}', {id: id}, function (data) {
+
+            });
         }
 
         function demanderInfo(){
@@ -249,6 +265,7 @@
 
                             cacherBoutonsVotes();
                             phase = data["phase"];
+                            afficherBoutonsActions();
 
                             majMorts();
 
@@ -615,6 +632,7 @@
                                 <button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>{% if votePour == j.id %}Annuler{% else %}Voter{% endif %}</button>
                                 <button id="{{ "voteOui" ~ j.id }}" onclick="voteTribunal(true);" style="display:none" class="colonne_bouton_vote" >Oui</button>
                                 <button id="{{ "voteNon" ~ j.id }}" onclick="voteTribunal(false);" style="display:none" class="colonne_bouton_vote" >Non</button>
+                                <button id="{{ "actNuit1" ~ j.id }}" onclick="actNuit1({{ j.id }});" style="display:none" class="colonne_bouton_vote" >Tuer</button>
                             </td></tr>
                         {% else %}
                         <tr><td>{{ cpt }}</td><td><span class="nbVotes" id="{{ "nbVotes" ~ j.id }}"></span></td><td class="colonne_nom_joueur"><span class="mort" id="{{ "nom" ~ j.id }}">{{ j.nom }}</span> </td><td class="colonne_bouton_vote"><button id="{{ "votePour" ~ j.id }}" onclick="votePourTellePersonne({{ j.id }});" style="display:none" class="colonne_bouton_vote" {% if partie.phaseEnCours != constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') %}hidden="hidden"{% endif %}>Voter</button></td></tr>

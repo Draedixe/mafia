@@ -49,3 +49,9 @@ recuperer_noms_options:
 liste_compositions:
     path: /composition/liste
     defaults: { _controller: MafiaRolesBundle:Composition:affichageListeCompositions }
+
+action_nuit_1:
+    path: /nuit/action1
+    defaults: { _controller: MafiaRolesBundle:Default:nuit }
+    requirements:
+      _method: POST
