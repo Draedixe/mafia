@@ -20,6 +20,10 @@ class VilleController extends Controller {
      */
     public function citoyenAction(){
 
+        $repositoryStatut = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Statut');
+        $em = $this->getDoctrine()->getManager();
         $userGlobal = $this->getUser();
         $userPartieCourant = $userGlobal->getUserCourant();
 
@@ -42,15 +46,28 @@ class VilleController extends Controller {
                             /* Si le joueur est bien Survivant */
                             if ($userPartieCourant->getRole()->getEnumRole() == RolesEnum::CITOYEN) {
 
+                                $statut = $repositoryStatut->findOneBy(array("acteur"=>$userPartieCourant));
+                                // Si il active l'utilisation du gilet
+                                if($statut == null) {
                                 /* S'il lui reste des Gilets */
-                                if($userPartieCourant->getCapaciteRestante() > 0){
-                                    $statutProtege = new Statut(StatusEnum::GILET,$userPartieCourant,$userPartieCourant);
-                                    $userPartieCourant->setCapaciteRestante($userPartieCourant->getCapaciteRestante()-1);
+                                    if($userPartieCourant->getCapaciteRestante() > 0){
+                                        $statutProtege = new Statut(StatusEnum::GILET,$userPartieCourant,$userPartieCourant);
+                                        $userPartieCourant->setCapaciteRestante($userPartieCourant->getCapaciteRestante()-1);
 
-                                    $em = $this->getDoctrine()->getManager();
-                                    $em->persist($statutProtege);
+                                        $em = $this->getDoctrine()->getManager();
+                                        $em->persist($statutProtege);
+                                        $em->persist($userPartieCourant);
+                                        $em->flush();
+                                        return new JsonResponse(array("ACTION" => "OK"));
+                                    }
+                                }
+                                // Si il annule l'utilisation du gilet
+                                else{
+                                    $userPartieCourant->setCapaciteRestante($userPartieCourant->getCapaciteRestante()+1);
                                     $em->persist($userPartieCourant);
+                                    $em->remove($statut);
                                     $em->flush();
+                                    return new JsonResponse(array("ACTION" => "ANNULER"));
                                 }
                             }
                         }
@@ -58,6 +75,7 @@ class VilleController extends Controller {
                 }
             }
         }
+        return new JsonResponse(array("ACTION" => "ERREUR"));
     }
 
     /**

@@ -62,24 +62,19 @@ class MafiaController extends Controller {
                                     if($ciblePartieCourant->getRole()->getEnumFaction() != FactionEnum::MAFIA){
 
                                         $statut = $repositoryStatut->findOneBy(array("acteur"=>$userPartieCourant));
+                                        /* Si le joueur n'avait pas décidé d'action avant */
                                         if($statut == null) {
-                                            /*if(count($statuts) > 0){
-                                                foreach($statuts as $s){
-                                                    $em->remove($s);
-                                                }
-                                                $em->flush();
-                                                return new JsonResponse(array("ACTION" => "ANNULER"));*/
-
                                             $statutTue = new Statut(StatusEnum::TUE, $ciblePartieCourant, $userPartieCourant);
-
                                             $em->persist($statutTue);
                                             $em->flush();
                                             return new JsonResponse(array("ACTION" => "OK"));
-                                        } elseif ($statut->getVictime() == $ciblePartieCourant){
+                                        } // Si il annule son action (il indique la même cible que précédemment)
+                                        elseif ($statut->getVictime() == $ciblePartieCourant){
                                             $em->remove($statut);
                                             $em->flush();
                                             return new JsonResponse(array("ACTION" => "ANNULER"));
-                                        } else {
+                                        } // Si il change de cible
+                                        else {
                                             $statut->setVictime($ciblePartieCourant);
                                             $em->persist($statut);
                                             $em->flush();

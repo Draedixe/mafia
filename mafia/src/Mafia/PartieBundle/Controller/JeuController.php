@@ -69,7 +69,7 @@ class JeuController extends FunctionsController{
                 $monRoleData = null;
                 $monRole = $user->getRole();
                 if($monRole != null) {
-                    $monRoleData = array("faction" => $monRole->getEnumFaction(), "nom" => $monRole->getNomRole(), "description" => $monRole->getDescription(), "descriptionPrincipale" => $monRole->getDescriptionPrincipale(), "capacite" => $monRole->getCapacite());
+                    $monRoleData = array("roleEnum" => $monRole->getEnumRole(), "faction" => $monRole->getEnumFaction(), "nom" => $monRole->getNomRole(), "description" => $monRole->getDescription(), "descriptionPrincipale" => $monRole->getDescriptionPrincipale(), "capacite" => $monRole->getCapacite());
                 }
                 $monId = $user->getId();
                 if($user->getVotePour() != null){

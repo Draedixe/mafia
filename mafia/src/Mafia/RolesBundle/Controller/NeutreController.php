@@ -26,6 +26,10 @@ class NeutreController extends Controller {
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
+        $repositoryStatut = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Statut');
+
         $ciblePartieCourant = $repositoryUser->find($idCible);
 
         $userGlobal = $this->getUser();
@@ -53,10 +57,27 @@ class NeutreController extends Controller {
 
                                 /* Si le joueur est bien Tueur en série */
                                 if ($userPartieCourant->getRole()->getEnumRole() == RolesEnum::TUEUR_EN_SERIE) {
-                                    $statutMort = new Statut(StatusEnum::TUE, $ciblePartieCourant, $userPartieCourant);
                                     $em = $this->getDoctrine()->getManager();
-                                    $em->persist($statutMort);
-                                    $em->flush();
+
+                                    $statut = $repositoryStatut->findOneBy(array("acteur"=>$userPartieCourant));
+                                    /* Si le joueur n'avait pas décidé d'action avant */
+                                    if($statut == null) {
+                                        $statutTue = new Statut(StatusEnum::TUE, $ciblePartieCourant, $userPartieCourant);
+                                        $em->persist($statutTue);
+                                        $em->flush();
+                                        return new JsonResponse(array("ACTION" => "OK"));
+                                    } // Si il annule son action (il indique la même cible que précédemment)
+                                    elseif ($statut->getVictime() == $ciblePartieCourant){
+                                        $em->remove($statut);
+                                        $em->flush();
+                                        return new JsonResponse(array("ACTION" => "ANNULER"));
+                                    } // Si il change de cible
+                                    else {
+                                        $statut->setVictime($ciblePartieCourant);
+                                        $em->persist($statut);
+                                        $em->flush();
+                                        return new JsonResponse(array("ACTION" => "OK"));
+                                    }
                                 }
                             }
                         }
@@ -64,6 +85,7 @@ class NeutreController extends Controller {
                 }
             }
         }
+        return new JsonResponse(array("ACTION" => "ERREUR"));
     }
 
     /**
