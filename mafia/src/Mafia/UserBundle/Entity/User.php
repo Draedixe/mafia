@@ -48,6 +48,7 @@ class User extends BaseUser
      */
     private $userCourant;
 
+
     /**
      * @var integer
      *
@@ -105,6 +106,7 @@ class User extends BaseUser
         $this->propositions = new ArrayCollection();
         $this->points = 0;
         $this->nbMessagesNonLus = 0;
+        $this->banni = false;
     }
 
     /**
@@ -179,6 +181,7 @@ class User extends BaseUser
     {
         $this->nbMessagesNonLus = $nbMessagesNonLus;
     }
+
 
 
 }

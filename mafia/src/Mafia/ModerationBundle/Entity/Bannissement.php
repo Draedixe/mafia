@@ -25,7 +25,7 @@ class Bannissement
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="debutBannissement", type="date")
+     * @ORM\Column(name="debutBannissement", type="datetime")
      */
     private $debutBannissement;
 
@@ -44,17 +44,23 @@ class Bannissement
     private $tempsBannissement;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="unite", type="string", length=1)
+     */
+    private $unite;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="userBanni",nullable=false)
      */
     private $userBanni;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="userBannant",nullable=false)
      */
     private $modoBannant;
-
 
     /**
      * Get id
@@ -165,6 +171,22 @@ class Bannissement
     public function setUserBanni($userBanni)
     {
         $this->userBanni = $userBanni;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUnite()
+    {
+        return $this->unite;
+    }
+
+    /**
+     * @param string $unite
+     */
+    public function setUnite($unite)
+    {
+        $this->unite = $unite;
     }
 
 

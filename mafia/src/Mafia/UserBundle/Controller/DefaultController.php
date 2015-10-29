@@ -4,6 +4,7 @@ namespace Mafia\UserBundle\Controller;
 
 use Mafia\ModerationBundle\Entity\Bannissement;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class DefaultController extends Controller
 {
@@ -25,7 +26,11 @@ class DefaultController extends Controller
                 $formBuilder = $this->createFormBuilder($bannissement);
                 $formBuilder
                     ->add('explication', 'textarea', array('label' => 'Explication : '))
-                    ->add('tempsBannissement', 'integer', array('label' => 'Temps de ban (-1 si définitif) : '));
+                    ->add('tempsBannissement', 'integer', array('label' => 'Temps de ban : '))
+                    ->add('unite', 'choice', array(
+                        'choices' => array('S' => 'Secondes', 'I' => 'Minutes', 'H' => 'Heures', 'D' => 'Jours', 'M' => 'Mois', 'F' => 'Définitif'),
+                        'multiple' => false
+                        ));
                 $form = $formBuilder->getForm();
                 $request = $this->get('request');
 

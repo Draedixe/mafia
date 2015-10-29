@@ -1,7 +1,16 @@
 parameters:
-#    mafia_user.example.class: Mafia\UserBundle\Example
+    mafia_user.component.authentication.login_success_handler.class: Mafia\UserBundle\Component\Authentication\LoginSuccessHandler
 
 services:
-#    mafia_user.example:
-#        class: %mafia_user.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    mafia_platform.beta.html:
+        class: Mafia\UserBundle\Beta\BetaHTML
+    mafia_platform.beta.listener:
+            class: Mafia\UserBundle\Beta\BetaListener
+            arguments: [@mafia_platform.beta.html, "2016-01-31"]
+            tags:
+                - { name: kernel.event_listener, event: kernel.response, method: processBeta }
+    mafia_user.component.authentication.login_success_handler:
+        class:  %mafia_user.component.authentication.login_success_handler.class%
+        arguments:  [@router,@doctrine.orm.entity_manager]
+        tags:
+            - { name: 'monolog.logger', channel: 'security' }

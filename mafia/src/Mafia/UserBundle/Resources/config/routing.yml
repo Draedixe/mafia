@@ -8,4 +8,4 @@ menu_principal:
 
 profil:
     path: /profil/{id}
-    defaults: { _controller: MafiaUserBundle:Default:profil, id:1  }
+    defaults: { _controller: MafiaUserBundle:Default:profil, id:1 }

@@ -19,6 +19,7 @@ security:
             form_login:
                 provider: fos_userbundle
                 csrf_provider: form.csrf_provider
+                success_handler: mafia_user.component.authentication.login_success_handler
             logout:       true
             anonymous:    true
 
