@@ -1,0 +1,51 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Bans de {{ user.username }}{% endblock %}
+
+
+
+{% block fos_user_content %}
+    {% for ban in bans %}
+        <fieldset>
+            <label>{{ ban.modoBannant }}</label><br/>
+            {{ ban.explication }}<br/>
+            Début : {{ ban.debutBannissement|date('d/m/Y H:i:s') }}<br/>
+            Temps :
+            {% if ban.unite == 'F' %}
+                Définif
+            {% else %}
+                {{ ban.tempsBannissement }}
+                {% if ban.unite == 'I' %}
+                    minutes
+                {% elseif ban.unite == 'H' %}
+                    heures
+                {% elseif ban.unite == 'S' %}
+                    secondes
+                {% elseif ban.unite =='D' %}
+                    jours
+                {% else %}
+                    mois
+                {% endif %}
+            {% endif %}
+
+        </fieldset>
+    {% endfor %}
+    <p {#class="pagination"#}>
+        {% if nbPages > 1 %}
+            {% if pageCourante > 1 %}
+                <a href="{{ path('bannissements_user',{page:pageCourante-1,id:user.id}) }}"><</a>
+            {% endif %}
+        {% endif %}
+        <a href="{{ path('bannissements_user',{id:user.id}) }}">{%   if pageCourante == 1 %}<b>{% endif %}1{% if pageCourante == 1 %}</b>{% endif %}</a>
+        {% if nbPages > 1 %}
+            {% if nbPages != pageCourante and pageCourante > 1 %}
+                <a href="{{ path('bannissements_user', {page:pageCourante,id:user.id}) }}">.. <b>{{ pageCourante }}</b></a>
+            {% endif %}
+            <a href="{{ path('bannissements_user', {page:nbPages,id:user.id}) }}">{% if pageCourante == nbPages %}<b>{% endif %}.. {{ nbPages }}{% if pageCourante == nbPages %}</b>{% endif %}</a>
+            {% if pageCourante < nbPages %}
+                <a href="{{ path('bannissements_user',{page:pageCourante+1,id:user.id}) }}">></a>
+            {% endif %}
+        {% endif %}
+    </p>
+{% endblock %}

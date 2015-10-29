@@ -13,3 +13,11 @@ vos_requetes:
 requetes_ouvertes:
     path:     /moderation/requetes
     defaults: { _controller: MafiaModerationBundle:Requete:listeRequetesEnCours }
+
+bannissements_user:
+    path:     /moderation/bans/user/{id}/{page}
+    defaults: { _controller: MafiaModerationBundle:Bannissement:listeBannissementsUser, page:1 }
+
+bannissements:
+    path:     /moderation/bans/tout/{page}
+    defaults: { _controller: MafiaModerationBundle:Bannissement:listeBannissements, page:1 }

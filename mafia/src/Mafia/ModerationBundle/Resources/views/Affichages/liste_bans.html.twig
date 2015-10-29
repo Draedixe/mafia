@@ -1,0 +1,38 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Bans{% endblock %}
+
+
+
+{% block fos_user_content %}
+    {% for ban in bans %}
+        <fieldset>
+            <label>{{ ban.userBanni }}</label><br/>
+            Banni par {{ ban.modoBannant }}<br/>
+            {{ ban.explication }}<br/>
+            Début : {{ ban.debutBannissement|date('d/m/Y H:i:s') }}<br/>
+            Temps :
+            {% if ban.unite == 'F' %}
+                Définif
+            {% else %}
+                {{ ban.tempsBannissement }}
+                {% if ban.unite == 'I' %}
+                    minutes
+                {% elseif ban.unite == 'H' %}
+                    heures
+                {% elseif ban.unite == 'S' %}
+                    secondes
+                {% elseif ban.unite =='D' %}
+                    jours
+                {% else %}
+                    mois
+                {% endif %}
+            {% endif %}
+
+        </fieldset>
+
+
+    {% endfor %}
+    {% include 'MafiaFamilleBundle:Templates:pagination.html.twig' with {'pathMethode' : 'bannissements', 'pageCourante':pageCourante, 'nbPages' : nbPages }  %}
+{% endblock %}

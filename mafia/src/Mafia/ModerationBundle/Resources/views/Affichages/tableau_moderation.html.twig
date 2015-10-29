@@ -7,8 +7,8 @@
     {% if is_granted("ROLE_MODERATEUR") %}
         <h2>Tableau de modération</h2>
 
-        Bannir
-        Voir requêtes
+        <a href="{{ path('bannissements') }}">Voir bannissements</a>
+        <a href="{{ path('requetes_ouvertes') }}" >Voir requêtes</a>
         Voir dénonciations
 
 
