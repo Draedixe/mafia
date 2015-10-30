@@ -20,9 +20,8 @@
                     {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
                 </a>
 
-                <nav><h1>Menu:</h1>
+                <nav><div class="logo"><a href="{{ path('mafia_user_homepage') }}"><img src="{{ asset('img/logo.png') }}"/></a><h1>Menu:</h1></div>
                     <a href="{{ path('profil',{id:app.user.id}) }}">Profil</a>
-                    <a href="{{ path('menu_principal') }}">Menu Principal</a>
                     <a href="{{ path('liste_roles') }}">Rôles</a>
                     <a href="{{ path('liste_compositions') }}">Compositions</a>
                     <a href="{{ path('liste_parametres') }}">Paramètres</a>
@@ -34,8 +33,8 @@
                     <a href="{{ path('liste_familles') }}">Familles</a>
                     <a href="{{ path('choix_type_partie') }}">Jouer</a>
                     <a href="{{ path('liste_proposition') }}">Propositions</a>
-                    <a href="{{ path('liste_messages') }}">Messages ({{ app.user.nbMessagesNonLus }})</a>
-                    <a href="http://fr.french-mafia.wikia.com/wiki/Accueil">Lien vers le wiki</a>
+                    <a href="{{ path('liste_contacts') }}">Messages ({{ app.user.nbMessagesNonLus }})</a>
+                    <a href="http://fr.french-mafia.wikia.com/wiki/Accueil">Wiki</a>
                 </nav>
 
                 {% block fos_user_content %}

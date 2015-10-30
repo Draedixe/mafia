@@ -1,6 +1,6 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 
-{% block title %}Mafia - Vos messages{% endblock %}
+{% block title %}Mafia - MP avec {{ contact.username }}{% endblock %}
 
 {% block fos_user_content %}
 
@@ -59,28 +59,24 @@
     </script>
     {# Fin du code pour la Popup #}
 
-
-    {% set contactId = 1 %}
-    {% for key, messagesContact in messages %}
         <fieldset>
-            <label>{{ key }}</label>
+            <label>{{ contact.username }}</label>
             <table>
-                {% for message in messagesContact %}
+                {% for message in messages %}
                     <tr>
-                        <td>{% if message.recepteur == app.user %}Reçu :{% set contactId = message.expediteur.id %}{% else %}Envoyé :{% set contactId = message.recepteur.id %}{% endif %}</td>
-                        <td>{{ message.texte }} - le {{ message.dateEnvoi | date }}</td>
+                        <td>{% if message.recepteur == app.user %}Reçu :{% else %}Envoyé :{% endif %}</td>
+                        <td>{{ message.texte }} - le {{ message.dateEnvoi | date('d/m/Y H:i:s') }}</td>
                     </tr>
                 {% endfor %}
             </table>
         </fieldset>
 
-        <a href="#" data-width="500" data-rel="{{ "popup_name"~contactId }}" class="poplight">Répondre</a>
-        <div class="popup_block" id={{ "popup_name"~contactId }} >
-            <textarea id="{{ "text"~contactId }}"></textarea><label for="{{ "text"~contactId }}"></label>
-            <button onclick="repondre({{ contactId }});">Envoyer</button>
+        <a href="#" data-width="500" data-rel="{{ "popup_name"~contact.id  }}" class="poplight">Répondre</a>
+        <div class="popup_block" id={{ "popup_name"~contact.id  }} >
+            <textarea id="{{ "text"~contact.id  }}"></textarea><label for="{{ "text"~contact.id }}"></label>
+            <button onclick="repondre({{ contact.id  }});">Envoyer</button>
         </div>
-    {% endfor %}
 
-    {% include 'MafiaFamilleBundle:Templates:pagination.html.twig' with {'pathMethode' : 'liste_messages', 'pageCourante':pageCourante, 'nbPages' : nbPages}  %}
+    {% include 'MafiaFamilleBundle:Templates:pagination_avec_id.html.twig' with {'id':contact.id, 'pathMethode' : 'liste_messages', 'pageCourante':pageCourante, 'nbPages' : nbPages}  %}
 
 {% endblock fos_user_content %}

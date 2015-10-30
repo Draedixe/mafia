@@ -135,6 +135,8 @@ class MessagePrive
     }
 
     /**
+     * Get expediteur
+     *
      * @return User
      */
     public function getExpediteur()
