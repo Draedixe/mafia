@@ -15,4 +15,6 @@ abstract class regroupementVariable {
     const NB_BANS_PAR_PAGE_USER = 1;
     /* Nbr de bannissement sur la page de tous les bans*/
     const NB_BANS_PAR_PAGE_TOUT = 1;
+    /* Nbr de bannissement sur la page de tous les bans*/
+    const NB_DERNIERS_BANS = 5;
 } 
