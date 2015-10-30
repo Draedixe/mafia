@@ -3,6 +3,7 @@
 namespace Mafia\PartieBundle\Controller;
 
 use Mafia\PartieBundle\Entity\PhaseJeuEnum;
+use Mafia\RolesBundle\Entity\FactionEnum;
 use Proxies\__CG__\Mafia\PartieBundle\Entity\UserPartie;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -86,8 +87,19 @@ class JeuController extends FunctionsController{
                 } else {
                     $idAccuse = 0;
                 }
+                //Equipe du joueur
+                $equipe = array();
+                if($monRole->getEnumFaction() == FactionEnum::MAFIA){
+                    foreach($usersPartie as $us){
+                        if($us->getRole()->getEnumFaction() == FactionEnum::MAFIA){
+                            $equipe[] = array("id" => $us->getId(), "role" => $us->getRole()->getNomRole());
+                        }
+                    }
+                }
+
                 return $this->render('MafiaPartieBundle:Affichages:jeu.html.twig',
                     array(
+                        "equipe" => $equipe,
                         "partie" => $partie,
                         "joueurs" => $joueurs,
                         "tempsRestant" => ($partie->getDureePhase() * 60) - ((new \DateTime())->getTimestamp() - $partie->getDebutPhase()->getTimestamp()),

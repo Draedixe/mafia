@@ -649,11 +649,16 @@
                 {% endif %}
                 <br/>
                 {{ monRole.descriptionPrincipale }}<br/><br/>
-                <b>{-endur- % Equipe:</b><br/>
-                Raph55 <b>(Parrain)</b><br/>
-                Drae <b>(Mafioso)</b><br/>
-                Pascal <b>(Mafioso)</b> - <i>Mort</i>}
-
+                {% if equipe|length > 0 %}
+                    <b>Equipe:</b><br/>
+                    {% for e in equipe %}
+                        {% for key, j in joueurs %}
+                            {% if e.id == j.id %}
+                                {{ j.nom }} <b>({{ e.role }})</b>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
                 <br/><br/><b>Capacité de jour: </b> {{ monRole.capacite }}<br/><br/>
 
                 <span class="descriptionSec">{{ monRole.description }}</span><br/>
