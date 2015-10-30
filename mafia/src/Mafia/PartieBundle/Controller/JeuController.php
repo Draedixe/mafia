@@ -152,7 +152,7 @@ class JeuController extends FunctionsController{
                 $cible = $repositoryStatut->findOneBy(array("acteur"=>$user));
                 $cibleId = -1;
                 if($cible != null){
-                    $cibleId = $cible->getVictime();
+                    $cibleId = $cible->getVictime()->getId();
                 }
                 foreach ($usersPartieTous as $userEnVie) {
                     $enVieId[] = $userEnVie->getId();

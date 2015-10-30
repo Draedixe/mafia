@@ -164,9 +164,14 @@
         function afficherBoutonsActions() {
 
             if (enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::PARRAIN') }}
-            || enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::TUEUR_EN_SERIE') }}) {
+                    || enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::TUEUR_EN_SERIE') }}
+                    || enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::MAFIOSO') }}) {
+
                 for (var j in enVieId) {
                     if (enVieId[j] != monId && joueursVivant[j]) {
+                        if(cibleId == enVieId[j]){
+                            $('#actNuit1' + enVieId[j]).html("Annuler");
+                        }
                         $('#actNuit1' + enVieId[j]).show();
                     }
                 }

@@ -4,6 +4,7 @@ namespace Mafia\PartieBundle\Controller;
 
 use Mafia\PartieBundle\Entity\StatusEnum;
 use Mafia\PartieBundle\Entity\Statut;
+use Mafia\RolesBundle\Entity\FactionEnum;
 use Mafia\RolesBundle\Entity\OptionsRolesEnum;
 use Mafia\RolesBundle\Entity\RolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -300,7 +301,6 @@ class AubeController extends FunctionsController{
                         $statutsPartie = $this->retirerStatutParEnum(StatusEnum::GILET, $statutsPartie);
 
                         foreach($statutsATraiter as $statutATraiter){
-                            $this->messageSysteme($em,$chat,$statutATraiter->getEnumStatut());
                             $this->retirerStatutParEnumEtVictime(StatusEnum::TUE,$statutATraiter->getActeur(),$statutsPartie);
                         }
 
@@ -314,7 +314,14 @@ class AubeController extends FunctionsController{
 
                         foreach($statutsTues as $statutTue){
                             $statutTue->getVictime()->setVivant(false);
-                            $this->messageSysteme($em,$chat,$statutTue->getVictime()->getNom() . " a été tué par " . $statutTue->getActeur()->getNom());
+                            $tueur = $statutTue->getActeur();
+                            $messageTueur = "";
+                            if($tueur->getRole()->getEnumFaction() == FactionEnum::MAFIA){
+                                $messageTueur = "la mafia";
+                            }else{
+                                $messageTueur = "un(e) " . $tueur->getRole()->getNomRole();
+                            }
+                            $this->messageSysteme($em,$chat,$statutTue->getVictime()->getNom() . " a été tué par " . $messageTueur);
                         }
                         /* Les infos ont été envoyées */
 
