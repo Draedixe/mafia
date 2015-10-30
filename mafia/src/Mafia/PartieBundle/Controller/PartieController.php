@@ -245,8 +245,10 @@ class PartieController extends Controller{
             $data = array();
             $id = 0;
             foreach ($messages as $message) {
-                $data[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte());
-                $id++;
+                if($message->getUser() != null) {
+                    $data[$id] = array("id" => $message->getId(), "pseudo" => $message->getUser()->getUsername(), "message" => $message->getTexte());
+                    $id++;
+                }
             }
 
             $userList = $repositoryUser->findBy(array("partie" => $partie));

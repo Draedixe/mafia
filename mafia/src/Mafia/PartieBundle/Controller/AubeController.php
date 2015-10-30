@@ -8,8 +8,9 @@ use Mafia\RolesBundle\Entity\OptionsRolesEnum;
 use Mafia\RolesBundle\Entity\RolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mafia\PartieBundle\Entity\UserPartie;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-class AubeController extends Controller{
+class AubeController extends FunctionsController{
 
     function rechercheStatutParEnum($enumStatut, &$arrayOfStatuts){
         $res = array();
@@ -44,7 +45,7 @@ class AubeController extends Controller{
         return $res;
     }
     function rechercheStatutParActeur($acteur, $arrayOfStatuts){
-
+        $res = null;
         foreach($arrayOfStatuts as $cle => $statut)
         {
             if($statut->getActeur() == $acteur){
@@ -90,6 +91,7 @@ class AubeController extends Controller{
 
     function traitementAubeAction()
     {
+
         $userGlobal = $this->getUser();
         if($userGlobal != null){
             $userPartieCourant = $userGlobal->getUserCourant();
@@ -98,14 +100,15 @@ class AubeController extends Controller{
                 if($partie != null)
                 {
                     //Pour eviter d'avoir plusieurs fois les meme traitements
-                    if(!$partie->getTraitementAubeEnCours())
+                    if(!$partie->isTraitementAubeEnCours())
                     {
                         $em = $this->getDoctrine()->getManager();
                         /* On prend le jeton du webaphore */
+
                         $partie->setTraitementAubeEnCours(true);
                         $em->persist($partie);
                         $em->flush();
-
+                        $chat = $partie->getChat();
 
                         /** Lancons les traitements! **/
 
@@ -120,19 +123,95 @@ class AubeController extends Controller{
                             ->getRepository('MafiaPartieBundle:Statut');
 
 
+
                         $usersPartie = $repositoryUser->findBy(array('partie'=>$partie));
                         $composition = $partie->getComposition();
                         $rolesComposEnJeu = $composition->getRolesCompo();
                         $rolesEnJeu = array();
                         foreach($rolesComposEnJeu as $roleCompo){
-                            $rolesEnJeu[$roleCompo->getRole()->getEnumRole()] = $roleCompo()->getRole();
+                            $enumRole = $roleCompo->getRole()->getEnumRole();
+                            $rolesEnJeu[$enumRole] = $roleCompo->getRole();
                         }
                         $optionsRoles = $composition->getOptionsRoles();
 
                         $statutsPartie = array();
+                        foreach($usersPartie as $userPartie){
+                            $query = $em->createQuery('SELECT s FROM Mafia\PartieBundle\Entity\Statut s WHERE s.acteur = :idUser');
+                            $query->setParameters(array(
+                                'idUser' => $userPartie->getId()
+                            ));
+                            $statutsPartie = array_merge($statutsPartie,$query->getResult());
+                        }
+
+                        /* Voila, on a pris des repositories et les users et les statuts */
+
+                        /* Traitons les Statuts pour les mettre comme nécessaire */
+
+                        /* Prétraitement: le kill de la mafia */
+
+                        if(isset($rolesEnJeu[RolesEnum::MAFIOSO]) || isset($rolesEnJeu[RolesEnum::PARRAIN])){
+                            $parrainEnJeu = array();
+                            $mafiososEnJeu = array();
+                            if(isset($rolesEnJeu[RolesEnum::PARRAIN])){
+                                $parrainEnJeu = $this->rechercheUsersParRole($rolesEnJeu[RolesEnum::PARRAIN],$usersPartie);
+                            }
+                            if(isset($rolesEnJeu[RolesEnum::MAFIOSO])) {
+                                $mafiososEnJeu = $this->rechercheUsersParRole($rolesEnJeu[RolesEnum::MAFIOSO], $usersPartie);
+                            }
+
+                            $votesMafia = array();
+                            foreach($usersPartie as $us){
+                                $votesMafia[$us->getId()] = 0;
+                            }
+                            //Vote du parrain
+                            foreach($parrainEnJeu as $p){
+                                $voteParrain = $this->rechercheStatutParActeur($p, $statutsPartie);
+                                if($voteParrain != null){
+                                    $em->remove($voteParrain);
+                                    $em->remove($voteParrain);
+                                    $votesMafia[$voteParrain->getVictime()->getId()] += 20;
+                                    $em->flush();
+                                }
+                            }
+                            //Vote des mafiosos
+                            foreach($mafiososEnJeu as $m){
+                                $voteMafioso = $this->rechercheStatutParActeur($m, $statutsPartie);
+                                if($voteMafioso != null){
+                                    $em->remove($voteMafioso);
+                                    $votesMafia[$voteMafioso->getVictime()->getId()] += 1;
+                                    $em->flush();
+                                }
+                            }
+
+                            $voteMax = -1;
+                            $voteCible = -1;
+                            foreach($votesMafia as $key=>$v){
+                                if($v > $voteMax && $v != 0){
+                                    $voteCible = $key;
+                                    $voteMax = $v;
+                                }
+                            }
+                            if($voteCible != -1){
+                                if(count($mafiososEnJeu) > 0){
+                                    $rand = rand(0, count($mafiososEnJeu)-1);
+                                    $userCible = $repositoryUser->findOneBy(array("id"=>$voteCible));
+                                    $killMafia = new Statut(StatusEnum::TUE, $userCible, $mafiososEnJeu[$rand]);
+                                    $em->persist($killMafia);
+                                    $em->flush();
+                                }
+                                else{
+                                    $userCible = $repositoryUser->findOneBy(array("id"=>$voteCible));
+                                    $killMafia = new Statut(StatusEnum::TUE, $userCible, $parrainEnJeu[0]);
+                                    $em->persist($killMafia);
+                                    $em->flush();
+                                }
+                            }
+                        }
+
+                        $statutsPartie = array();
                         foreach($usersPartie as $userPartie)
                         {
-                            $query = $em->createQuery('SELECT s FROM Mafia\PartieBundle\Entity\Statut s WHERE s.acteur = :idUser OR s.victime = :idUser');
+                            $query = $em->createQuery('SELECT s FROM Mafia\PartieBundle\Entity\Statut s WHERE s.acteur = :idUser');
                             $query->setParameters(array(
                                 'idUser' => $userPartie->getId()
                             ));
@@ -140,9 +219,6 @@ class AubeController extends Controller{
                         }
                         $saveStatuts = $statutsPartie;
 
-                        /* Voila, on a pris des repositories et les users et les statuts */
-
-                        /* Traitons les Statuts pour les mettre comme nécessaire */
 
                         // MARIONETTE SUR BLOQUEUR
                         // CONDUCTEUR
@@ -194,45 +270,48 @@ class AubeController extends Controller{
 
 
 
-
-
                         // LES GILETS
-                        $statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::GILET,$statutsPartie);
+                        /*$statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::GILET,$statutsPartie);
                         foreach($statutsATraiter as $statutATraiter){
                             $this->rechercheStatutParEnumEtVictime(StatusEnum::TUE,$statutATraiter->getActeur(),$statutsPartie);
-                        }
+                        }*/
 
                         /** Fin des traitements **/
 
                         /* On envoie les infos */
 
                         $statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::TUE,$statutsPartie);
+
                         $statutsTues = array_merge($statutsATraiter,$this->rechercheStatutParEnum(StatusEnum::TUE_ANTI_INVUL,$statutsPartie));
+
                         foreach($statutsTues as $statutTue){
                             $statutTue->getVictime()->setVivant(false);
+                            $this->messageSysteme($em,$chat,$statutTue->getVictime()->getNom() . " a été tué par " . $statutTue->getActeur()->getNom());
                         }
-
                         /* Les infos ont été envoyées */
 
                         $em = $this->getDoctrine()->getManager();
                         /* On libère le jeton du webaphore */
                         $partie->setTraitementAubeEnCours(false);
-                        foreach($usersPartie as $user)
-                        {
+                        foreach($usersPartie as $user){
                             $em->persist($user);
                         }
 
-                        foreach($saveStatuts as $statut)
-                        {
+                        foreach($saveStatuts as $statut){
                             if($statut->getEnumStatut() != StatusEnum::ESSENCE){
                                 $em->remove($statut);
                             }
                         }
                         $em->persist($partie);
                         $em->flush();
+                        return new JsonResponse();
                     }
                 }
             }
         }
+
+        return new JsonResponse();
     }
+
+
 } 

@@ -12,12 +12,14 @@ use Mafia\PartieBundle\Entity\StatusEnum;
 use Mafia\PartieBundle\Entity\Statut;
 use Mafia\RolesBundle\Entity\RolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class NeutreController extends Controller {
 
     /**
      * Fonction appelée lorsque le TeS tente de tuer quelqu'un
      * @param $idCible int L'id de la cible du TeS
+     * @return JsonResponse
      */
     public function tueurEnSerieAction($idCible){
 

@@ -158,6 +158,7 @@ class DefaultController extends Controller
                     case RolesEnum::TUEUR_DE_MASSE:
                         break;
                     case RolesEnum::TUEUR_EN_SERIE:
+                        $response = $this->forward('MafiaRolesBundle:Neutre:tueurEnSerie', array('idCible' => $idCible));
                         break;
                     case RolesEnum::VEILLEUR:
                         break;

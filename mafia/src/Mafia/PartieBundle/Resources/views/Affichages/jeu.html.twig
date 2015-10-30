@@ -148,6 +148,8 @@
             for(var j in enVieId){
                 if(enVieId[j] != monId && joueursVivant[j]){
                     $('#votePour'+enVieId[j]).show();
+                }
+                if(joueursVivant[j]){
                     $('#nbVotes'+enVieId[j]).show();
                 }
             }

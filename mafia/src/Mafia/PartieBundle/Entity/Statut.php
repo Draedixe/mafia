@@ -29,13 +29,13 @@ class Statut
     private $enumStatut;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
      * @ORM\JoinColumn(nullable=false)
      */
     private $victime;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
+     * @ORM\ManyToOne(targetEntity="Mafia\PartieBundle\Entity\UserPartie")
      * @ORM\JoinColumn(nullable=false)
      */
     private $acteur;

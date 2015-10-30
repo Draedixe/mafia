@@ -15,13 +15,13 @@ class RecupCompo
         $compo = $partie->getComposition();
         $roles = $compo->getRolesCompo();
         $rolesData = array();
-        //récupération ROLES FIXES
+        //rÃ©cupÃ©ration ROLES FIXES
         foreach($roles as $r){
             for($i = 0; $i<$r->getQuantite();$i++) {
                 array_push($rolesData, $r->getRole()->getNomRole());
             }
         }
-        //récupération ROLES ALEATOIRES (CATOGIRES)
+        //rÃ©cupÃ©ration ROLES ALEATOIRES (CATOGIRES)
         $categories = $compo->getCategoriesCompo();
         foreach($categories as $r){
             for($i = 0; $i<$r->getQuantite();$i++) {
