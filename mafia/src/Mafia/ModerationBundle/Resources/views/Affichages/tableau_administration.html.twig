@@ -1,0 +1,19 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Administration{% endblock %}
+
+{% block fos_user_content %}
+    {% if is_granted("ROLE_ADMIN") %}
+        <h2>Tableau d'administration</h2>
+
+        <a href="{{ path('creation_role') }}">+ Créer un rôle</a>
+        <a href="{{ path('creation_crime') }}">+ Créer un crime</a>
+        <a href="{{ path('creation_categorie') }}">+ Créer une catégorie</a>
+        <a href="{{ path('creation_parametres') }}">+ Créer des paramètres</a>
+
+
+
+
+    {% endif %}
+{% endblock %}

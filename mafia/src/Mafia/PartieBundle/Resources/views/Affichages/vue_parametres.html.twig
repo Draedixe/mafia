@@ -1,0 +1,14 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Paramètres{% endblock %}
+
+{% block fos_user_content %}
+
+
+    <a href="{{ path('liste_parametres') }}">Retour à la liste des paramètres</a>
+
+    <h2>{{ parametres.nomParametres }}</h2>
+    {% include 'MafiaPartieBundle:Templates:parametres.html.twig' with {'parametres' : parametres}  %}
+
+{% endblock %}

@@ -10,12 +10,11 @@
     </script>
 
     <h3>Liste des paramètres</h3>
-    <a href="{{ path('creation_parametres') }}">+ Créer des paramètres</a>
 
 
     <ul>
         {% for parametre in parametres %}
-            <li><a href="{{ path('vue_parametres',{'id' : parametre.id}) }}">{{ parametre.nomParametres }}</a> - <a onclick="return confirm('Voulez-vous vraiment supprimer ces paramètres ?')" href="{{ path('supprimer_parametres',{'id' : parametre.id}) }}">Supprimer</a></li>
+            <li><a href="{{ path('vue_parametres',{'id' : parametre.id}) }}">{{ parametre.nomParametres }}</a>{% if is_granted("ROLE_ADMIN") %} - <a href="{{ path('vue_modif_parametres',{id:parametre.id}) }}">Modifier</a> - <a onclick="return confirm('Voulez-vous vraiment supprimer ces paramètres ?')" href="{{ path('supprimer_parametres',{'id' : parametre.id}) }}">Supprimer</a>{% endif %}</li>
         {% endfor %}
     </ul>
 

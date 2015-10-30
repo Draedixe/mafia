@@ -58,7 +58,7 @@ class DefaultController extends Controller
         return $this->redirect($this->generateUrl('liste_parametres'));
     }
 
-    public function affichageParametresAction($id)
+    public function affichageModifParametresAction($id)
     {
         $repository = $this->getDoctrine()
             ->getManager()
@@ -94,19 +94,30 @@ class DefaultController extends Controller
             $em->flush();
             return $this->redirect($this->generateUrl('vue_parametres', array('id'=>$parametres->getId())));
         }
-        return $this->render('MafiaPartieBundle:Formulaires:vue_parametres.html.twig', array(
+        return $this->render('MafiaPartieBundle:Formulaires:vue_modif_parametres.html.twig', array(
             'form' => $form->createView(),
         ));
 
     }
 
+    public function affichageParametresAction($id)
+    {
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Parametres');
+
+        $parametres = $repository->find($id);
+        return $this->render('MafiaPartieBundle:Affichages:vue_parametres.html.twig', array(
+            'parametres' => $parametres
+        ));
+    }
     public function affichageListeParametresAction()
     {
         $repository = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaPartieBundle:Parametres');
 
-        $parametres = $repository->findAll();
+        $parametres = $repository->findBy(array("officiel" => true));
         return $this->render('MafiaPartieBundle:Affichages:liste_parametres.html.twig', array(
             'parametres' => $parametres
         ));
