@@ -291,3 +291,13 @@ p .pagination{
 .nbVotes{
     padding-left: 15px;
 }
+
+.logo img{
+    display: inline-block;
+    width: 50%;
+    height: 50%;
+}
+
+.logo h1{
+    display: inline-block;
+}

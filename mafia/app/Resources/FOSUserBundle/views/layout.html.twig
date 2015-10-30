@@ -20,9 +20,8 @@
                     {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
                 </a>
 
-                <nav><h1>Menu:</h1>
+                <nav><div class="logo"><a href="{{ path('mafia_user_homepage') }}"><img src="{{ asset('img/logo.png') }}"/></a><h1>Menu:</h1></div>
                     <a href="{{ path('profil',{id:app.user.id}) }}">Profil</a>
-                    <a href="{{ path('menu_principal') }}">Menu Principal</a>
                     <a href="{{ path('liste_roles') }}">Rôles</a>
                     <a href="{{ path('liste_compositions') }}">Compositions</a>
                     <a href="{{ path('liste_parametres') }}">Paramètres</a>
