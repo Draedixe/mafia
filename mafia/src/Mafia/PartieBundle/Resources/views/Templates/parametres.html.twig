@@ -1,0 +1,54 @@
+<table class="parametres">
+    <tr>
+        <td>Durée du jour</td><td>{{ parametres.dureeDuJour }}</td>
+    </tr>
+    <tr>
+        <td>Type de jugement</td>
+        <td>
+            {% if parametres.enumTypeDeJugement == constant('Mafia\\PartieBundle\\Entity\\TypeJugementEnum::MAJORITE') %}Majorité
+            {% elseif parametres.enumTypeDeJugement == constant('Mafia\\PartieBundle\\Entity\\TypeJugementEnum::PROCES') %}Procès
+            {% elseif parametres.enumTypeDeJugement == constant('Mafia\\PartieBundle\\Entity\\TypeJugementEnum::SCRUTIN_SECRET') %}Scrutin secret
+            {% else %}Scrutin secret procès
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>Durée de la nuit</td><td>{{ parametres.dureeDeLaNuit }}</td>
+    </tr>
+    <tr>
+        <td>Dernières volontés</td><td>{% if parametres.dernieresVolontes %}Oui{% else %}Non{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Temps de discussion</td><td>{{ parametres.tempsDeDiscussion }}</td>
+    </tr>
+    <tr>
+        <td>Début partie</td>
+        <td>
+            {% if parametres.debutDuJeu == constant('Mafia\\PartieBundle\\Entity\\DebutPartieEnum::NUIT') %}Nuit
+            {% elseif parametres.debutDuJeu == constant('Mafia\\PartieBundle\\Entity\\DebutPartieEnum::JOUR') %}Jour
+            {% else %}Jour sans lynchage
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>Type de nuit</td>
+        <td>
+            {% if parametres.typeDeNuit == constant('Mafia\\PartieBundle\\Entity\\TypeNuitEnum::SEQUENCE') %}Séquence
+            {% elseif parametres.typeDeNuit == constant('Mafia\\PartieBundle\\Entity\\TypeNuitEnum::DESCRIPTION_MORTS') %}Description morts
+            {% else %}Nuit classique
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>Messages privés</td><td>{% if parametres.messagePrives %}Oui{% else %}Non{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Phase de discussion</td><td>{% if parametres.phaseDiscussion %}Oui{% else %}Non{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Choix du nom</td><td>{% if parametres.choisirNom %}Oui{% else %}Non{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Temps tribunal</td><td>{{ parametres.tempsTribunal }}</td>
+    </tr>
+</table>

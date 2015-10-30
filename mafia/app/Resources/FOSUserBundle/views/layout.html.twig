@@ -35,6 +35,12 @@
                     <a href="{{ path('liste_proposition') }}">Propositions</a>
                     <a href="{{ path('liste_contacts') }}">Messages ({{ app.user.nbMessagesNonLus }})</a>
                     <a href="http://fr.french-mafia.wikia.com/wiki/Accueil">Wiki</a>
+                    {% if is_granted("ROLE_MODERATEUR") %}
+                        <a href="{{ path('tableau_moderation') }}">Modération</a>
+                    {% endif %}
+                    {% if is_granted("ROLE_ADMIN") %}
+                        <a href="{{ path('tableau_administration') }}">Administration</a>
+                    {% endif %}
                 </nav>
 
                 {% block fos_user_content %}

@@ -2,6 +2,10 @@ tableau_moderation:
     path:     /moderation/tableau
     defaults: { _controller: MafiaModerationBundle:Moderation:tableauModeration }
 
+tableau_administration:
+    path:     /administration/tableau
+    defaults: { _controller: MafiaModerationBundle:Moderation:tableauAdministration }
+
 creation_requete:
     path:     /requete/creer
     defaults: { _controller: MafiaModerationBundle:Requete:creationRequete }

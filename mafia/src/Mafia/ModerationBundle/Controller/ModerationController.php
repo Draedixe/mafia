@@ -29,4 +29,9 @@ class ModerationController extends Controller
             'derniersBans' => $derniersBans
         ));
     }
+    public function tableauAdministrationAction(){
+
+        return $this->render('MafiaModerationBundle:Affichages:tableau_administration.html.twig', array(
+        ));
+    }
 }
