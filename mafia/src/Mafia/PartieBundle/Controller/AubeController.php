@@ -323,6 +323,60 @@ class AubeController extends FunctionsController{
                             }
                             $this->messageSysteme($em,$chat,$statutTue->getVictime()->getNom() . " a été tué par " . $messageTueur);
                         }
+                        /* Conditions de victoire */
+                        $usersEnVie = $repositoryUser->findBy(array("partie"=>$partie, "vivant"=>true));
+                        if(count($usersEnVie) <= 2) {
+                            if (count($usersEnVie) == 2) {
+                                $role1 = $usersEnVie[0]->getRole()->getEnumRole();
+                                $role2 = $usersEnVie[1]->getRole()->getEnumRole();
+                                $faction1 = $usersEnVie[0]->getRole()->getEnumFaction();
+                                $faction2 = $usersEnVie[1]->getRole()->getEnumFaction();
+                                $user1 = $usersEnVie[0];
+                                $user2 = $usersEnVie[1];
+                                if($role1 == RolesEnum::TUEUR_EN_SERIE || $role2 == RolesEnum::TUEUR_EN_SERIE){
+                                    if($role2 == RolesEnum::TUEUR_EN_SERIE){
+                                        $role1 = $role2;
+                                        $user1 = $user2;
+                                    }
+                                    $this->messageSysteme($em,$chat,"Le Tueur en Série (".$user1->getNom().") a gagné la partie");
+                                } elseif($faction1 == FactionEnum::MAFIA || $faction2 == FactionEnum::MAFIA ){
+                                    if($faction1 == FactionEnum::MAFIA && $role2 == RolesEnum::CITOYEN){
+                                        $this->messageSysteme($em,$chat,"La Ville (".$user2->getNom().") a gagné la partie");
+                                    }
+                                    elseif($faction2 == FactionEnum::MAFIA && $role1 == RolesEnum::CITOYEN){
+                                        $this->messageSysteme($em,$chat,"La Ville (".$user1->getNom().") a gagné la partie");
+                                    }
+                                    else {
+                                        if ($faction2 == FactionEnum::MAFIA) {
+                                            $role1 = $role2;
+                                            $user1 = $user2;
+                                        }
+                                        $this->messageSysteme($em, $chat, "La Mafia (" . $user1->getNom() . ") a gagné la partie");
+                                    }
+                                } else{
+                                    $this->messageSysteme($em,$chat,"La Ville (".$user1->getNom().") a gagné la partie");
+                                }
+                            } else if (count($usersEnVie) == 1) {
+                                $faction1 = $usersEnVie[0]->getRole()->getEnumFaction();
+                                $user1 = $usersEnVie[0];
+                                $role1 = $usersEnVie[0]->getRole();
+                                if($faction1 == FactionEnum::MAFIA){
+                                    $this->messageSysteme($em, $chat, "La Mafia (" . $user1->getNom() . ") a gagné la partie");
+                                }
+                                elseif($faction1 == FactionEnum::VILLE){
+                                    $this->messageSysteme($em,$chat,"La Ville (".$user1->getNom().") a gagné la partie");
+                                }
+                                else{
+                                    $this->messageSysteme($em,$chat,"Le/La" . $role1->getNomRole() . "(".$user1->getNom().") a gagné la partie");
+                                }
+                            } else {
+                                $this->messageSysteme($em,$chat,"Personne n'a gagné la partie");
+                            }
+                            $partie->setTerminee(true);
+                            $em->persist($partie);
+                            $em->flush();
+                        }
+
                         /* Les infos ont été envoyées */
 
                         $em = $this->getDoctrine()->getManager();
