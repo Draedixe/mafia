@@ -23,6 +23,8 @@
         var votes = [];
         var idAccuse = {{ idAccuse }};
         var monId = {{ monId }};
+        var capaciteRestante = -1;
+        var cibleId = -1;
         {% for key, j in joueurs %}
             enVieId[{{ key }}] = {{ j.id }};
             enViePseudo[{{ key }}] = "{{ j.nom }}";
@@ -171,9 +173,25 @@
             }
             else if (enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::CITOYEN') }}
                     || enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::SURVIVANT') }}) {
-                for (var j in enVieId) {
-                    if (enVieId[j] == monId) {
-                        $('#actNuit1' + enVieId[j]).show();
+                if(cibleId != -1) {
+                    for (var j in enVieId) {
+                        if (enVieId[j] == monId) {
+                            $('#actNuit1' + enVieId[j]).show();
+                            $('#actNuit1' + enVieId[j]).html("Annuler");
+                        }
+                    }
+                }else if(capaciteRestante > 0){
+                    for (var j in enVieId) {
+                        if (enVieId[j] == monId) {
+                            $('#actNuit1' + enVieId[j]).show();
+                            $('#actNuit1' + enVieId[j]).html("Action");
+                        }
+                    }
+                }else{
+                    for (var j in enVieId) {
+                        if (enVieId[j] == monId) {
+                            $('#actNuit1' + enVieId[j]).hide();
+                        }
                     }
                 }
             }
@@ -296,7 +314,8 @@
                             joueursVivant = data['joueursVivants'];
                             enViePseudo = data['enViePseudo'];
                             enVieId = data['enVieId'];
-
+                            capaciteRestante = data['capaciteRestante'];
+                            cibleId = data['cibleId'];
                             cacherBoutonsVotes();
                             phase = data["phase"];
                             afficherBoutonsActions();

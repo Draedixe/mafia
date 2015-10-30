@@ -129,6 +129,10 @@ class JeuController extends FunctionsController{
             ->getManager()
             ->getRepository('MafiaPartieBundle:UserPartie');
 
+        $repositoryStatut = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaPartieBundle:Statut');
+
         //$user = $repositoryUser->findOneBy(array("user" => $this->getUser(), "vivant" => true));
         $userGlobal = $this->getUser();
         if($userGlobal != null) {
@@ -144,6 +148,12 @@ class JeuController extends FunctionsController{
                 $joueursRoles = array();
                 $enVieId = array();
                 $enViePseudo = array();
+                $nbCapacite = $user->getCapaciteRestante();
+                $cible = $repositoryStatut->findOneBy(array("acteur"=>$user));
+                $cibleId = -1;
+                if($cible != null){
+                    $cibleId = $cible->getVictime();
+                }
                 foreach ($usersPartieTous as $userEnVie) {
                     $enVieId[] = $userEnVie->getId();
                     $enViePseudo[] = $userEnVie->getNom();
@@ -155,9 +165,9 @@ class JeuController extends FunctionsController{
                     }
                 }
                 if ($phase == PhaseJeuEnum::NUIT) {
-                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("cibleId"=>$cibleId, "capaciteRestante" => $nbCapacite, "enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("cibleId"=>$cibleId, "capaciteRestante" => $nbCapacite, "enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }

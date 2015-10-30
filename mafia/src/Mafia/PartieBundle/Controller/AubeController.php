@@ -12,27 +12,54 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AubeController extends FunctionsController{
 
-    function rechercheStatutParEnum($enumStatut, &$arrayOfStatuts){
+    function rechercheStatutParEnum($enumStatut, $arrayOfStatuts){
         $res = array();
+
         foreach($arrayOfStatuts as $cle => $statut)
         {
             if($statut->getEnumStatut() == $enumStatut){
                 $res[] = $statut;
-                unset($arrayOfStatuts[$cle]);
+
             }
         }
         return $res;
     }
-    function rechercheStatutParEnumEtVictime($enumStatut,$victime, &$arrayOfStatuts){
+
+    function retirerStatutParEnum($enumStatut, $arrayOfStatuts){
+
+
+        foreach($arrayOfStatuts as $cle => $statut)
+        {
+            if($statut->getEnumStatut() == $enumStatut){
+
+                unset($arrayOfStatuts[$cle]);
+            }
+        }
+        return $arrayOfStatuts;
+    }
+
+    function rechercheStatutParEnumEtVictime($enumStatut,$victime, $arrayOfStatuts){
         $res = array();
         foreach($arrayOfStatuts as $cle => $statut)
         {
             if($statut->getEnumStatut() == $enumStatut && $statut->getVictime() == $victime){
                 $res[] = $statut;
-                unset($arrayOfStatuts[$cle]);
+
             }
         }
         return $res;
+    }
+
+    function retirerStatutParEnumEtVictime($enumStatut,$victime, $arrayOfStatuts){
+
+        foreach($arrayOfStatuts as $cle => $statut)
+        {
+            if($statut->getEnumStatut() == $enumStatut && $statut->getVictime() == $victime){
+
+                unset($arrayOfStatuts[$cle]);
+            }
+        }
+        return $arrayOfStatuts;
     }
     function rechercheStatutParVictime($victime, $arrayOfStatuts){
         $res = array();
@@ -251,6 +278,7 @@ class AubeController extends FunctionsController{
                                 if($optionAdBlock != null){
                                     if($optionAdBlock->getValeur()){
                                         $bloqueurs = $this->rechercheStatutParEnumEtVictime(StatusEnum::BLOQUE,$tueur,$statutsPartie);
+                                        $statutsPartie = $this->retirerStatutParEnumEtVictime(StatusEnum::BLOQUE,$tueur,$statutsPartie);
                                         foreach($bloqueurs as $bloqueur){
                                             $statutsPartie[] = new Statut(StatusEnum::TUE,$bloqueur->getActeur(),$tueur);
                                         }
@@ -267,14 +295,14 @@ class AubeController extends FunctionsController{
                         }
 
 
-
-
-
                         // LES GILETS
-                        /*$statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::GILET,$statutsPartie);
+                        $statutsATraiter = $this->rechercheStatutParEnum(StatusEnum::GILET,$statutsPartie);
+                        $statutsPartie = $this->retirerStatutParEnum(StatusEnum::GILET, $statutsPartie);
+
                         foreach($statutsATraiter as $statutATraiter){
-                            $this->rechercheStatutParEnumEtVictime(StatusEnum::TUE,$statutATraiter->getActeur(),$statutsPartie);
-                        }*/
+                            $this->messageSysteme($em,$chat,$statutATraiter->getEnumStatut());
+                            $this->retirerStatutParEnumEtVictime(StatusEnum::TUE,$statutATraiter->getActeur(),$statutsPartie);
+                        }
 
                         /** Fin des traitements **/
 

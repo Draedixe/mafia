@@ -8,6 +8,7 @@ use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
 use Mafia\PartieBundle\Entity\PhaseJeuEnum;
 use Mafia\PartieBundle\Entity\UserPartie;
+use Mafia\RolesBundle\Entity\RolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -427,6 +428,10 @@ class PartieController extends Controller{
                             for($cpt = 0; $cpt<$nbR; ++$cpt){
                                 $random2 = rand(0, count($rolesAffecter)-1-$cpt);
                                 $userList[$cpt]->setRole($rolesAffecter[$random2]);
+                                //Nb d'utilisation du gilet pare balles
+                                if($rolesAffecter[$random2]->getEnumRole() == RolesEnum::CITOYEN){
+                                    $userList[$cpt]->setCapaciteRestante(1);
+                                }
                                 unset($rolesAffecter[$random2]);
                                 $rolesAffecter = array_values($rolesAffecter);
                                 $em->persist($userList[$cpt]);

@@ -12,6 +12,7 @@ use Mafia\PartieBundle\Entity\StatusEnum;
 use Mafia\PartieBundle\Entity\Statut;
 use Mafia\RolesBundle\Entity\RolesEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class VilleController extends Controller {
 
