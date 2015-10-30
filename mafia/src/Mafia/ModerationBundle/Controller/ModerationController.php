@@ -31,7 +31,42 @@ class ModerationController extends Controller
     }
     public function tableauAdministrationAction(){
 
+        $formBuilder = $this->createFormBuilder();
+        $formBuilder->add('pseudo', 'text', array('label' => 'Pseudo du joueur'))
+                    ->add('role', 'choice', array(
+                        'choices' => array('USER' => 'Utilisateur', 'ROLE_MODERATEUR' => 'Modérateur', 'ROLE_ADMIN' => 'Administrateur'),
+                        'multiple' => false
+                    ));
+
+        $form = $formBuilder->getForm();
+        $request = $this->get('request');
+        if ($request->getMethod() == 'POST') {
+            $form->bind($request);
+        }
+        if ($form->isValid()) {
+
+            $repositoryUser = $this->getDoctrine()
+                ->getManager()
+                ->getRepository('MafiaUserBundle:User');
+
+            $user = $repositoryUser->findOneBy(array('username' => $form->get('pseudo')->getData()));
+            $role = $form->get('role')->getData();
+            if($role != 'USER'){
+                $roles = array();
+                $roles[] = $role;
+                $user->setRoles($roles);
+            }
+            else{
+                $user->setRoles(array());
+            }
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+            return $this->redirect($this->generateUrl('tableau_administration', array()));
+        }
         return $this->render('MafiaModerationBundle:Affichages:tableau_administration.html.twig', array(
+            'promotion' => $form->createView()
         ));
     }
 }

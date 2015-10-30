@@ -7,13 +7,18 @@
     {% if is_granted("ROLE_ADMIN") %}
         <h2>Tableau d'administration</h2>
 
-        <a href="{{ path('creation_role') }}">+ Créer un rôle</a>
-        <a href="{{ path('creation_crime') }}">+ Créer un crime</a>
-        <a href="{{ path('creation_categorie') }}">+ Créer une catégorie</a>
-        <a href="{{ path('creation_parametres') }}">+ Créer des paramètres</a>
+        <a href="{{ path('creation_role') }}">+ Créer un rôle</a><br/>
+        <a href="{{ path('creation_crime') }}">+ Créer un crime</a><br/>
+        <a href="{{ path('creation_categorie') }}">+ Créer une catégorie</a><br/>
+        <a href="{{ path('creation_parametres') }}">+ Créer des paramètres</a><br/>
 
 
-
+        <div class="well">
+            <form method="post" {{ form_enctype(promotion) }}>
+                {{ form_widget(promotion) }}
+                <input type="submit" class="btn btn-primary" />
+            </form>
+        </div>
 
     {% endif %}
 {% endblock %}
