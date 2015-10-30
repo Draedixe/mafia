@@ -1,0 +1,11 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+{% block title %}Mafia - Contacts{% endblock %}
+
+{% block fos_user_content %}
+
+    {% for contact in contacts %}
+        <a href="{{ path("liste_messages",{id:contact.id}) }}">{{ contact.username }} - ({{ nbMessagesNL[contact.id] }})</a><br/>
+    {% endfor %}
+    {% include 'MafiaFamilleBundle:Templates:pagination.html.twig' with {'pathMethode' : 'liste_contacts', 'pageCourante':pageCourante, 'nbPages' : nbPages}  %}
+{% endblock %}

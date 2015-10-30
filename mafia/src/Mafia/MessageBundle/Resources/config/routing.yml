@@ -3,8 +3,15 @@ envoyer_message:
     defaults: { _controller: MafiaMessageBundle:Message:creationMessage, id:1 }
 
 liste_messages:
-    path: /messages/liste/{page}
-    defaults: { _controller: MafiaMessageBundle:Message:affichageMessages, page:1 }
+    path: /messages/liste/{id}_{page}
+    defaults: { _controller: MafiaMessageBundle:Message:affichageMessages,id:1, page:1 }
+    requirements:
+      page: \d
+      id: \d
+
+liste_contacts:
+    path: /contact/liste/{page}
+    defaults: { _controller: MafiaMessageBundle:Message:affichageContacts, page:1 }
     requirements:
       page: \d
 

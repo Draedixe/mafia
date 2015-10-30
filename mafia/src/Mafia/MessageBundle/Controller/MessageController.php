@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\DateTime;
 class MessageController extends Controller{
 
 
-    function creationMessageAction($id)
+    public function creationMessageAction($id)
     {
         $repositoryUser = $this->getDoctrine()
             ->getManager()
@@ -52,45 +52,98 @@ class MessageController extends Controller{
             'form' => $form->createView(),
         ));
     }
+    public function affichageContactsAction($page){
+        $em = $this->getDoctrine()->getManager();
 
+        $query = $em->createQuery('SELECT DISTINCT u FROM Mafia\UserBundle\Entity\User u, Mafia\MessageBundle\Entity\MessagePrive m WHERE m.recepteur = :idRecepteur AND m.expediteur = u OR m.recepteur = u AND m.expediteur = :idExpediteur');
+        $query->setParameters(array(
+            'idRecepteur' => $this->getUser(),
+            'idExpediteur' => $this->getUser(),
+        ));
+        $liste_contacts = $query->getResult();
 
-    function affichageMessagesAction($page)
+        $repositoryMessage = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaMessageBundle:MessagePrive');
+
+        $nbMessagesNonLus = array();
+
+        foreach($liste_contacts as $contact){
+            $messagesNonLu = $repositoryMessage->findBy(array('expediteur'=>$contact,'vu' => false));
+            $nbMessagesNonLus[$contact->getId()] = count($messagesNonLu);
+        }
+
+        $nbContacts = count($liste_contacts);
+        if($nbContacts%regroupementVariable::NB_CONTACTS_PAR_PAGE > 0){
+            $nbPages = floor($nbContacts/regroupementVariable::NB_CONTACTS_PAR_PAGE) +1;
+        }
+        else{
+            $nbPages = $nbContacts/regroupementVariable::NB_CONTACTS_PAR_PAGE;
+        }
+        if($nbPages == 1){
+            return $this->render('MafiaMessageBundle:Affichages:liste_contacts.html.twig', array(
+                'nbMessagesNL' => $nbMessagesNonLus,
+                'contacts' => $liste_contacts,
+                'pageCourante' => $page,
+                'nbPages' => $nbPages
+            ));
+        }
+        else{
+            $contactsSurPage = array_slice($liste_contacts,( regroupementVariable::NB_CONTACTS_PAR_PAGE * ($page-1)),regroupementVariable::NB_CONTACTS_PAR_PAGE);
+            return $this->render('MafiaMessageBundle:Affichages:liste_contacts.html.twig', array(
+                'nbMessagesNL' => $nbMessagesNonLus,
+                'contacts' => $contactsSurPage,
+                'pageCourante' => $page,
+                'nbPages' => $nbPages
+            ));
+        }
+    }
+
+    public function affichageMessagesAction($id,$page)
     {
 
         $em = $this->getDoctrine()->getManager();
 
-        $query = $em->createQuery('SELECT DISTINCT u FROM Mafia\UserBundle\Entity\User u, Mafia\MessageBundle\Entity\MessagePrive m WHERE m.recepteur = :idRecepteur AND m.expediteur = u OR m.recepteur = u AND m.expediteur = :idExpediteur2');
-        $query->setParameters(array(
-            'idRecepteur' => $this->getUser(),
-            'idExpediteur2' => $this->getUser(),
-        ));
-        $liste_contacts = $query->getResult();
-        $this->getUser()->setNbMessagesNonLus(0);
+        $repositoryUser = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaUserBundle:User');
+
+        $contact = $repositoryUser->find($id);
+
+        $repositoryMessage = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaMessageBundle:MessagePrive');
+
+        $messagesNonLu = $repositoryMessage->findBy(array('expediteur'=>$contact,'vu' => false));
+
+        $this->getUser()->setNbMessagesNonLus($this->getUser()->getNbMessagesNonLus()-count($messagesNonLu));
+        foreach($messagesNonLu as $message)
+        {
+            $message->setVu(true);
+            $em->persist($message);
+        }
         $em->persist($this->getUser());
         $em->flush();
-        $messages = array();
-        foreach($liste_contacts as $contact)
-        {
-            $query = $em->createQuery('SELECT m FROM Mafia\MessageBundle\Entity\MessagePrive m WHERE m.recepteur = :idRecepteur AND m.expediteur = :idExpediteur OR m.recepteur = :idRecepteur2 AND m.expediteur = :idExpediteur2');
-            $query->setParameters(array(
-                'idRecepteur' => $this->getUser(),
-                'idExpediteur' => $contact,
-                'idRecepteur2' => $contact,
-                'idExpediteur2' => $this->getUser(),
-            ));
 
-            $messages[$contact->getUsername()] = $query->getResult();
-        }
+        $query = $em->createQuery('SELECT m FROM Mafia\MessageBundle\Entity\MessagePrive m WHERE m.recepteur = :idRecepteur AND m.expediteur = :idExpediteur OR m.recepteur = :idRecepteur2 AND m.expediteur = :idExpediteur2');
+        $query->setParameters(array(
+            'idRecepteur' => $this->getUser(),
+            'idExpediteur' => $contact,
+            'idRecepteur2' => $contact,
+            'idExpediteur2' => $this->getUser(),
+        ));
+        $messages = $query->getResult();
 
-        $nbContacts = count($liste_contacts);
-        if($nbContacts%regroupementVariable::NB_MP_PAR_PAGE > 0){
-            $nbPages = floor($nbContacts/regroupementVariable::NB_MP_PAR_PAGE) +1;
+        $nbMessages = count($messages);
+        if($nbMessages%regroupementVariable::NB_MP_PAR_PAGE > 0){
+            $nbPages = floor($nbMessages/regroupementVariable::NB_MP_PAR_PAGE) +1;
         }
         else{
-            $nbPages = $nbContacts/regroupementVariable::NB_MP_PAR_PAGE;
+            $nbPages = $nbMessages/regroupementVariable::NB_MP_PAR_PAGE;
         }
         if($nbPages == 1){
             return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
+                'contact' => $contact,
                 'messages' => $messages,
                 'pageCourante' => $page,
                 'nbPages' => $nbPages
@@ -99,6 +152,7 @@ class MessageController extends Controller{
         else{
             $messagesSurPage = array_slice($messages,( regroupementVariable::NB_MP_PAR_PAGE * ($page-1)),regroupementVariable::NB_MP_PAR_PAGE);
             return $this->render('MafiaMessageBundle:Affichages:liste_messages.html.twig', array(
+                'contact' => $contact,
                 'messages' => $messagesSurPage,
                 'pageCourante' => $page,
                 'nbPages' => $nbPages
