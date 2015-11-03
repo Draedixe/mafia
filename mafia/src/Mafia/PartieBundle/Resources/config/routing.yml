@@ -68,6 +68,12 @@ demande_info_aube:
     requirements:
       _method: POST
 
+demande_info_fin:
+    path: /jeu/fin
+    defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsFin }
+    requirements:
+      _method: POST
+
 demande_info_nuit:
     path: /jeu/nuit
     defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsNuit }

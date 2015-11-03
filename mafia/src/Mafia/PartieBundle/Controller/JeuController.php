@@ -278,6 +278,34 @@ class JeuController extends FunctionsController{
         return new JsonResponse(array("statut" => "FAIL"));
     }
 
+    public function recevoirInformationsFinAction()
+    {
+        $userGlobal = $this->getUser();
+        if($userGlobal != null) {
+            $user = $userGlobal->getUserCourant();
+            if ($user != null) {
+                $repositoryUser = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaPartieBundle:UserPartie');
+
+                $request = $this->container->get('request');
+                $id = $request->get('premierid');
+                $messages = $this->recevoirTousMessages($user,$id);
+                $phase = $this->verifPhase();
+                $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
+                $joueursVivants = array();
+                foreach ($usersPartieTous as $userEnVie) {
+                    $joueursVivants[] = $userEnVie->getVivant();
+                }
+
+                return new JsonResponse(array("joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
+
+
+            }
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
+    }
+
     public function recevoirInformationsJourAction()
     {
         $repositoryUser = $this->getDoctrine()
