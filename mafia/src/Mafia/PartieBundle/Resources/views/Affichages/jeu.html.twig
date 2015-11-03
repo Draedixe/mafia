@@ -440,16 +440,11 @@
             {
                 if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }}) {
                     $('#phaseEnCours').text("Aube");
-
+                    cacherBoutonsVotes();
                     majMorts();
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR') }}) {
                     $('#phaseEnCours').text("Jour");
-
-                    afficherBoutonsVotes();
-                }
-                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
-                    $('#phaseEnCours').text("Discussion");
 
                     for(var j in enVieId){
                         if(!joueursVivant[j]){
@@ -457,6 +452,13 @@
                             $('#nbVotes'+enVieId[j]).show();
                         }
                     }
+
+                    afficherBoutonsVotes();
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
+                    $('#phaseEnCours').text("Discussion");
+
+                    cacherBoutonsVotes();
 
                     majMorts();
                 }
@@ -471,6 +473,7 @@
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_DEFENSE') }}) {
                     $('#phaseEnCours').text("Tribunal: Défense");
+                    cacherBoutonsVotes();
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::TRIBUNAL_VOTE') }}) {
                     $('#phaseEnCours').text("Tribunal: Vote");
@@ -682,6 +685,8 @@
                         Tribunal: Vote
                     {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::RESULTAT_VOTE') %}
                         Résultat des votes
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::FIN_DE_PARTIE') %}
+                        Fin de la partie
                     {% endif %}
                 </span>
             </div>
