@@ -162,7 +162,6 @@
         }
 
         function afficherBoutonsActions() {
-
             if (enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::PARRAIN') }}
                     || enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::TUEUR_EN_SERIE') }}
                     || enumRole == {{ constant('Mafia\\RolesBundle\\Entity\\RolesEnum::MAFIOSO') }}) {
@@ -485,9 +484,9 @@
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::NUIT') }}) {
 
                     $('#phaseEnCours').text("Nuit");
-                    {% for j in joueurs %}
-                        $('#votePour'+{{ j.id }}).html("Voter");
-                    {% endfor %}
+
+                    cacherBoutonsVotes();
+                    afficherBoutonsActions();
 
                     majMorts();
                 }

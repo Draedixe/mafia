@@ -297,10 +297,7 @@ class JeuController extends FunctionsController{
                 foreach ($usersPartieTous as $userEnVie) {
                     $joueursVivants[] = $userEnVie->getVivant();
                 }
-
                 return new JsonResponse(array("joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
-
-
             }
         }
         return new JsonResponse(array("statut" => "FAIL"));
@@ -322,35 +319,35 @@ class JeuController extends FunctionsController{
                 $messages = $this->recevoirTousMessages($user,$id);
                 $usersPartie = $repositoryUser->findBy(array("partie" => $user->getPartie(), "vivant" => true));
                 $phase = $this->verifPhase();
-                if ($phase == PhaseJeuEnum::JOUR) {
-                    $votes = array();
-                    foreach ($usersPartie as $joueur) {
-                        $votes[$joueur->getId()] = 0;
+                $votes = array();
+                foreach ($usersPartie as $joueur) {
+                    $votes[$joueur->getId()] = 0;
+                }
+                foreach ($usersPartie as $joueur) {
+                    if ($joueur->getVotePour() != null) {
+                        $votes[$joueur->getVotePour()->getId()]++;
                     }
-                    foreach ($usersPartie as $joueur) {
-                        if ($joueur->getVotePour() != null) {
-                            $votes[$joueur->getVotePour()->getId()]++;
-                        }
-                    }
+                }
 
-                    $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
-                    $enVieId = array();
-                    $enViePseudo = array();
-                    $joueursVivants = array();
-                    $joueursRoles = array();
-                    foreach ($usersPartieTous as $userEnVie) {
-                        $enVieId[] = $userEnVie->getId();
-                        $enViePseudo[] = $userEnVie->getNom();
-                        $joueursVivants[] = $userEnVie->getVivant();
-                        if($userEnVie->getVivant()){
-                            $joueursRoles[] = "???";
-                        } else{
-                            $joueursRoles[] = $userEnVie->getRole()->getNomRole();
-                        }
+                $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
+                $enVieId = array();
+                $enViePseudo = array();
+                $joueursVivants = array();
+                $joueursRoles = array();
+                foreach ($usersPartieTous as $userEnVie) {
+                    $enVieId[] = $userEnVie->getId();
+                    $enViePseudo[] = $userEnVie->getNom();
+                    $joueursVivants[] = $userEnVie->getVivant();
+                    if($userEnVie->getVivant()){
+                        $joueursRoles[] = "???";
+                    } else{
+                        $joueursRoles[] = $userEnVie->getRole()->getNomRole();
                     }
+                }
+                if ($phase == PhaseJeuEnum::JOUR) {
                     return new JsonResponse(array("joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants, "votes"=>$votes, "messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase, "enVieId" => $enVieId, "enViePseudo" => $enViePseudo));
                 } else {
-                    return new JsonResponse(array("messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants, "votes"=>$votes, "messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase, "enVieId" => $enVieId, "enViePseudo" => $enViePseudo));
                 }
 
             }
