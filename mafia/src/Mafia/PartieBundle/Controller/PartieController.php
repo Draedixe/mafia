@@ -376,23 +376,44 @@ class PartieController extends Controller{
                             //Transformation des categories en roles
                             $imp_temp = array();
 
+                            //Pour les roles compo
+                            foreach($rolesCompo as $rc){
+                                for($i = 0; $i < $rc->getQuantite(); $i++){
+                                    array_push($rolesAffecter, $rc->getRole());
+                                }
+                            }
+
                             //Pour toutes les CategoriesCompo contenues dans la composition
                             foreach ($cat as $c) {
                                 $roles = $c->getCategorie()->getRoles();
                                 //Pour chaque role
                                 foreach($roles as $r){
-                                    $trouve = false;
-                                    //On regarde s'il y a une importance qui correspond
-                                    foreach($importances as $i){
-                                        if($r == $i->getRole()){
-                                            array_push($imp_temp,array($r,$i->getValeur()));
-                                            $trouve = true;
-                                            break;
+                                    //Si c'est un role unique
+                                    $trouveDejaDefinie = false;
+                                    if($r->isRoleUnique()){
+                                        //On cherche si il est déja dans la composition
+                                        foreach($rolesAffecter as $raa){
+                                            if($raa == $r){
+                                                $trouveDejaDefinie = true;
+                                                break;
+                                            }
                                         }
                                     }
-                                    //Si on n'en trouve pas on la met à 100
-                                    if(!$trouve){
-                                        array_push($imp_temp,array($r,100));
+
+                                    if(!$trouveDejaDefinie) {
+                                        $trouve = false;
+                                        //On regarde s'il y a une importance qui correspond
+                                        foreach ($importances as $i) {
+                                            if ($r == $i->getRole()) {
+                                                array_push($imp_temp, array($r, $i->getValeur()));
+                                                $trouve = true;
+                                                break;
+                                            }
+                                        }
+                                        //Si on n'en trouve pas on la met à 100
+                                        if (!$trouve) {
+                                            array_push($imp_temp, array($r, 100));
+                                        }
                                     }
                                 }
 
@@ -416,12 +437,7 @@ class PartieController extends Controller{
                                 }
                             }
 
-                            //Pour les roles compo
-                            foreach($rolesCompo as $rc){
-                                for($i = 0; $i < $rc->getQuantite(); $i++){
-                                    array_push($rolesAffecter, $rc->getRole());
-                                }
-                            }
+
 
                             //Affectation des roles
                             $nbR = count($rolesAffecter);
