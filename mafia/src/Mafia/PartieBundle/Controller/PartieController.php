@@ -3,6 +3,7 @@
 namespace Mafia\PartieBundle\Controller;
 
 use Mafia\PartieBundle\Entity\Chat;
+use Mafia\PartieBundle\Entity\DebutPartieEnum;
 use Mafia\PartieBundle\Entity\Message;
 use Mafia\PartieBundle\Entity\Parametres;
 use Mafia\PartieBundle\Entity\Partie;
@@ -154,7 +155,17 @@ class PartieController extends Controller{
                     $partieChoisie = new Partie();
                     $partieChoisie->setParametres($param);
                     $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
-                    $partieChoisie->setPhaseEnCours($param->getDebutDuJeu());
+                    $debutDuJeu = $param->getDebutDuJeu();
+                    if($debutDuJeu == DebutPartieEnum::JOUR){
+                        $partieChoisie->setPhaseEnCours(PhaseJeuEnum::JOUR);
+                    }
+                    else if($debutDuJeu == DebutPartieEnum::JOUR_SANS_LYNCHAGE){
+                        $partieChoisie->setPhaseEnCours(PhaseJeuEnum::JOUR_SANS_VOTE);
+                    }
+                    else{
+                        $partieChoisie->setPhaseEnCours(PhaseJeuEnum::NUIT);
+                    }
+
                     $partieChoisie->setDureePhase(1);
                     $partieChoisie->setTempsJourRestant(1);
                     $partieChoisie->setDebutPhase(new \DateTime());
@@ -451,6 +462,7 @@ class PartieController extends Controller{
                                 $em->persist($userList[$cpt]);
                             }
 
+                            $partie->setDebutPhase(new \DateTime());
                             $em->persist($newMessage);
                             $em->persist($chat);
                             $em->persist($partie);

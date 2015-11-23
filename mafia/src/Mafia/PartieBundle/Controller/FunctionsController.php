@@ -165,18 +165,20 @@ class FunctionsController extends Controller{
                                     $partie->setDureePhase(0.2);
                                 } else {
                                     $accuse = $partie->getAccuse();
-                                    $this->messageSysteme($em, $chat, $accuse->getNom() . " a été libéré");
-                                    $partie->setAccuse(null);
-                                    if ($partie->getTempsJourRestant() > 0) {
-                                        $this->razVotes();
-                                        $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
-                                        $partie->setDureePhase($partie->getTempsJourRestant());
-                                        $this->messageSysteme($em, $chat, "C'est le jour");
-                                    } else {
-                                        $this->razVotes();
-                                        $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
-                                        $partie->setDureePhase($parametres->getDureeDeLaNuit());
-                                        $this->messageSysteme($em, $chat, "C'est la nuit");
+                                    if($accuse != null) {
+                                        $this->messageSysteme($em, $chat, $accuse->getNom() . " a été libéré");
+                                        $partie->setAccuse(null);
+                                        if ($partie->getTempsJourRestant() > 0) {
+                                            $this->razVotes();
+                                            $partie->setPhaseEnCours(PhaseJeuEnum::JOUR);
+                                            $partie->setDureePhase($partie->getTempsJourRestant());
+                                            $this->messageSysteme($em, $chat, "C'est le jour");
+                                        } else {
+                                            $this->razVotes();
+                                            $partie->setPhaseEnCours(PhaseJeuEnum::NUIT);
+                                            $partie->setDureePhase($parametres->getDureeDeLaNuit());
+                                            $this->messageSysteme($em, $chat, "C'est la nuit");
+                                        }
                                     }
                                 }
                                 break;
