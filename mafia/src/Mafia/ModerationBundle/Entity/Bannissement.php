@@ -32,7 +32,7 @@ class Bannissement
     /**
      * @var string
      *
-     * @ORM\Column(name="explication", type="string", length=255)
+     * @ORM\Column(name="explication", type="text")
      */
     private $explication;
 

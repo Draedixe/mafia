@@ -1,0 +1,23 @@
+<fieldset class="bannissement">
+    <label>{{ ban.modoBannant }}</label><br/>
+    {{ ban.explication }}<br/>
+    Début : {{ ban.debutBannissement|date('d/m/Y H:i:s') }}<br/>
+    Temps :
+    {% if ban.unite == 'F' %}
+        Définif
+    {% else %}
+        {{ ban.tempsBannissement }}
+        {% if ban.unite == 'I' %}
+            minutes
+        {% elseif ban.unite == 'H' %}
+            heures
+        {% elseif ban.unite == 'S' %}
+            secondes
+        {% elseif ban.unite =='D' %}
+            jours
+        {% else %}
+            mois
+        {% endif %}
+    {% endif %}
+
+</fieldset>

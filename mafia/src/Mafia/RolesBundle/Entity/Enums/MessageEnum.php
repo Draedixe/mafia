@@ -14,4 +14,5 @@ class MessageEnum {
     const ERREUR_role_unique = "Ce rôle doit être unique";
     const ERREUR_composition_non_existant = "Cette composition n'existe pas";
     const ERREUR_composition_non_createur = "Vous n'êtes pas le créateur de cette composition";
+    const ERREUR_option_valeur_invalide = "La valeur de cette option est invalide";
 }

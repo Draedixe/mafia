@@ -1,34 +1,6 @@
-creation_crime:
-    path: /crime/creation
-    defaults: { _controller: MafiaRolesBundle:Crime:creationCrime }
-
-liste_crimes:
-    path: /crime/liste
-    defaults: { _controller: MafiaRolesBundle:Crime:affichageListeCrimes }
-
-creation_categorie:
-    path: /categorie/creation
-    defaults: { _controller: MafiaRolesBundle:Categorie:creationCategorie }
-
-liste_categories:
-    path: /categorie/liste
-    defaults: { _controller: MafiaRolesBundle:Categorie:affichageListeCategories }
-
-creation_role:
-    path: /role/creation
-    defaults: { _controller: MafiaRolesBundle:Role:creationRole }
-
-vue_role:
-    path: /role/afficher/{id}
-    defaults: { _controller: MafiaRolesBundle:Role:affichageRole, id:1 }
-
 vue_composition:
     path: /composition/afficher/{id}
     defaults: { _controller: MafiaRolesBundle:Composition:affichageComposition, id:1 }
-
-liste_roles:
-    path: /role/liste
-    defaults: { _controller: MafiaRolesBundle:Role:affichageListeRoles }
 
 creation_composition:
     path: /composition/creation
@@ -46,6 +18,24 @@ recuperer_noms_options:
     requirements:
       _method: POST
 
+change_valeur_option:
+    path: /options/valeur
+    defaults: { _controller: MafiaRolesBundle:Composition:changerOptionRoleCompo }
+    requirements:
+      _method: POST
+
+recuperer_valeur_importance:
+    path: /importance/recupValeur
+    defaults: { _controller: MafiaRolesBundle:Composition:recupererValeurImportance }
+    requirements:
+      _method: POST
+
+changer_valeur_importance:
+    path: /importance/changerValeur
+    defaults: { _controller: MafiaRolesBundle:Composition:changerValeurImportance }
+    requirements:
+      _method: POST
+
 liste_compositions:
     path: /composition/liste
     defaults: { _controller: MafiaRolesBundle:Composition:affichageListeCompositions }
@@ -55,3 +45,23 @@ action_nuit_1:
     defaults: { _controller: MafiaRolesBundle:Default:nuit }
     requirements:
       _method: POST
+
+changer_nom_compo:
+    path: /composition/nom
+    defaults: { _controller: MafiaRolesBundle:Composition:changerNom }
+    requirements:
+      _method: POST
+
+ajout_role_compo:
+    path: /composition/role
+    defaults: { _controller: MafiaRolesBundle:Composition:ajoutRoleCompo }
+    requirements:
+      _method: POST
+
+modifier_composition:
+    path: /composition/modification/{id}
+    defaults: { _controller: MafiaRolesBundle:Composition:modificationComposition }
+
+routing_roles:
+    resource: "@MafiaRolesBundle/Resources/config/routing_roles.yml"
+    prefix:   /

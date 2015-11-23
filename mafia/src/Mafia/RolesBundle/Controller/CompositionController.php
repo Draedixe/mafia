@@ -8,14 +8,10 @@
 
 namespace Mafia\RolesBundle\Controller;
 
-
-use Mafia\RolesBundle\Entity\CategorieCompo;
 use Mafia\RolesBundle\Entity\Composition;
 use Mafia\RolesBundle\Entity\Importance;
 use Mafia\RolesBundle\Entity\OptionRole;
 use Mafia\RolesBundle\Entity\OptionsRoles;
-use Mafia\RolesBundle\Entity\OptionsRolesEnum;
-use Mafia\RolesBundle\Entity\Role;
 use Mafia\RolesBundle\Entity\RolesCompos;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -37,22 +33,74 @@ class CompositionController extends Controller{
 
     public function creationCompositionAction()
     {
+        $composition = new Composition();
+        $composition->setNomCompo("Composition de " . $this->getUser()->getUsername());
+        if ($this->get('security.context')->isGranted('ROLE_SUPER_MODERATEUR')) {
+            $composition->setOfficielle(true);
+        }
+        else{
+            $composition->setOfficielle(false);
+        }
+        $composition->setCreateur($this->getUser());
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($composition);
+        $em->flush();
+
+        return $this->redirect($this->generateUrl('modifier_composition', array('id'=>$composition->getId())));
+    }
+    public function modificationCompositionAction($id)
+    {
+        $repository = $this->getDoctrine()
+        ->getManager()
+        ->getRepository('MafiaRolesBundle:Composition');
+
+        $composition = $repository->find($id);
+
+        if($composition != null){
+            if($composition->getCreateur() == $this->getUser() or $this->get('security.context')->isGranted('ROLE_SUPER_MODERATEUR')){
+                $repository = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaRolesBundle:Role');
+
+                $roles = $repository->findAll();
+
+                $repository = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaRolesBundle:Categorie');
+
+                $categories = $repository->findAll();
+
+                return $this->render('MafiaRolesBundle:Formulaires:creer_composition.html.twig', array(
+                    'roles' => $roles,
+                    'categories' => $categories,
+                    'composition' => $composition
+                ));
+            }
+        }
+        return $this->redirect($this->generateUrl('creation_composition', array()));
+
+    }
+
+    public function changerNomAction(){
         $repository = $this->getDoctrine()
             ->getManager()
-            ->getRepository('MafiaRolesBundle:Role');
+            ->getRepository('MafiaRolesBundle:Composition');
+        $request = $this->get('request');
+        $compo = $repository->find($request->get("id"));
+        if($compo != null){
+            if($compo->getCreateur() == $this->getUser()){
+                $compo->setNomCompo($request->get("nom"));
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($compo);
+                $em->flush();
+                return new JsonResponse(array('statut' => "SUCCESS"));
+            }else{
+                return new JsonResponse(array('statut' => "FAIL",'erreur' => "Vous n'etes pas le createur de cette composition"));
+            }
+        }else{
+            return new JsonResponse(array('statut' => "FAIL",'erreur' => "Cette composition n'existe pas"));
+        }
 
-        $roles = $repository->findAll();
-
-        $repository = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:Categorie');
-
-        $categories = $repository->findAll();
-
-        return $this->render('MafiaRolesBundle:Formulaires:creer_composition.html.twig', array(
-            'roles' => $roles,
-            'categories' => $categories
-        ));
     }
 
     public function affichageCompositionAction($id)
@@ -84,166 +132,130 @@ class CompositionController extends Controller{
 
     }
 
-    public function ajoutCompositionAction()
-    {
-        // Recupérations des infos envoyées en POST \\
+    public function ajoutRoleCompoAction(){
         $request = $this->get('request');
-        $composition = $request->get("composition");
-        $options = $request->get("options");
-        $importances = $request->get("importances");
+        $idRole = $request->get("idRole");
+        $idCompo = $request->get("idCompo");
 
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Composition');
+        $composition = $repository->find($idCompo);
 
-        // On prepare \\
-        $newComposition = new Composition();
-        if($request->get("nom") != "")
-        {
-            $newComposition->setNomCompo($request->get("nom"));
-        }
-        else
-        {
-            $newComposition->setNomCompo("Composition");
-        }
-        $newComposition->setOfficielle(false);
-
-        // ACCES BDD \\
         $repository = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaRolesBundle:Role');
+        $role = $repository->find($idRole);
+
+        $em = $this->getDoctrine()->getManager();
+        if($composition != null){
+            if($composition->getCreateur() == $this->getUser() or $this->get('security.context')->isGranted('ROLE_SUPER_MODERATEUR')){
+                if($role != null){
+                    if($role->isRoleUnique()){
+                        if(!$composition->isDansCompo($role)) {
+                            $composition->addRoleCompo(new RolesCompos($role,1));
+                            $em->persist($composition);
+                            $em->flush();
+                            return new JsonResponse(array('statut' => "SUCCESS"));
+                        }else{
+                            return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_role_unique));
+                        }
+                    }else{
+                        $roleCompo = $composition->getRoleCompo($role);
+                        if($roleCompo == null){
+                            $composition->addRoleCompo(new RolesCompos($role,1));
+                        }else{
+                            $qte = $roleCompo->getQuantite();
+                            $composition->removeRoleCompo($roleCompo);
+                            $composition->addRoleCompo($role,$qte+1);
+                        }
+                        $em->persist($composition);
+                        $em->flush();
+                        return new JsonResponse(array('statut' => "SUCCESS"));
+                    }
+                }else{
+                    return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_role_non_existant));
+                }
+            }else{
+                return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_createur));
+            }
+        }else{
+            return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_existant));
+        }
+    }
+
+    public function changerOptionRoleCompoAction(){
+        $request = $this->get('request');
+        $idRole = $request->get("idRole");
+        $idCompo = $request->get("idCompo");
+        $valeur = $request->get("valeur");
+        $enumOption = $request->get("enumOption");
+
         $repositoryOptions = $this->getDoctrine()
             ->getManager()
             ->getRepository('MafiaRolesBundle:OptionRole');
-        $repositoryImportances = $this->getDoctrine()
+
+        $repositoryRole = $this->getDoctrine()
             ->getManager()
-            ->getRepository('MafiaRolesBundle:Importance');
-        $repositoryRoleCompo = $this->getDoctrine()
+            ->getRepository('MafiaRolesBundle:Role');
+
+        $role = $repositoryRole->find($idRole);
+
+        $repository = $this->getDoctrine()
             ->getManager()
-            ->getRepository('MafiaRolesBundle:RolesCompos');
-        $repositoryCategorieCompo = $this->getDoctrine()
+            ->getRepository('MafiaRolesBundle:Composition');
+
+        $composition = $repository->find($idCompo);
+
+        $repository = $this->getDoctrine()
             ->getManager()
-            ->getRepository('MafiaRolesBundle:CategorieCompo');
-        $repositoryCategorie = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('MafiaRolesBundle:Categorie');
+            ->getRepository('MafiaRolesBundle:Role');
+        $role = $repository->find($idRole);
+
         $em = $this->getDoctrine()->getManager();
 
-        // Les options \\
-        if($options){
-            foreach($options as $option)
-            {
-                if($option['option'] >= 0 and $option['option'] <= 124){
-                    $role = $repository->find($option['role']);
-                    if($role != null) {
-                        $newOption = $repositoryOptions->findOneBy(array("enumOption"=>$option['option'],"valeur"=>$option['valeur'],"role"=>$role));
+        if($composition != null){
+            if($composition->getCreateur() == $this->getUser() or $this->get('security.context')->isGranted('ROLE_SUPER_MODERATEUR')){
+                if($role != null){
+                    $arrValeur = OptionsRoles::getValeursPossibles($role->getEnumRole(),$enumOption);
+                    if($valeur >= $arrValeur["min"] && $valeur <= $arrValeur["max"]){
+                        $newOption = $repositoryOptions->findOneBy(array("enumOption"=>$enumOption,"valeur"=>$valeur,"role"=>$role));
                         if($newOption == null)
                         {
                             $newOption = new OptionRole();
                             $newOption->setRole($role);
-                            $newOption->setEnumOption($option['option']);
-                            $newOption->setValeur($option['valeur']);
+                            $newOption->setEnumOption($enumOption);
+                            $newOption->setValeur($valeur);
                             $em->persist($newOption);
                         }
-                        $newComposition->addOptionRole($newOption);
+                        $composition->addOptionRole($newOption);
+                        $em->persist($composition);
+                        $em->flush();
+                        return new JsonResponse(array('statut' => "SUCCESS"));
+                    }else{
+                        return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_option_valeur_invalide));
                     }
-                    else
-                    {
-                        return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$option['role']." n'existe pas"));
-                    }
+                }else{
+                    return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_role_non_existant));
                 }
+            }else{
+                return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_createur));
             }
+        }else{
+            return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_existant));
         }
-
-        // Les importances \\
-        if($importances){
-            foreach($importances as $importance)
-            {
-                if($importance['valeur'] >= 0 and $importance['valeur'] <= 200){
-
-                    $role = $repository->find($importance['role']);
-                    if($role != null) {
-                        $newImportance = $repositoryImportances->findOneBy(array("valeur" => $importance['valeur'], "role" => $role));
-                        if ($newImportance == null) {
-                            $newImportance = new Importance();
-                            $newImportance->setRole($role);
-                            $newImportance->setValeur($importance['valeur']);
-                            $em->persist($newImportance);
-                        }
-                        $newComposition->addImportance($newImportance);
-                    }
-                    else
-                    {
-                        return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$importance['role']." n'existe pas"));
-                    }
-                }
-                else
-                {
-                    return new JsonResponse(array('type' => "Importance", 'erreur' => "L'importance du rôle ".$importance['role']." doit être comprise en 0 et 200, actuellement elle est à ".$importance['valeur']));
-                }
-            }
-        }
-        else
-        {
-            return new JsonResponse(array('type' => "Importance", 'erreur' => "Merci de préciser des importances pour les rôle de la composition"));
-        }
-
-        // Les roles et categories \\
-        if($composition){
-            $arrOccurences = array();
-            foreach($composition as $idRole)
-            {
-                $arrOccurences[$idRole] = $this->nombreOccurences($composition,$idRole);
-            }
-            foreach($arrOccurences as $idRole => $quantite)
-            {
-                if($idRole >= 0){
-                    $role = $repository->find($idRole);
-                    if($role != null) {
-                        $newRoleCompo = $repositoryRoleCompo->findOneBy(array("quantite" => $quantite, "role" => $role));
-                        if($newRoleCompo == null){
-                            $newRoleCompo = new RolesCompos($role,$quantite);
-                            $em->persist($newRoleCompo);
-                        }
-                        $newComposition->addRoleCompo($newRoleCompo);
-                    }
-                    else
-                    {
-                        return new JsonResponse(array('type' => "Role", 'erreur' => "Le role ".$idRole." n'existe pas"));
-                    }
-                }
-                else
-                {
-                    $categorie = $repositoryCategorie->find(-1 * $idRole);
-                    if($categorie != null) {
-                        $newCategorieCompo = $repositoryCategorieCompo->findOneBy(array("quantite" => $quantite, "categorie" => $categorie));
-                        if($newCategorieCompo == null){
-                            $newCategorieCompo = new CategorieCompo($categorie,$quantite);
-                            $em->persist($newCategorieCompo);
-                        }
-                        $newComposition->addCategorieCompo($newCategorieCompo);
-                    }
-                    else
-                    {
-                        return new JsonResponse(array('type' => "Categorie", 'erreur' => "La catégorie ".$idRole." n'existe pas"));
-                    }
-                }
-            }
-
-        }
-        else
-        {
-            return new JsonResponse(array('type' => "Role", 'erreur' => "Merci d'ajouter des rôles à la composition"));
-        }
-
-        $em->persist($newComposition);
-        $em->flush();
-
-        return new Response($this->generateUrl('vue_composition', array('id'=>$newComposition->getId())));
-
     }
 
     public function recupererNomOptionsAction()
     {
         $request = $this->get('request');
         $role = $request->get("role");
+        $idCompo = $request->get("compo");
+
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Composition');
+        $composition = $repository->find($idCompo);
 
         $resultat = OptionsRoles::getName($role);
         if(count($resultat) > 0)
@@ -252,7 +264,13 @@ class CompositionController extends Controller{
             foreach($resultat as $enumOption => $nom)
             {
                 $arrValeur = OptionsRoles::getValeursPossibles($role,$enumOption);
-                $arrFinal[$enumOption] = array('nom' => $nom, 'min'=> $arrValeur["min"], 'max' => $arrValeur["max"], 'defaut' => OptionsRoles::getOptionsDefaut($role,$enumOption));
+                $optionDansCompo = $composition->getOptionRole($enumOption);
+                if($optionDansCompo != null) {
+                    $valeur = $optionDansCompo->getValeur();
+                }else{
+                    $valeur = OptionsRoles::getOptionsDefaut($role,$enumOption);
+                }
+                $arrFinal[$enumOption] = array('nom' => $nom, 'min'=> $arrValeur["min"], 'max' => $arrValeur["max"], 'valeur' => $valeur);
             }
             $data = json_encode($arrFinal);
             return new Response($data);
@@ -274,5 +292,85 @@ class CompositionController extends Controller{
             'compositions' => $compositions
         ));
 
+    }
+
+    public function recupererValeurImportanceAction(){
+        $request = $this->get('request');
+        $idRole = $request->get("idRole");
+        $idCompo = $request->get("idCompo");
+
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Composition');
+        $composition = $repository->find($idCompo);
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Role');
+        $role = $repository->find($idRole);
+
+        if($composition != null){
+            if($composition->getCreateur() == $this->getUser() or $this->get('security.context')->isGranted('ROLE_SUPER_MODERATEUR')){
+                if($role != null){
+                    $importance = $composition->getImportanceDuRole($role);
+                    if($importance == null){
+                        $valeur = 100;
+                    }else{
+                        $valeur = $importance->getValeur();
+                    }
+                    return new JsonResponse(array('statut' => "SUCCESS",'valeur' => $valeur));
+                }else{
+                    return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_role_non_existant));
+                }
+            }else{
+                return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_createur));
+            }
+        }else{
+            return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_existant));
+        }
+    }
+    public function changerValeurImportanceAction(){
+        $request = $this->get('request');
+        $idRole = $request->get("idRole");
+        $idCompo = $request->get("idCompo");
+        $valeur = $request->get("valeur");
+
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Composition');
+        $composition = $repository->find($idCompo);
+        $repository = $this->getDoctrine()
+            ->getManager()
+            ->getRepository('MafiaRolesBundle:Role');
+        $role = $repository->find($idRole);
+        $em = $this->getDoctrine()->getManager();
+        if($composition != null){
+            if($composition->getCreateur() == $this->getUser() or $this->get('security.context')->isGranted('ROLE_SUPER_MODERATEUR')){
+                if($role != null){
+                    $importance = $composition->getImportanceDuRole($role);
+                    if($importance != null){
+                        $composition->removeImportance($importance);
+                    }
+                    $repository = $this->getDoctrine()
+                        ->getManager()
+                        ->getRepository('MafiaRolesBundle:Importance');
+                    $importance = $repository->findBy(array("role" => $role,"valeur" => $valeur));
+                    if($importance == null){
+                        $importance = new Importance($role,$valeur);
+                        $em->persist($importance);
+                    }
+
+                    $composition->addImportance($importance);
+                    $em->persist($composition);
+                    $em->flush();
+                    return new JsonResponse(array('statut' => "SUCCESS",'valeur' => $valeur));
+                }else{
+                    return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_role_non_existant));
+                }
+            }else{
+                return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_createur));
+            }
+        }else{
+            return new JsonResponse(array('statut' => "FAIL",'erreur' => \MessageEnum::ERREUR_composition_non_existant));
+        }
     }
 }

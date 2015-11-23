@@ -33,6 +33,12 @@ class Importance
      */
     private $valeur;
 
+    public function __construct(Role $role, $valeur)
+    {
+        $this->role = $role;
+        $this->valeur = $valeur;
+    }
+
     /**
      * @return Role
      */
