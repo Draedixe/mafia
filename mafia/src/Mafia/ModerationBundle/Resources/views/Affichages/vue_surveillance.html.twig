@@ -1,0 +1,31 @@
+{% extends "FOSUserBundle::layout.html.twig" %}
+
+
+{% block title %}Mafia - Surveillance {{ surveillance.intitule }}{% endblock %}
+
+
+
+{% block fos_user_content %}
+
+    <h2>{{ surveillance.intitule }} - Priorité {{ surveillance.priorite }}</h2>
+    Ouverte le {{ surveillance.debut|date('d/m/Y H:i:s') }}
+    <p>
+        Raison de la surveillance :<br/>
+        {{ surveillance.raison }}
+    </p>
+    <ul>
+        {% for user in surveillance.usersSurveilles %}
+            <li>{{ user.username }}{% if user.userCourant is not null %} - {{ user.userCourant.partie.nomPartie }}{% endif %}</li>
+        {% endfor %}
+    </ul>
+
+    <p style="color: red">{% if surveillance.termine %}Cette surveillance est terminée{% else %}Cette surveillance est encore cours{% endif %}</p>
+
+
+    {% if is_granted("ROLE_SUPER_MODERATEUR") %}
+        <label for="pseudo">Pseudo du joueur à ajouter : </label>
+            <input type="text" name="pseudo"/>
+        <button>Ajouter</button>
+    {% endif %}
+
+{% endblock %}

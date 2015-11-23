@@ -5,6 +5,7 @@
 {% block fos_user_content %}
 
     <script>
+        var compositionId = {{ composition.id }};
         var composition = [];
         var idSelectionnee;
         var nomSelectionne;
@@ -16,193 +17,14 @@
         var importances = [];
         var actionEnCours = false;
 
-        function ajoutCompo(id, nom, unique, role)
+        function changerNom()
         {
-
-            var li;
-            if(idSelectionnee) {
-                if (unique) {
-                    if (document.getElementsByClassName("elem" + id).length <= 0) {
-                        li = document.createElement("li");
-                        li.appendChild(document.createTextNode(nom));
-                        li.id = "elem" + nombreElem + id;
-                        li.className = "elem" + id;
-                        nombreElem++;
-                        li.onclick = function () {
-                            boutonEnleve(li.id, id, role);
-                        };
-                        $('#tableauCompo').append(li);
-                        composition.push(id);
-                    }
-                    else {
-                        alert("Cet élément est unique dans une composition !")
-                    }
-
+            $.post('{{ path('changer_nom_compo')}}',{id:{{ composition.id }},nom: $('#nomComposition').val()}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert(data['erreur']);
                 }
-                else {
-                    li = document.createElement("li");
-                    li.appendChild(document.createTextNode(nom));
-                    li.id = "elem" + nombreElem + id;
-                    li.className = "elem" + id;
-                    nombreElem++;
-                    li.onclick = function () {
-                        boutonEnleve(li.id, id, role);
-                    };
-                    $('#tableauCompo').append(li);
-                    composition.push(id);
-                }
-            }
-            else
-            {
-                alert("Merci de sélectionner un rôle !");
-            }
+            });
         }
-
-        function enleveCompo()
-        {
-            if(ancienSelect.indexOf("elem") > -1 )
-            {
-                $(ancienSelect).remove();
-                composition.splice($.inArray(idSelectionnee, composition),1);
-            }
-        }
-
-        function boutonEnleve(identifiantElem, id, role)
-        {
-            if(!actionEnCours)
-            {
-                var importanceTD = $("#importanceTD");
-                importanceTD.empty();
-                if(role >= 0){
-                    var label, range, div;
-                    label = document.createElement("label");
-                    label.setAttribute('for','importanceRange');
-                    label.appendChild(document.createTextNode('Importance du rôle : '));
-                    range = document.createElement("input");
-                    range.setAttribute('onchange','changementValeurImportance(' + id + ')');
-                    range.setAttribute('id','importanceRange');
-                    range.setAttribute('type', 'range');
-                    range.setAttribute('min', '0');
-                    range.setAttribute('max', '200');
-                    var valeur = valeurImportance(id);
-                    if(valeur > -1){
-                        range.setAttribute('value',valeur );
-                    }
-                    else{
-                        range.setAttribute('value', '100');
-                        importances.push({role:id,valeur: 100});
-                    }
-                    div = document.createElement("div");
-                    div.setAttribute('id','importanceValeur');
-                    div.appendChild(document.createTextNode(range.value));
-                    importanceTD.append(label).append(range).append(div);
-                    recupererOptions(role,id);
-                    $(ancienSelect).css('background-color','');
-                    idSelectionnee = id;
-                }
-                else
-                {
-                    $(ancienSelect).css('background-color','');
-                    idSelectionnee = id * -1;
-                }
-                roleSelectionne = role;
-                ancienSelect = "#"+identifiantElem;
-                $(ancienSelect).css('background-color','#00CCFF');
-            }
-            else
-            {
-                alert("Un chargement est encore en cours");
-            }
-        }
-
-        function boutonAjout(id,nom,unique,role)
-        {
-            if(!actionEnCours)
-            {
-                var importanceTD = $("#importanceTD");
-                importanceTD.empty();
-                if(role >= 0){
-                    var label, range, div;
-                    label = document.createElement("label");
-                    label.setAttribute('for','importanceRange');
-                    label.appendChild(document.createTextNode('Importance du rôle : '));
-                    range = document.createElement("input");
-                    range.setAttribute('onchange','changementValeurImportance(' + id + ')');
-                    range.setAttribute('id','importanceRange');
-                    range.setAttribute('type', 'range');
-                    range.setAttribute('min', '0');
-                    range.setAttribute('max', '200');
-                    var valeur = valeurImportance(id);
-                    if(valeur > -1){
-                        range.setAttribute('value',valeur );
-                    }
-                    else{
-                        range.setAttribute('value', '100');
-                        importances.push({role:id,valeur: 100});
-                    }
-                    div = document.createElement("div");
-                    div.setAttribute('id','importanceValeur');
-                    div.appendChild(document.createTextNode(range.value));
-                    importanceTD.append(label).append(range).append(div);
-                    recupererOptions(role,id);
-                    roleSelectionne = role;
-                    $(ancienSelect).css('background-color','');
-                    ancienSelect = "#role" + id;
-                    idSelectionnee = id;
-                }
-                else
-                {
-                    $(ancienSelect).css('background-color','');
-                    ancienSelect = "#categorie" + id;
-                    idSelectionnee = id * -1;
-                }
-                nomSelectionne = nom;
-                uniqueSelectionne = unique;
-                $(ancienSelect).css('background-color','#00CCFF');
-
-            }
-            else
-            {
-                alert("Un chargement est encore en cours");
-            }
-        }
-
-        function validerCompo()
-        {
-            if(!actionEnCours) {
-                if(composition.length > 0)
-                {
-                    actionEnCours=true;
-                    $.post('{{ path('ajout_compo')}}', {
-                        composition: composition,
-                        options: options,
-                        nom: $('#nomComposition').val(),
-                        importances: importances
-                    }, function (data) {
-                        actionEnCours = false;
-                        if(data == "FAIL"){
-                            alert("Composition invalide, merci de ne pas inventer d'options, rôles ou de respecter l'échelle d'importance");
-                        }
-                        else if(data['type'] != null){
-                            alert(data['erreur']);
-                        }
-                        else
-                        {
-                            document.location.href = data;
-                        }
-                    });
-                }
-                else
-                {
-                    alert("Composition vide, merci d'ajouter des rôles");
-                }
-            }
-            else
-            {
-                alert("Un chargement est encore en cours");
-            }
-        }
-
         function recupererOptions(role,id)
         {
             actionEnCours = true;
@@ -210,12 +32,11 @@
             $.ajax({
                 type: "POST",
                 url : "{{ path('recuperer_noms_options')}}",
-                data: {role: role},
+                data: {role: role,compo: compositionId},
                 dataType : "json",
                 error: function()
                 {
                     actionEnCours = false;
-
                 },
                 success : function(data)
                 {
@@ -223,26 +44,23 @@
                     {
                         actionEnCours = false;
                     }
-                    else
-                    {
-
+                    else{
                         var min;
                         var max;
-                        var defaut;
+                        var valeur;
                         var p;
                         var valeurPoss;
                         var radio, label;
                         for(var option in data)
                         {
-
                             min = data[option]["min"];
                             max = data[option]['max'];
-                            defaut = data[option]['defaut'];
+                            defaut = data[option]['valeur'];
                             p = document.createElement("p");
                             p.appendChild(document.createTextNode(data[option]["nom"]));
                             p.id = "option" + option;
                             p.className = "options";
-                            for(var j = min; j < max+1 ; j ++)
+                            for(var j = min; j <= max ; j ++)
                             {
                                 label = document.createElement("label");
                                 label.setAttribute('for','option' + option + 'val' + j);
@@ -253,10 +71,9 @@
                                 radio.setAttribute('type', 'radio');
                                 radio.setAttribute('name', 'option' + option);
                                 radio.setAttribute('value', j);
-                                valeurPoss = valeurOption(id,option);
-                                if(valeurPoss > -1)
+                                if(valeur > -1)
                                 {
-                                    if(j == valeurPoss)
+                                    if(j == valeur)
                                     {
                                         radio.setAttribute('checked', 'true');
                                     }
@@ -276,80 +93,115 @@
                 }
             });
         }
-
-
-
-        function valeurOption(role,option)
+        function boutonAjout(id,nom,unique,role)
         {
-            for(var i in options)
+            if(!actionEnCours)
             {
-                if(options[i]['role'] == role && options[i]['option'] == option)
-                {
-                    return options[i]['valeur'];
-                }
-            }
-            return -1;
-        }
+                if(role >= 0){
+                    idSelectionnee = id;
+                    $(ancienSelect).css('background-color','');
+                    roleSelectionne = role;
+                    ancienSelect = "#role" + id;
+                    valeurImportance();
+                    recupererOptions(role,id);
 
-        function valeurImportance(role)
-        {
-            for(var i in importances)
-            {
-                if(importances[i]['role'] == role)
-                {
-                    return importances[i]['valeur'];
                 }
-            }
-            return -1;
-        }
+                else
+                {
+                    $(ancienSelect).css('background-color','');
+                    ancienSelect = "#categorie" + id;
+                    idSelectionnee = id * -1;
+                }
+                nomSelectionne = nom;
+                uniqueSelectionne = unique;
+                $(ancienSelect).css('background-color','#00CCFF');
 
-        function changementValeurImportance(role)
-        {
-            var valeur = $('#importanceRange').val();
-            if(valeurImportance(role) > -1)
-            {
-                for(var i in importances)
-                {
-                    if(importances[i]['role'] == role)
-                    {
-                        importances[i]['valeur'] = valeur;
-                    }
-                }
             }
             else
             {
-                importances.push({role:role,valeur: valeur});
+                alert("Un chargement est encore en cours");
             }
-            $("#importanceValeur").text(valeur);
         }
 
-        function changementValeurOption(role,option,valeur)
+
+        function valeurImportance()
         {
-            if(valeurOption(role,option) > -1)
-            {
-                for(var i in options)
-                {
-                    if(options[i]['role'] == role && options[i]['option'] == option)
-                    {
-                        options[i]['valeur'] = valeur;
-                    }
+            $.post('{{ path('recuperer_valeur_importance')}}',{idCompo:{{ composition.id }},idRole:idSelectionnee}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert(data['erreur']);
+                    creationRange(-1)
+                }else{
+                    creationRange(data['valeur']);
+
                 }
-            }
-            else
-            {
-                options.push({role:role,option:option,valeur:valeur});
-            }
+            });
         }
 
+        function creationRange(valeur){
+            var importanceTD = $("#importanceTD");
+            importanceTD.empty();
+            var label, range, div;
+            label = document.createElement("label");
+            label.setAttribute('for','importanceRange');
+            label.appendChild(document.createTextNode('Importance du rôle : '));
+            range = document.createElement("input");
+            range.setAttribute('onchange','changementValeurImportance()');
+            range.setAttribute('id','importanceRange');
+            range.setAttribute('type', 'range');
+            range.setAttribute('min', '0');
+            range.setAttribute('max', '200');
+            if(valeur > -1 && valeur <= 200){
+                range.setAttribute('value',valeur );
+            }
+            else{
+                range.setAttribute('value', '100');
+            }
+            div = document.createElement("div");
+            div.setAttribute('id','importanceValeur');
+            div.appendChild(document.createTextNode(range.value));
+            importanceTD.append(label).append(range).append(div);
+        }
+
+        function changementValeurImportance(){
+            $.post('{{ path('changer_valeur_importance')}}',{idCompo:{{ composition.id }},idRole:idSelectionnee,valeur:$('#importanceRange').val()}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert(data['erreur']);
+                }else{
+
+                }
+            });
+        }
+
+        function ajoutCompo(role){
+
+            $.post('{{ path('ajout_role_compo')}}',{idCompo:{{ composition.id }},idRole:role}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert(data['erreur']);
+                }
+            });
+        }
+
+        function changementValeurOption(role,option,valeur){
+            $.post('{{ path('change_valeur_option')}}',{idCompo:{{ composition.id }},idRole:role,valeur:valeur,enumOption:option}, function (data) {
+                if(data['statut'] == "FAIL"){
+                    alert(data['erreur']);
+                }else{
+
+                }
+            });
+        }
     </script>
+
     <h3>Création d'une composition</h3>
 
     <p>
         <label for="nomComposition">Nom de la composition :</label><input type="text" id="nomComposition">
+        <button onclick="changerNom();">Changer</button>
     </p>
-    <div style="display: table;width: 80%">
-        <div style="display:table-row">
-            <div style="display:table-cell">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
                 <h4 style="display: inline-block">Ville</h4>
                 <ul>
                     {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::VILLE') %}
@@ -357,7 +209,7 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div style="display:table-cell">
+            <div class="col-md-2">
                 <h4>Mafia</h4>
                 <ul>
                     {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::MAFIA') %}
@@ -365,7 +217,15 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div style="display:table-cell">
+            <div class="col-md-2">
+                <h4>Triade</h4>
+                <ul>
+                    {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::TRIADE') %}
+                        <li id="{{ "role" ~ role.id }}" onclick="boutonAjout({{ role.id }},'{{ role.nomRole }}',{{ role.roleUnique ? 1 : 0 }},{{ role.enumRole }});">{{ role.nomRole }}  </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-2">
                 <h4>Neutre</h4>
                 <ul>
                     {% for role in roles if role.enumFaction == constant('Mafia\\RolesBundle\\Entity\\FactionEnum::NEUTRE') %}
@@ -373,7 +233,7 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div style="display:table-cell">
+            <div class="col-md-4">
                 <h4>Catégorie</h4>
                 <ul>
                     {% for categorie in categories %}
@@ -382,25 +242,31 @@
                 </ul>
             </div>
         </div>
-        <hr width="80%">
-        <div style="display:table-row">
-            <div style="display:table-cell" id="importanceTD"></div>
-            <div style="display:table-cell">
-                <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne, roleSelectionne);"  >></button>
-                <button id="boutonEnleve" onclick="enleveCompo(idSelectionnee,nomSelectionne,uniqueSelectionne,roleSelectionne);"  ><</button>
-            </div>
-            <div style="display:table-cell;border: 1px #296cff solid" id="optionsRole">
 
+        <div class="row" style="padding: 10px">
+            <div class="col-md-4" id="importanceTD"></div>
+            <div class="col-md-4">
+                <button id="boutonAjout" onclick="ajoutCompo(idSelectionnee,nomSelectionne,uniqueSelectionne, roleSelectionne);"  >\/</button>
+                <button id="boutonEnleve" onclick="enleveCompo(idSelectionnee,nomSelectionne,uniqueSelectionne,roleSelectionne);"  >/\</button>
+            </div>
+            <div class="col-md-4" style="border: 1px #296cff solid" id="optionsRole">
             </div>
         </div>
-        <hr width="80%">
-        <div style="display:table-row">
-            <ul style="display:table-cell;border:solid 2px darkred" id="tableauCompo">
+
+        <div class="row" style="padding: 10px">
+            <ul style=";border:solid 2px darkred" id="tableauCompo">
 
             </ul>
         </div>
+        <div class="row">
+            <div class="col-md-5"></div>
+            <div class="col-md-2">
+                <button onclick="validerCompo();">
+                    Valider
+                </button>
+            </div>
+            <div class="col-md-5"></div>
+        </div>
     </div>
-    <button onclick="validerCompo();">
-        Valider
-    </button>
+
 {% endblock %}

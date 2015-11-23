@@ -25,8 +25,20 @@ class ModerationController extends Controller
 
         $derniersBans = array_slice($bans,0,regroupementVariable::NB_DERNIERS_BANS);
 
+        $qbSurv = $em->createQueryBuilder();
+
+        $qbSurv->select('s')
+            ->from('Mafia\ModerationBundle\Entity\Surveillance', 's')
+            ->where('s.termine = false')
+            ->orderBy('s.priorite','ASC');
+
+        $querySurv = $qbSurv->getQuery();
+
+        $surveillances = $querySurv->getResult();
+
         return $this->render('MafiaModerationBundle:Affichages:tableau_moderation.html.twig', array(
-            'derniersBans' => $derniersBans
+            'derniersBans' => $derniersBans,
+            'surveillances' => $surveillances
         ));
     }
     public function tableauAdministrationAction(){
@@ -34,7 +46,7 @@ class ModerationController extends Controller
         $formBuilder = $this->createFormBuilder();
         $formBuilder->add('pseudo', 'text', array('label' => 'Pseudo du joueur'))
                     ->add('role', 'choice', array(
-                        'choices' => array('USER' => 'Utilisateur', 'ROLE_MODERATEUR' => 'Modérateur', 'ROLE_ADMIN' => 'Administrateur'),
+                        'choices' => array('USER' => 'Utilisateur', 'ROLE_MODERATEUR' => 'Modérateur','ROLE_SUPER_MODERATEUR' => 'Super Modérateur', 'ROLE_ADMIN' => 'Administrateur'),
                         'multiple' => false
                     ));
 

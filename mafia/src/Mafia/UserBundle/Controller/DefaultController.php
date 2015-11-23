@@ -43,7 +43,9 @@ class DefaultController extends Controller
 
                     $bannissement->setUserBanni($user);
 
+                    $user->addRole("ROLE_BANNI");
                     $em = $this->getDoctrine()->getManager();
+                    $em->persist($user);
                     $em->persist($bannissement);
                     $em->flush();
                     return $this->redirect($this->generateUrl('tableau_moderation', array()));

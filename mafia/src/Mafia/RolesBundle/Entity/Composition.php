@@ -4,6 +4,7 @@ namespace Mafia\RolesBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mafia\UserBundle\Entity\User;
 
 /**
  * Composition
@@ -59,6 +60,11 @@ class Composition
      * @ORM\JoinTable(name="categories_compo")
      */
     private $categoriesCompo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mafia\UserBundle\Entity\User")
+     */
+    private $createur;
 
     /**
      * Get id
@@ -151,6 +157,19 @@ class Composition
     }
 
     /**
+     * @param $enumOption
+     * @return OptionRole
+     */
+    public function getOptionRole($enumOption){
+        foreach($this->optionsRoles as $optionRole){
+            if($optionRole->getEnumOption() == $enumOption){
+                return $optionRole;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param Importance $importance
      */
     public function addImportance(Importance $importance)
@@ -177,6 +196,22 @@ class Composition
     }
 
     /**
+     *
+     * @param Role $role
+     * @return Importance
+     */
+    public function getImportanceDuRole(Role $role)
+    {
+        foreach($this->importances as $importance){
+            if($importance->getRole() == $role){
+                return $importance;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * @param RolesCompos $roleCompo
      */
     public function addRoleCompo(RolesCompos $roleCompo)
@@ -190,6 +225,31 @@ class Composition
     public function removeRoleCompo(RolesCompos $roleCompo)
     {
         $this->rolesCompo->removeElement($roleCompo);
+    }
+    /**
+     * @param Role $role
+     * @return boolean
+     */
+    public function isDansCompo(Role $role){
+        foreach($this->rolesCompo as $roleCompo){
+            if($roleCompo->getRole() == $role){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param Role $role
+     * @return RolesCompos
+     */
+    public function getRoleCompo(Role $role){
+        foreach($this->rolesCompo as $roleCompo){
+            if($roleCompo->getRole() == $role){
+                return $roleCompo;
+            }
+        }
+        return null;
     }
 
     /**
@@ -227,4 +287,22 @@ class Composition
     {
         return $this->categoriesCompo;
     }
+
+    /**
+     * @return User
+     */
+    public function getCreateur()
+    {
+        return $this->createur;
+    }
+
+    /**
+     * @param User $createur
+     */
+    public function setCreateur(User $createur)
+    {
+        $this->createur = $createur;
+    }
+
+
 }

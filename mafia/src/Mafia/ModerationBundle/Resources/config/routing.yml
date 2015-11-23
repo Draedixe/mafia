@@ -25,3 +25,11 @@ bannissements_user:
 bannissements:
     path:     /moderation/bans/tout/{page}
     defaults: { _controller: MafiaModerationBundle:Bannissement:listeBannissements, page:1 }
+
+creation_surveillance:
+    path:     /super_moderation/surveillance/creation
+    defaults: { _controller: MafiaModerationBundle:Surveillance:creationSurveillance }
+
+vue_surveillance:
+    path:     /moderation/surveillance/vue/{id}
+    defaults: { _controller: MafiaModerationBundle:Surveillance:affichageSurveillance,id:1 }

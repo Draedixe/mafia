@@ -232,7 +232,7 @@ abstract class OptionsRoles {
             OptionsRolesEnum::MARIONETTISTE_VICTIME_SAIT_CONTROLE => 1,
             OptionsRolesEnum::MARIONETTISTE_TRANSFORME_SORCIER_SI_CONVERTI => 1
         ),
-        RolesEnum::SORCIER => array(
+        RolesEnum::GOUROU => array(
             OptionsRolesEnum::SORCIER_LIMITE_SAUVETAGE => 2,
             OptionsRolesEnum::SORCIER_NUIT_ECART_ENTRE_SAUVETAGE => 0
         )
@@ -569,7 +569,7 @@ abstract class OptionsRoles {
                     OptionsRolesEnum::MARIONETTISTE_TRANSFORME_SORCIER_SI_CONVERTI => "Se transforme en sorcier quand converti"
                 );
                 break;
-            case RolesEnum::SORCIER :
+            case RolesEnum::GOUROU :
                 return array(
                     OptionsRolesEnum::SORCIER_LIMITE_SAUVETAGE => "Limite de sauvetages",
                     OptionsRolesEnum::SORCIER_NUIT_ECART_ENTRE_SAUVETAGE => "Nombre de nuits entre 2 sauvetages"
@@ -646,7 +646,7 @@ abstract class OptionsRoles {
             case RolesEnum::SURVIVANT :
                 if ($option == OptionsRolesEnum::SURVIVANT_NOMBRE_GILET_PARE_BALLE) $resultat = array("min" => 0, "max" => 4);
                 break;
-            case RolesEnum::SORCIER :
+            case RolesEnum::GOUROU :
                 if ($option == OptionsRolesEnum::SORCIER_LIMITE_SAUVETAGE) $resultat = array("min" => 2, "max" => 3);
                 break;
 

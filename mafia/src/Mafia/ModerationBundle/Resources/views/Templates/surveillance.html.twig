@@ -1,0 +1,13 @@
+<fieldset class="surveillance">
+    <label><a href="{{ path('vue_surveillance',{id:surveillance.id}) }}">{{ surveillance.intitule }} - Priorité {{ surveillance.priorite }}</a></label><br/>
+    Ouverte le {{ surveillance.debut|date('d/m/Y H:i:s') }}<br/>
+    Raison de la surveillance :<br/>
+    <div>
+        {{ surveillance.raison }}
+    </div>
+    <ul>
+        {% for user in surveillance.usersSurveilles %}
+            <li>{{ user.username }}{% if user.userCourant is not null %} - {{ user.userCourant.partie.nomPartie }}{% endif %}</li>
+        {% endfor %}
+    </ul>
+</fieldset>
