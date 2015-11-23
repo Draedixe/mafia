@@ -132,6 +132,14 @@ class Partie
      */
     private $accuse;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $numJour;
+
+
     function __construct()
     {
         $this->nombreJoueursMax = 15;
@@ -139,6 +147,23 @@ class Partie
         $this->dureePhase=0.2;
         $this->tempsJourRestant=0;
         $this->traitementAubeEnCours = false;
+        $this->numJour = 1;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumJour()
+    {
+        return $this->numJour;
+    }
+
+    /**
+     * @param int $numJour
+     */
+    public function setNumJour($numJour)
+    {
+        $this->numJour = $numJour;
     }
 
     /**

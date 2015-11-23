@@ -140,22 +140,6 @@ class PartieController extends Controller{
                 $nombreParties = count($partiesEnAttentes);
                 //Si il n'existe pas de partie joignable on la crée
                 if ($nombreParties <= 0) {
-                    $partieChoisie = new Partie();
-                    $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
-                    $partieChoisie->setPhaseEnCours(PhaseJeuEnum::JOUR);
-                    $partieChoisie->setDureePhase(1);
-                    $partieChoisie->setTempsJourRestant(1);
-                    $partieChoisie->setDebutPhase(new \DateTime());
-                    $partieChoisie->setCommencee(false);
-                    $partieChoisie->setTerminee(false);
-                    $partieChoisie->setMaireAnnonce(false);
-                    $partieChoisie->setTypePartie($type);
-                    //3 joueurs pour la compo de test
-                    if (strcmp($type, "test") == 0) {
-                        $partieChoisie->setNombreJoueursMax(3);
-                    }
-
-
                     $allParam = $repositoryParam->findAll();
                     if (count($allParam) == 0) {
                         $param = new Parametres();
@@ -167,7 +151,21 @@ class PartieController extends Controller{
                         $param = $allParam[0];
                     }
 
+                    $partieChoisie = new Partie();
                     $partieChoisie->setParametres($param);
+                    $partieChoisie->setNomPartie("Partie de " . $this->getUser()->getUsername());
+                    $partieChoisie->setPhaseEnCours($param->getDebutDuJeu());
+                    $partieChoisie->setDureePhase(1);
+                    $partieChoisie->setTempsJourRestant(1);
+                    $partieChoisie->setDebutPhase(new \DateTime());
+                    $partieChoisie->setCommencee(false);
+                    $partieChoisie->setTerminee(false);
+                    $partieChoisie->setMaireAnnonce(false);
+                    $partieChoisie->setTypePartie($type);
+                    //3 joueurs pour la compo de test
+                    if (strcmp($type, "test") == 0) {
+                        $partieChoisie->setNombreJoueursMax(3);
+                    }
 
                     $repositoryRoles = $this->getDoctrine()
                         ->getManager()
@@ -182,7 +180,7 @@ class PartieController extends Controller{
                     }
 
                     $partieChoisie->setComposition($compo);
-                    $partieChoisie->setPhaseEnCours(0);
+
                     //Création du chat
                     $chat = new Chat();
                     $em->persist($chat);

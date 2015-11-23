@@ -92,6 +92,12 @@ demande_info_discussion:
     requirements:
       _method: POST
 
+demande_info_jour_sans_vote:
+    path: /jeu/jour_sans_vote
+    defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsJourSansVote }
+    requirements:
+      _method: POST
+
 demande_info_tribunal_defense:
     path: /jeu/tribunal/defense
     defaults: { _controller: MafiaPartieBundle:Jeu:recevoirInformationsTribunalDefense }

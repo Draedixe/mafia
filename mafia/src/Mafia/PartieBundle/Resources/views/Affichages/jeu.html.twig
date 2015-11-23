@@ -14,7 +14,7 @@
         setInterval( function(){
             timer();
         }, 1000);
-
+        var numJour = {{ numJour }};
         var enumRole = {{ monRole.roleEnum }};
         var enVieId = [];
         var enViePseudo = [];
@@ -246,7 +246,8 @@
                             afficherMessage(data['messages']);
                             joueursRoles = data['joueursRoles'];
                             joueursVivant = data['joueursVivants'];
-
+                            $('#numJour').html(data['numJour']);
+                            numJour = data['numJour'];
 
                             cacherBoutonsVotes();
                             phase = data["phase"];
@@ -294,6 +295,25 @@
                         }
                         else {
                             joueursVivant = data['joueursVivants'];
+                            afficherMessage(data['messages']);
+
+                            cacherBoutonsVotes();
+                            phase = data["phase"];
+                            recupDuree(exPhase);
+                        }
+                        lock = false;
+                    });
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR_SANS_VOTE') }}) {
+                    var premierID = $('#chat_ig div:last').attr('id'); // on récupère l'id le plus récent
+                    if (premierID == undefined) {
+                        premierID = 0;
+                    }
+                    $.post('{{ path('demande_info_jour_sans_vote')}}', {premierid: premierID}, function (data) {
+                        if (data['statut'] == "FAIL") {
+                            $('#chat_ig').append("<div id='"+ $('#chat_ig div:last').attr('id') +"' ><b>Erreur</b></div>");
+                        }
+                        else {
                             afficherMessage(data['messages']);
 
                             cacherBoutonsVotes();
@@ -459,6 +479,7 @@
             {
                 if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::AUBE') }}) {
                     $('#phaseEnCours').text("Aube");
+                    $('#numJour').html(numJour+1);
                     cacherBoutonsVotes();
                     majMorts();
                 }
@@ -476,6 +497,13 @@
                 }
                 else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::DISCUSSION') }}) {
                     $('#phaseEnCours').text("Discussion");
+
+                    cacherBoutonsVotes();
+
+                    majMorts();
+                }
+                else if (phase == {{ constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR_SANS_VOTE') }}) {
+                    $('#phaseEnCours').text("1er Jour");
 
                     cacherBoutonsVotes();
 
@@ -714,8 +742,11 @@
                         Résultat des votes
                     {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::FIN_DE_PARTIE') %}
                         Fin de la partie
+                    {% elseif partie.phaseEnCours == constant('Mafia\\PartieBundle\\Entity\\PhaseJeuEnum::JOUR_SANS_VOTE') %}
+                        Jour
                     {% endif %}
                 </span>
+                n°<span id="numJour">{{ numJour }}</span>
             </div>
             <div id="votes">
                 <table class="panneauJoueurs">

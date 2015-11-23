@@ -109,7 +109,8 @@ class JeuController extends FunctionsController{
                         "monRole" => $monRoleData,
                         "monId" => $monId,
                         "votePour" => $votePour,
-                        "idAccuse" => $idAccuse
+                        "idAccuse" => $idAccuse,
+                        "numJour" => $partie->getNumJour()
                     )
                 );
             } else {
@@ -177,9 +178,11 @@ class JeuController extends FunctionsController{
                     }
                 }
                 if ($phase == PhaseJeuEnum::NUIT) {
-                    return new JsonResponse(array("cibleId"=>$cibleId, "capaciteRestante" => $nbCapacite, "enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("cibleId"=>$cibleId, "capaciteRestante" => $nbCapacite, "enViePseudo"=>$enViePseudo,
+                        "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "SUCCESS", 'phase' => $phase));
                 } else {
-                    return new JsonResponse(array("cibleId"=>$cibleId, "capaciteRestante" => $nbCapacite, "enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("cibleId"=>$cibleId, "capaciteRestante" => $nbCapacite, "enViePseudo"=>$enViePseudo,
+                        "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants,"messages" => $messages, "statut" => "CHANGEMENT", 'phase' => $phase));
                 }
 
             }
@@ -221,8 +224,8 @@ class JeuController extends FunctionsController{
                 $id = $request->get('premierid');
                 $messages = $this->recevoirTousMessages($user,$id);
                 $phase = $this->verifPhase();
-
-                $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
+                $partie = $user->getPartie();
+                $usersPartieTous = $repositoryUser->findBy(array("partie" => $partie));
                 $joueursVivants = array();
                 $joueursRoles = array();
                 $enVieId = array();
@@ -238,9 +241,11 @@ class JeuController extends FunctionsController{
                     }
                 }
                 if ($phase == PhaseJeuEnum::AUBE) {
-                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
+                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles,
+                        "joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase, "numJour" => $partie->getNumJour()));
                 } else {
-                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles, "joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
+                    return new JsonResponse(array("enViePseudo"=>$enViePseudo, "enVieId" => $enVieId, "joueursRoles"=>$joueursRoles,
+                        "joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase, "numJour" => $partie->getNumJour()));
                 }
 
             }
@@ -249,6 +254,36 @@ class JeuController extends FunctionsController{
     }
 
     public function recevoirInformationsDiscussionAction()
+    {
+        $userGlobal = $this->getUser();
+        if($userGlobal != null) {
+            $user = $userGlobal->getUserCourant();
+            if ($user != null) {
+                $repositoryUser = $this->getDoctrine()
+                    ->getManager()
+                    ->getRepository('MafiaPartieBundle:UserPartie');
+
+                $request = $this->container->get('request');
+                $id = $request->get('premierid');
+                $messages = $this->recevoirTousMessages($user,$id);
+                $phase = $this->verifPhase();
+                $usersPartieTous = $repositoryUser->findBy(array("partie" => $user->getPartie()));
+                $joueursVivants = array();
+                foreach ($usersPartieTous as $userEnVie) {
+                    $joueursVivants[] = $userEnVie->getVivant();
+                }
+                if ($phase == PhaseJeuEnum::DISCUSSION) {
+                    return new JsonResponse(array("joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "SUCCESS", 'phase' => $phase));
+                } else {
+                    return new JsonResponse(array("joueursVivants"=>$joueursVivants, "messages" => $messages,"statut" => "CHANGEMENT", 'phase' => $phase));
+                }
+
+            }
+        }
+        return new JsonResponse(array("statut" => "FAIL"));
+    }
+
+    public function recevoirInformationsJourSansVoteAction()
     {
         $userGlobal = $this->getUser();
         if($userGlobal != null) {
