@@ -355,7 +355,9 @@ class CompositionController extends Controller{
                         ->getRepository('MafiaRolesBundle:Importance');
                     $importance = $repository->findBy(array("role" => $role,"valeur" => $valeur));
                     if($importance == null){
-                        $importance = new Importance($role,$valeur);
+                        $importance = new Importance();
+                        $importance->setValeur($valeur);
+                        $importance->setRole($role);
                         $em->persist($importance);
                     }
 
